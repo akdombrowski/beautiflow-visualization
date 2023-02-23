@@ -241,6 +241,25 @@ export const createCytoscapeGraph = (flowJSON) => {
   }
 };
 
+export const createCytoscapeGraphForViz = (flowJSON, containerID) => {
+  try {
+    const elementsCopy = getCopyOfElementsObj(flowJSON);
+    const containerEl = document.getElementById(containerID);
+
+    const cy = cytoscape({
+      container: containerEl,
+      elements: elementsCopy,
+      layout: { name: "preset" },
+      headless: false,
+      styleEnabled: true,
+    });
+
+    return cy;
+  } catch (e) {
+    throw new Error("Could not create cytoscape graph.", { cause: e });
+  }
+};
+
 export const createCytoscapeGraphFromEles = async (elements) => {
   try {
     const cy = cytoscape({
