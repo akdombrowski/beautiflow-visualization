@@ -811,7 +811,7 @@ export const spaceHorizontallyWithAnimation = async (
 
   console.log(cy.getElementById("bviv3cclyg").json());
 
-  const cyBeforeRepositioning = createCytoscapeGraphFromEles(
+  const cyBeforeRepositioning = await createCytoscapeGraphFromEles(
     cy.$("*").clone().jsons()
   );
   const nodes = cy.nodes();
@@ -850,12 +850,28 @@ export const spaceHorizontallyWithAnimation = async (
   const rootsArr = roots.toArray();
   const rootsArr1 = rootsArr.slice(0, 1);
 
+  console.log("roots");
+  console.log(roots.jsons());
   console.log("animating roots");
-  roots.animate({
-    position: { x: 100, y: 100 },
-    style: { background: "red" },
-    duration: 2000,
-  });
+  const dur = 5000;
+  await Promise.all(
+    roots.map((ele, i, eles) => {
+      return new Promise((resolve, reject) => {
+        ele.animate(
+          {
+            style: { backgroundColor: "red" },
+          },
+          {
+            duration: dur,
+          }
+        );
+
+        // await eles.pon("style");
+      });
+    })
+  );
+
+  await cy.pon("style");
 
   const rows = [];
   const rowNum = 0;
@@ -863,23 +879,52 @@ export const spaceHorizontallyWithAnimation = async (
   let currRowPosY = 160;
   let nextRowYAdd = 240;
   roots.forEach((ele, i, eles) => {
-    // if (i === 2) {
-    // rootsArr1.forEach((ele, i, eles) => {
     cy.$("*").breadthFirstSearch({
       root: ele,
-      visit: (v, edge, prev, j, depth) => {
-        console.log("edge"); // we're getting null here
-        console.log(edge.id());
+      visit: async (v, edge, prev, j, depth) => {
+        if (prev) {
+          const prevPos = prev.position();
+          prev.animate(
+            {
+              // position: prevPos,
+              style: { backgroundColor: "green" },
+            },
+            {
+              duration: dur,
+            }
+          );
+          // .delay(dur * (i + 1));
+        }
+
+        // await cy.pon("style");
+
+        console.log("edge");
+        console.log(edge?.id());
         console.log("v");
         console.log(v.id());
-        cy.$("node#" + v.id()).animate({
-          style: { background: "yellow" },
-          duration: 1000,
-        });
-        cy.$("node#" + prev.id()).animate({
-          style: { background: "green" },
-          duration: 1000,
-        });
+        const vPos = v.position();
+        v.animate(
+          {
+            // position: vPos,
+            style: { backgroundColor: "yellow" },
+          },
+          {
+            duration: dur,
+          }
+        );
+        // .delay(dur * (i + 1));
+        v.animate(
+          {
+            // position: vPos,
+            style: { backgroundColor: "white" },
+          },
+          {
+            duration: dur,
+          }
+        );
+
+        await cy.pon("style");
+
         if (roots.getElementById(v.id())) {
           currRowPosY += nextRowYAdd;
           v.position({ x: rowStartPosX, y: currRowPosY });
@@ -892,9 +937,9 @@ export const spaceHorizontallyWithAnimation = async (
           const prevNodePosY = prev.position("y");
           const currNodePosY = v.position("y");
           const nextPosX = prevNodePosX + spacing;
-
-          v.position("x", nextPosX);
-
+          //
+          // v.position("x", nextPosX);
+          //
           if (v.id() === "bviv3cclyg") {
             console.log();
             console.log();
@@ -924,8 +969,8 @@ export const spaceHorizontallyWithAnimation = async (
               (currNodePosY - prevNodeOgPosY) / verticalTolerance
             );
             const nextPosY = (currRowPosY + 240) * numberOfRowsBelow;
-            v.position("y", nextPosY);
-
+            // v.position("y", nextPosY);
+            //
             if (v.id() === "bviv3cclyg") {
               console.log("verticalTolerance");
               console.log(verticalTolerance);
@@ -935,7 +980,7 @@ export const spaceHorizontallyWithAnimation = async (
               console.log();
             }
           } else {
-            v.position("y", currRowPosY);
+            // v.position("y", currRowPosY);
           }
         }
       },
