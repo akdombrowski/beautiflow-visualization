@@ -1,5 +1,5 @@
 import cytoscape from "cytoscape";
-import { readFileSync, writeFileSync } from "fs";
+// import { readFileSync, writeFileSync } from "fs";
 
 export const convertStrToJSON = (str) => {
   try {
@@ -9,7 +9,29 @@ export const convertStrToJSON = (str) => {
   }
 };
 
-export const readFlowJSONFile = async (filename) => {
+// export const readFlowJSONFile = async (filename) => {
+//   console.log("Reading flow json from file... ", filename);
+//   if (!filename.endsWith(".json")) {
+//     const errMsg = "Must use a JSON file (filename ends with .json).";
+//     console.error(errMsg);
+//     throw new Error(errMsg);
+//   }
+
+//   let data = await readFileSync(filename, "utf8", (err, data) => {
+//     if (err) {
+//       console.error(err);
+//       throw new Error("Couldn't read file contents", { cause: err });
+//     }
+
+//     return data;
+//   });
+
+//   const flowJSON = convertStrToJSON(data);
+
+//   return flowJSON;
+// };
+
+export const readFlowJSONFileWithFileReader = async (filename) => {
   console.log("Reading flow json from file... ", filename);
   if (!filename.endsWith(".json")) {
     const errMsg = "Must use a JSON file (filename ends with .json).";
@@ -17,18 +39,18 @@ export const readFlowJSONFile = async (filename) => {
     throw new Error(errMsg);
   }
 
-  let data = await readFileSync(filename, "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-      throw new Error("Couldn't read file contents", { cause: err });
-    }
-
-    return data;
+  const blob = new Blob(new Array());
+  const reader = new FileReader();
+  const data = new File(blob, filename, {
+    type: "text/plain",
   });
+  reader.onload = (evt) => {
+    console.log(evt.target.result);
+    const flowJSON = convertStrToJSON(text);
+    return flowJSON;
+  };
 
-  const flowJSON = convertStrToJSON(data);
-
-  return flowJSON;
+  const text = reader.readAsText(data);
 };
 
 export const getGraphData = (flowJSON) => {
@@ -69,7 +91,9 @@ export const getEdges = (flowJSON) => {
 
 export const getCopyOfElementsObj = (flowJSON) => {
   try {
-    return JSON.parse(JSON.stringify(getElements(flowJSON)));
+    const elementsCopy = JSON.parse(JSON.stringify(getElements(flowJSON)));
+    console.log(elementsCopy);
+    return elementsCopy;
   } catch (e) {
     throw new Error("Could not get a copy of elements.", { cause: e });
   }
@@ -213,23 +237,16 @@ export const createPosMapping = (flowJSON) => {
 
 export const createCytoscapeGraph = (flowJSON) => {
   try {
-    const elementsCopy = getCopyOfElementsObj(flowJSON);
-    const posMapping = createPosMapping(flowJSON);
+    let parsedJSONFlow;
+    try {
+      parsedJSONFlow = convertStrToJSON(flowJSON);
+    } catch (e) {
+      parsedJSONFlow = flowJSON;
+    }
+    const elementsCopy = getCopyOfElementsObj(parsedJSONFlow);
 
     const cy = cytoscape({
       elements: elementsCopy,
-      // positions: posMapping,
-      // elements: () =>
-      //   new Promise((resolve, reject) => {
-      //     const elementsCopy = getCopyOfElementsObj(flowJSON);
-      //     console.log("elementsCopy.nodes.length");
-      //     console.log(elementsCopy.nodes.length);
-      //     if (!elementsCopy || Object.values(elementsCopy).length === 0) {
-      //       reject("No elements were found.");
-      //     } else {
-      //       resolve(elementsCopy);
-      //     }
-      //   }),
       layout: { name: "preset" },
       headless: true,
       styleEnabled: false,
@@ -243,8 +260,17 @@ export const createCytoscapeGraph = (flowJSON) => {
 
 export const createCytoscapeGraphForViz = (flowJSON, containerID) => {
   try {
-    const elementsCopy = getCopyOfElementsObj(flowJSON);
+    let parsedJSONFlow;
+    try {
+      parsedJSONFlow = convertStrToJSON(flowJSON);
+    } catch (e) {
+      parsedJSONFlow = flowJSON;
+    }
+
+    const elementsCopy = getCopyOfElementsObj(parsedJSONFlow);
     const containerEl = document.getElementById(containerID);
+
+    console.log(elementsCopy.jsons());
 
     const cy = cytoscape({
       container: containerEl,
@@ -252,6 +278,27 @@ export const createCytoscapeGraphForViz = (flowJSON, containerID) => {
       layout: { name: "preset" },
       headless: false,
       styleEnabled: true,
+      style: [
+        // the stylesheet for the graph
+        {
+          selector: "node",
+          style: {
+            "background-color": "#000",
+            label: "data(id)",
+          },
+        },
+
+        {
+          selector: "edge",
+          style: {
+            width: 3,
+            "line-color": "#ccc",
+            "target-arrow-color": "#ccc",
+            "target-arrow-shape": "triangle",
+            "curve-style": "bezier",
+          },
+        },
+      ],
     });
 
     return cy;
@@ -532,51 +579,51 @@ export const getSourceNode = (cy, targetNodeID) => {
   return sourceNode;
 };
 
-export const calcNodeRows = (nodes) => {
-  const rows = [];
-  let rowNum = 0;
+// export const calcNodeRows = (nodes) => {
+//   const rows = [];
+//   let rowNum = 0;
 
-  nodes.forEach((ele, i, eles) => {
-    // rootsArr1.forEach((ele, i, eles) => {
-    cy.filter('[nodeType != "ANNOTATION"]').breadthFirstSearch({
-      root: ele,
-      visit: (v, edge, prev, j, depth) => {
-        if (!prev) {
-          currRowPosY += nextRowYAdd;
-          v.position({ x: rowStartPosX, y: currRowPosY });
-        } else {
-          const prevNodePosX = prev.position("x");
-          const prevNodePosY = prev.position("y");
-          const currNodePosY = v.position("y");
-          const nextPosX = prevNodePosX + spacing;
+//   nodes.forEach((ele, i, eles) => {
+//     // rootsArr1.forEach((ele, i, eles) => {
+//     nodes.filter('[nodeType != "ANNOTATION"]').breadthFirstSearch({
+//       root: ele,
+//       visit: (v, edge, prev, j, depth) => {
+//         if (!prev) {
+//           currRowPosY += nextRowYAdd;
+//           v.position({ x: rowStartPosX, y: currRowPosY });
+//         } else {
+//           const prevNodePosX = prev.position("x");
+//           const prevNodePosY = prev.position("y");
+//           const currNodePosY = v.position("y");
+//           const nextPosX = prevNodePosX + spacing;
 
-          if (v.id() === "bviv3cclyg") {
-            console.log();
-            console.log("currNode");
-            console.log(v.json());
+//           if (v.id() === "bviv3cclyg") {
+//             console.log();
+//             console.log("currNode");
+//             console.log(v.json());
 
-            console.log("prevNode");
-            console.log(prev.json());
-            console.log();
-          }
-          v.position("x", nextPosX);
+//             console.log("prevNode");
+//             console.log(prev.json());
+//             console.log();
+//           }
+//           v.position("x", nextPosX);
 
-          // i think the diff calc is using the updated pos of the prev node, so it's not reliable
-          // calc row y pos ahead of time
-          if (currNodePosY - prevNodePosY > verticalTolerance) {
-            // 240 is where the next node should start accounting for space for an annotation above it with 150 spacing to that annotation from the row above
-            const nextPosY = prevNodePosY + 240;
-            const numberOfRowsBelow = Math.floor(
-              (currNodePosY - prevNodePosY) / verticalTolerance
-            );
-            v.position("y", nextPosY);
-          }
-        }
-      },
-      directed: true,
-    });
-  });
-};
+//           // i think the diff calc is using the updated pos of the prev node, so it's not reliable
+//           // calc row y pos ahead of time
+//           if (currNodePosY - prevNodePosY > verticalTolerance) {
+//             // 240 is where the next node should start accounting for space for an annotation above it with 150 spacing to that annotation from the row above
+//             const nextPosY = prevNodePosY + 240;
+//             const numberOfRowsBelow = Math.floor(
+//               (currNodePosY - prevNodePosY) / verticalTolerance
+//             );
+//             v.position("y", nextPosY);
+//           }
+//         }
+//       },
+//       directed: true,
+//     });
+//   });
+// };
 
 /**
  * normalize nodes
@@ -787,6 +834,6 @@ export const getFlowJSON = (ogFlowJSON, cy) => {
   return ogFlowJSON;
 };
 
-export const writeFlowJSON = (outputFilePath, ogFlowJSON, cy) => {
-  writeFileSync(outputFilePath, getFlowJSON(ogFlowJSON, cy));
-};
+// export const writeFlowJSON = (outputFilePath, ogFlowJSON, cy) => {
+//   writeFileSync(outputFilePath, getFlowJSON(ogFlowJSON, cy));
+// };
