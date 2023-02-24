@@ -4,12 +4,13 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   createCytoscapeGraphForViz,
   readFlowJSONFileWithFileReader,
   getCopyOfElementsObj,
   convertStrToJSON,
+  spaceHorizontallyWithAnimation,
 } from "./Cy";
 import CytoscapeComponent from "react-cytoscapejs";
 
@@ -17,6 +18,7 @@ function App() {
   const [file, setFile] = useState("");
   const [flowJSON, setFlowJSON] = useState("");
   const [elements, setElements] = useState("");
+  let cyRef = useRef(null);
   const cyContainerID = "cyContainer";
   const filename =
     "/home/adombrowski/workspace/beautiflowify/testFlows/WO_subflow_condensed_columns and rows - Beautiflow - Demo 3 - PingOne Sign-On, Password Forgot and Reset, User Registration_Export_2023-02-19T14_27_48.361Z.json";
@@ -46,17 +48,28 @@ function App() {
     reader.onload = async (e) => {
       const text = e.target.result;
       console.log(text);
-      setFlowJSON(text);
+      setFlowJSON(convertStrToJSON(text));
     };
     reader.readAsText(e.target.files[0]);
+  };
+
+  const space = (e) => {
+    e.preventDefault();
+    console.log("spacing");
+    console.log("cyRef");
+    console.log(cyRef);
+    // console.log("cyRef.current");
+    // console.log(cyRef.current);
+    if (cyRef) {
+      spaceHorizontallyWithAnimation(cyRef, 150, 330);
+    }
   };
 
   useEffect(() => {
     console.log("in useeffect");
     console.log(flowJSON);
     if (flowJSON) {
-      const parsedJSONFlow = convertStrToJSON(flowJSON);
-      setElements(getCopyOfElementsObj(parsedJSONFlow));
+      setElements(getCopyOfElementsObj(flowJSON));
     }
   }, [flowJSON]);
 
@@ -68,6 +81,9 @@ function App() {
             <CytoscapeComponent
               elements={CytoscapeComponent.normalizeElements(elements)}
               style={{ width: "100vw", height: "80vh" }}
+              cy={(cy) => {
+                cyRef = cy;
+              }}
             ></CytoscapeComponent>
           ) : (
             ""
@@ -81,8 +97,13 @@ function App() {
         </Col>
       </Row>
       <Row>
-        <Col>
-          <Button variant="dark">BFS</Button>
+        <Col xs={6}>
+          <Button variant="light">BFS</Button>
+        </Col>
+        <Col xs={6}>
+          <Button variant="light" onClick={(e) => space(e)}>
+            Space
+          </Button>
         </Col>
       </Row>
     </Container>

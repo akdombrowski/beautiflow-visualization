@@ -802,6 +802,184 @@ export const spaceHorizontally = async (
   return cy;
 };
 
+export const spaceHorizontallyWithAnimation = async (
+  cy,
+  spacing,
+  verticalTolerance
+) => {
+  // const cy = createCytoscapeGraph(flowJSON);
+
+  console.log(cy.getElementById("bviv3cclyg").json());
+
+  const cyBeforeRepositioning = createCytoscapeGraphFromEles(
+    cy.$("*").clone().jsons()
+  );
+  const nodes = cy.nodes();
+  const nodesOG = nodes.clone();
+  const nodesSorted = sortNodes(nodes, verticalTolerance);
+  const normalizedNodes = normalizeCyNodePos(nodesSorted);
+  const normalizedNodesUntouched = normalizedNodes.clone();
+  const normalizedNodesWOAnnotations = normalizedNodes.filter(
+    '[nodeType != "ANNOTATION"]'
+  );
+  const collWithNormalizedNodePos = cy.edges().union(normalizedNodes);
+  // (normalizedNodes.jsons());
+  cy.json(collWithNormalizedNodePos.jsons());
+
+  console.log(cy.getElementById("bviv3cclyg").json());
+
+  const roots = normalizedNodesWOAnnotations.roots();
+  // const startNode = getStartNode(nodesWOAnnotations, verticalTolerance);
+
+  // just in case, lock annotations' pos
+  lockAnnotationPositions(cy);
+
+  // console.log();
+  // console.log(normalizedNodesWOAnnotations.jsons().slice(0, 2));
+  // console.log();
+
+  // console.log();
+  // console.log("cy");
+  // console.log(cy);
+  // console.log();
+  // console.log();
+  // console.log("cyWOAnnotations");
+  // console.log(cyWOAnnotations);
+  // console.log();
+
+  const rootsArr = roots.toArray();
+  const rootsArr1 = rootsArr.slice(0, 1);
+
+  console.log("animating roots");
+  roots.animate({
+    position: { x: 100, y: 100 },
+    style: { background: "red" },
+    duration: 2000,
+  });
+
+  const rows = [];
+  const rowNum = 0;
+  let rowStartPosX = 300;
+  let currRowPosY = 160;
+  let nextRowYAdd = 240;
+  roots.forEach((ele, i, eles) => {
+    // if (i === 2) {
+    // rootsArr1.forEach((ele, i, eles) => {
+    cy.$("*").breadthFirstSearch({
+      root: ele,
+      visit: (v, edge, prev, j, depth) => {
+        console.log("edge"); // we're getting null here
+        console.log(edge.id());
+        console.log("v");
+        console.log(v.id());
+        cy.$("node#" + v.id()).animate({
+          style: { background: "yellow" },
+          duration: 1000,
+        });
+        cy.$("node#" + prev.id()).animate({
+          style: { background: "green" },
+          duration: 1000,
+        });
+        if (roots.getElementById(v.id())) {
+          currRowPosY += nextRowYAdd;
+          v.position({ x: rowStartPosX, y: currRowPosY });
+        } else {
+          const prevNodePosX = prev.position("x");
+          const prevNodeOg = cyBeforeRepositioning.getElementById(prev.id());
+          const prevNodeOgPos = prevNodeOg.position();
+          const prevNodeOgPosX = prevNodeOgPos.x;
+          const prevNodeOgPosY = prevNodeOgPos.y;
+          const prevNodePosY = prev.position("y");
+          const currNodePosY = v.position("y");
+          const nextPosX = prevNodePosX + spacing;
+
+          v.position("x", nextPosX);
+
+          if (v.id() === "bviv3cclyg") {
+            console.log();
+            console.log();
+            console.log("currNodePos");
+            console.log(v.id());
+            console.log(v.data("nodeType"));
+            console.log(v.data("name"));
+            console.log(v.position());
+            // console.log(v.json());
+
+            console.log("prevNodeOgPos");
+            console.log(prevNodeOg.id());
+            console.log(prevNodeOg.data("nodeType"));
+            console.log(prevNodeOg.position());
+            console.log();
+          }
+
+          // i think the diff calc is using the updated pos of the prev node, so it's not reliable
+          // calc row y pos ahead of time
+          if (currNodePosY - prevNodeOgPosY > verticalTolerance) {
+            console.log();
+            console.log(v.id());
+            console.log(prevNodeOg.id());
+            console.log();
+            // 240 is where the next node should start accounting for space for an annotation above it with 150 spacing to that annotation from the row above
+            const numberOfRowsBelow = Math.floor(
+              (currNodePosY - prevNodeOgPosY) / verticalTolerance
+            );
+            const nextPosY = (currRowPosY + 240) * numberOfRowsBelow;
+            v.position("y", nextPosY);
+
+            if (v.id() === "bviv3cclyg") {
+              console.log("verticalTolerance");
+              console.log(verticalTolerance);
+              console.log("after move currNodePos");
+              console.log(v.position());
+              console.log();
+              console.log();
+            }
+          } else {
+            v.position("y", currRowPosY);
+          }
+        }
+      },
+      directed: true,
+    });
+    // }
+  });
+
+  console.log();
+  console.log("old positions");
+  console.log("bb45iggzc5");
+  console.log(cyBeforeRepositioning.getElementById("bb45iggzc5").position());
+  console.log("ze3omkafya");
+  console.log(cyBeforeRepositioning.getElementById("ze3omkafya").position());
+  console.log();
+  console.log();
+  console.log("new positions");
+  console.log("bb45iggzc5");
+  console.log(cy.getElementById("bb45iggzc5").position());
+  console.log("ze3omkafya");
+  console.log(cy.getElementById("ze3omkafya").position());
+  console.log();
+
+  console.log();
+  console.log("old positions");
+  console.log("bviv3cclyg");
+  console.log(cyBeforeRepositioning.getElementById("bviv3cclyg").position());
+  console.log("w7jmfry8oc");
+  console.log(cyBeforeRepositioning.getElementById("w7jmfry8oc").position());
+  console.log();
+  console.log();
+  console.log("new positions");
+  console.log("bviv3cclyg");
+  console.log(cy.getElementById("bviv3cclyg").position());
+  console.log("w7jmfry8oc");
+  console.log(cy.getElementById("w7jmfry8oc").position());
+  console.log();
+
+  // return await createCytoscapeGraphFromEles(
+  //   cy.json(normalizedNodesWOAnnotations.jsons())
+  // );
+  return cy;
+};
+
 /**
  * Has to be run on a cy instance *NOT* in headless mode
  *
