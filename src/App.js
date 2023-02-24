@@ -55,19 +55,12 @@ function App() {
 
   const space = (e) => {
     e.preventDefault();
-    console.log("spacing");
-    console.log("cyRef");
-    console.log(cyRef);
-    // console.log("cyRef.current");
-    // console.log(cyRef.current);
     if (cyRef) {
       spaceHorizontallyWithAnimation(cyRef, 150, 330);
     }
   };
 
   useEffect(() => {
-    console.log("in useeffect");
-    console.log(flowJSON);
     if (flowJSON) {
       setElements(getCopyOfElementsObj(flowJSON));
     }
