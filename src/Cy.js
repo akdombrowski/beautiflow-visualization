@@ -455,6 +455,19 @@ export const getNodesWithinYTolerance = (cy, y, tolerance) => {
   });
 };
 
+export const shiftAnnotationRenderedPosFromNodes = (nodes) => {
+  const annies = nodes.filter('[nodeType = "ANNOTATION"]');
+  // can i run shift on a single node?
+  annies.forEach((ele, i, eles) => {
+    const posX = ele.position("x");
+    const width = ele.data("properties").width.value;
+    const newPosX = posX - width / 2;
+    ele.position("x", newPosX);
+  });
+
+  return nodes;
+};
+
 export const getCyNodesInRowAtYPos = (cyNodes, y, tolerance) => {
   return cyNodes.filter((ele, i, eles) => {
     if (isEleYPosWithinToleranceOfY(ele.json(), y, tolerance)) {
@@ -625,6 +638,98 @@ export const getSourceNode = (cy, targetNodeID) => {
 //   });
 // };
 
+export const animateSuccessorsOfEle = (ele) => {
+  const anis = ele
+    .successors()
+    .filter("nodes")
+    .map((el, i, els) => {
+      const ani = el.animation(
+        {
+          style: { backgroundColor: "blue" },
+        },
+        {
+          duration: 10000,
+          complete: () => console.log("animated " + ele.id() + "'s successors"),
+        }
+      );
+    });
+
+  return anis;
+};
+
+export const animateNodesAndWait = async (els, dur, color) => {
+  return Promise.all(
+    els.map((ele, i, eles) => {
+      return new Promise((resolve, reject) => {
+        const ani = ele.animation(
+          {
+            style: { backgroundColor: color },
+          },
+          {
+            duration: dur,
+            complete: () => {
+              // console.log("animated " + ele.id());
+              resolve("animated " + ele.id());
+            },
+          }
+        );
+        ani.play();
+        // await eles.pon("style");
+      });
+    })
+  );
+};
+
+export const animateElesAndWait = async (els, dur, color) => {
+  return Promise.all(
+    els.map((ele, i, eles) => {
+      return new Promise((resolve, reject) => {
+        let sty;
+        if (ele.isNode()) {
+          sty = { backgroundColor: color };
+        } else {
+          sty = { "line-color": color };
+        }
+        const ani = ele.animation(
+          {
+            style: sty,
+          },
+          {
+            duration: dur,
+            complete: () => {
+              // console.log("animated " + ele.id());
+              resolve("animated " + ele.id());
+            },
+          }
+        );
+        ani.play();
+        // await eles.pon("style");
+      });
+    })
+  );
+};
+
+export const animateNodes = (nodes, dur, color) => {
+  nodes.map((ele, i, eles) => {
+    const ani = ele.animation(
+      {
+        style: { backgroundColor: color },
+      },
+      {
+        duration: dur,
+        complete: () => console.log(ele.id() + " animated"),
+      }
+    );
+    ani.play();
+    // await eles.pon("style");
+  });
+};
+
+export const getRowOfNodesFromRoot = (root) => {
+  const row = root.successors();
+  return row.union(root);
+};
+
 /**
  * normalize nodes
  * lock annotations
@@ -692,12 +797,13 @@ export const spaceHorizontally = async (
   let rowStartPosX = 300;
   let currRowPosY = 160;
   let nextRowYAdd = 240;
-  roots.forEach((ele, i, eles) => {
+  roots.forEach(async (ele, i, eles) => {
     // if (i === 2) {
     // rootsArr1.forEach((ele, i, eles) => {
-    cy.$("*").breadthFirstSearch({
+    await animateNodesAndWait(getRowOfNodesFromRoot(ele), 5000, "green");
+    getRowOfNodesFromRoot(ele).breadthFirstSearch({
       root: ele,
-      visit: (v, edge, prev, j, depth) => {
+      visit: async (v, edge, prev, j, depth) => {
         console.log("edge"); // we're getting null here
         console.log(edge.id());
         console.log("v");
@@ -802,7 +908,7 @@ export const spaceHorizontally = async (
   return cy;
 };
 
-export const spaceHorizontallyWithAnimation = async (
+export const bfsAnimation = async (
   cy,
   spacing,
   verticalTolerance
@@ -853,81 +959,168 @@ export const spaceHorizontallyWithAnimation = async (
   console.log("roots");
   console.log(roots.jsons());
   console.log("animating roots");
-  const dur = 5000;
+  const dur = 1000;
   await Promise.all(
     roots.map((ele, i, eles) => {
       return new Promise((resolve, reject) => {
-        ele.animate(
+        const ani = ele.animation(
           {
             style: { backgroundColor: "red" },
           },
           {
             duration: dur,
+            complete: () => resolve(),
           }
         );
-
+        ani.play();
         // await eles.pon("style");
       });
     })
   );
+  console.log("animating roots completed");
+  // await cy.pon("style");
 
-  await cy.pon("style");
+  console.log("animating roots successors");
+  let color = "blue";
+  for (const r of roots) {
+    const animatedRootSuccessors = await animateNodesAndWait(
+      r.successors(),
+      dur,
+      color
+    );
+    console.log(animatedRootSuccessors);
+    // animateNodes(r.successors(), dur, color);
+  }
+
+  // await cy.pon("style");
+  // const rootSuccessorAnimations = roots.map((ele, i, eles) => {
+  //   // return new Promise((resolve, reject) => {
+  //   //   ele
+  //   //     .successors()
+  //   //     .filter("nodes")
+  //   //     .animate(
+  //   //       {
+  //   //         style: { backgroundColor: "blue" },
+  //   //       },
+  //   //       {
+  //   //         duration: 10000,
+  //   //         complete: () => {
+  //   //           console.log("animated " + ele.id() + "'s successors");
+  //   //           resolve();
+  //   //         },
+  //   //       }
+  //   //     );
+  //   // });
+
+  //   return animateSuccessorsOfEle(ele);
+  // });
+
+  // for (const s of rootSuccessorAnimations) {
+  //   await s;
+  // }
+
+  console.log("animating roots successors completed");
 
   const rows = [];
   const rowNum = 0;
   let rowStartPosX = 300;
   let currRowPosY = 160;
   let nextRowYAdd = 240;
-  roots.forEach((ele, i, eles) => {
-    cy.$("*").breadthFirstSearch({
+
+  console.log("animating row of nodes");
+  for (const r of roots) {
+    const rowNodes = getRowOfNodesFromRoot(r);
+    const animatedNodes = await animateNodesAndWait(rowNodes, 1000, "green");
+    console.log(animatedNodes);
+  }
+  console.log("animating row of nodes completed");
+
+  console.log("animating row of nodes and edges");
+  for (const r of roots) {
+    const rowNodes = getRowOfNodesFromRoot(r);
+    const row = rowNodes.union(rowNodes.connectedEdges());
+    const animatedEles = await animateElesAndWait(row, 1000, "red");
+    console.log(animatedEles);
+  }
+  console.log("animating row of nodes and edges completed");
+
+  for (const ele of roots) {
+    const currNodeAnimations = [];
+    const prevNodeAnimations = [];
+    const anis = [];
+    getRowOfNodesFromRoot(ele).breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
+        let prevNodeAniProm;
+        let prevNodeAni;
+        let currNodeAniProm;
+        let currNodeAni;
         if (prev) {
           const prevPos = prev.position();
-          prev.animate(
-            {
-              // position: prevPos,
-              style: { backgroundColor: "green" },
-            },
-            {
-              duration: dur,
-            }
-          );
+          // prev.animate(
+          //   {
+          //     // position: prevPos,
+          //     style: { backgroundColor: "green" },
+          //   },
+          //   {
+          //     duration: dur,
+          //   }
+          // );
           // .delay(dur * (i + 1));
+          prevNodeAniProm = new Promise((resolve, reject) => {
+            prevNodeAni = prev.animation(
+              {
+                // position: prevPos,
+                style: { backgroundColor: "green" },
+              },
+              {
+                duration: dur,
+                complete: () => resolve("animated " + v.id()),
+              }
+            );
+          });
         }
 
         // await cy.pon("style");
 
-        console.log("edge");
-        console.log(edge?.id());
-        console.log("v");
-        console.log(v.id());
+        if (edge) {
+          console.log("edge:", edge.id());
+        }
+        console.log("v:", v.id());
         const vPos = v.position();
-        v.animate(
-          {
-            // position: vPos,
-            style: { backgroundColor: "yellow" },
-          },
-          {
-            duration: dur,
-          }
-        );
-        // .delay(dur * (i + 1));
-        v.animate(
-          {
-            // position: vPos,
-            style: { backgroundColor: "white" },
-          },
-          {
-            duration: dur,
-          }
-        );
+        // v.animate(
+        //   {
+        //     // position: vPos,
+        //     style: { backgroundColor: "yellow" },
+        //   },
+        //   {
+        //     duration: dur,
+        //   }
+        // );
+        currNodeAniProm = new Promise((resolve, reject) => {
+          currNodeAni = v.animation(
+            {
+              // position: vPos,
+              style: { backgroundColor: "yellow" },
+            },
+            {
+              duration: dur,
+              complete: () => resolve("animated " + v.id()),
+            }
+          );
+        });
 
-        await cy.pon("style");
+        anis.push({
+          prevAniProm: prevNodeAniProm,
+          prevAni: prevNodeAni,
+          currAni: currNodeAni,
+          currAniProm: currNodeAniProm,
+        });
 
+        // await cy.pon("style");
         if (roots.getElementById(v.id())) {
-          currRowPosY += nextRowYAdd;
-          v.position({ x: rowStartPosX, y: currRowPosY });
+          // currRowPosY += nextRowYAdd;
+          // v.position({ x: rowStartPosX, y: currRowPosY });
         } else {
           const prevNodePosX = prev.position("x");
           const prevNodeOg = cyBeforeRepositioning.getElementById(prev.id());
@@ -943,17 +1136,21 @@ export const spaceHorizontallyWithAnimation = async (
           if (v.id() === "bviv3cclyg") {
             console.log();
             console.log();
-            console.log("currNodePos");
-            console.log(v.id());
-            console.log(v.data("nodeType"));
-            console.log(v.data("name"));
-            console.log(v.position());
+            console.log(
+              "currNodePos:",
+              v.id(),
+              v.data("nodeType"),
+              v.data("name"),
+              v.position()
+            );
             // console.log(v.json());
 
-            console.log("prevNodeOgPos");
-            console.log(prevNodeOg.id());
-            console.log(prevNodeOg.data("nodeType"));
-            console.log(prevNodeOg.position());
+            console.log(
+              "prevNodeOgPos:",
+              prevNodeOg.id(),
+              prevNodeOg.data("nodeType"),
+              prevNodeOg.position()
+            );
             console.log();
           }
 
@@ -965,17 +1162,15 @@ export const spaceHorizontallyWithAnimation = async (
             console.log(prevNodeOg.id());
             console.log();
             // 240 is where the next node should start accounting for space for an annotation above it with 150 spacing to that annotation from the row above
-            const numberOfRowsBelow = Math.floor(
-              (currNodePosY - prevNodeOgPosY) / verticalTolerance
-            );
-            const nextPosY = (currRowPosY + 240) * numberOfRowsBelow;
-            // v.position("y", nextPosY);
-            //
+            // const numberOfRowsBelow = Math.floor(
+            //   (currNodePosY - prevNodeOgPosY) / verticalTolerance
+            // );
+            // const nextPosY = (currRowPosY + 240) * numberOfRowsBelow;
+            // // v.position("y", nextPosY);
+            // //
             if (v.id() === "bviv3cclyg") {
-              console.log("verticalTolerance");
-              console.log(verticalTolerance);
-              console.log("after move currNodePos");
-              console.log(v.position());
+              console.log("verticalTolerance:", verticalTolerance);
+              console.log("after move currNodePos:", v.position());
               console.log();
               console.log();
             }
@@ -986,8 +1181,21 @@ export const spaceHorizontallyWithAnimation = async (
       },
       directed: true,
     });
+
+    for (const a of anis) {
+      console.log(a);
+      const { prevAniProm, prevAni, currAni, currAniProm } = a;
+      if (prevAniProm && prevAni) {
+        prevAni.play();
+        const prevAnimated = await prevAniProm;
+        console.log(prevAnimated);
+      }
+      currAni.play();
+      const currAnimated = await currAniProm;
+      console.log(currAnimated);
+    }
     // }
-  });
+  }
 
   console.log();
   console.log("old positions");
