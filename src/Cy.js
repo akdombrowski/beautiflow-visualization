@@ -455,13 +455,13 @@ export const getNodesWithinYTolerance = (cy, y, tolerance) => {
   });
 };
 
-export const shiftAnnotationRenderedPosFromNodes = (nodes) => {
+export const shiftAnnosPosFromNodes = (nodes) => {
   const annies = nodes.filter('[nodeType = "ANNOTATION"]');
   // can i run shift on a single node?
   annies.forEach((ele, i, eles) => {
     const posX = ele.position("x");
     const width = ele.data("properties").width.value;
-    const newPosX = posX - width / 2;
+    const newPosX = posX + width / 2;
     ele.position("x", newPosX);
   });
 
@@ -657,9 +657,20 @@ export const animateSuccessorsOfEle = (ele) => {
   return anis;
 };
 
-export const animateNodesAndWait = async (els, dur, color) => {
+export const emitStyleEventForExplainerText = (cy, ani, aniDes, start, end) => {
+  if (start) {
+    console.log(ani, aniDes);
+  } else if (end) {
+    console.log(ani, aniDes, "completed");
+  }
+
+  cy.emit("style", [ani, aniDes, start, end]);
+};
+
+export const animateNodesAndWait = async (cy, nodes, dur, color) => {
   return Promise.all(
-    els.map((ele, i, eles) => {
+    nodes.map((ele, i, eles) => {
+      const msg = "animated " + ele.id();
       return new Promise((resolve, reject) => {
         const ani = ele.animation(
           {
@@ -669,10 +680,12 @@ export const animateNodesAndWait = async (els, dur, color) => {
             duration: dur,
             complete: () => {
               // console.log("animated " + ele.id());
-              resolve("animated " + ele.id());
+              emitStyleEventForExplainerText(cy, "", msg, false, true);
+              resolve(msg);
             },
           }
         );
+        emitStyleEventForExplainerText(cy, "", msg, true, false);
         ani.play();
         // await eles.pon("style");
       });
@@ -680,9 +693,10 @@ export const animateNodesAndWait = async (els, dur, color) => {
   );
 };
 
-export const animateElesAndWait = async (els, dur, color) => {
+export const animateElesAndWait = async (cy, els, dur, color) => {
   return Promise.all(
     els.map((ele, i, eles) => {
+      const msg = "animated " + ele.id();
       return new Promise((resolve, reject) => {
         let sty;
         if (ele.isNode()) {
@@ -698,10 +712,12 @@ export const animateElesAndWait = async (els, dur, color) => {
             duration: dur,
             complete: () => {
               // console.log("animated " + ele.id());
-              resolve("animated " + ele.id());
+              emitStyleEventForExplainerText(cy, "", msg, false, true);
+              resolve(msg);
             },
           }
         );
+        emitStyleEventForExplainerText(cy, "", msg, true, false);
         ani.play();
         // await eles.pon("style");
       });
@@ -800,7 +816,7 @@ export const spaceHorizontally = async (
   roots.forEach(async (ele, i, eles) => {
     // if (i === 2) {
     // rootsArr1.forEach((ele, i, eles) => {
-    await animateNodesAndWait(getRowOfNodesFromRoot(ele), 5000, "green");
+    await animateNodesAndWait(cy, getRowOfNodesFromRoot(ele), 5000, "green");
     getRowOfNodesFromRoot(ele).breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
@@ -908,14 +924,10 @@ export const spaceHorizontally = async (
   return cy;
 };
 
-export const bfsAnimation = async (
-  cy,
-  spacing,
-  verticalTolerance
-) => {
+export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
   // const cy = createCytoscapeGraph(flowJSON);
 
-  console.log(cy.getElementById("bviv3cclyg").json());
+  // console.log(cy.getElementById("bviv3cclyg").json());
 
   const cyBeforeRepositioning = await createCytoscapeGraphFromEles(
     cy.$("*").clone().jsons()
@@ -959,9 +971,11 @@ export const bfsAnimation = async (
   console.log("roots");
   console.log(roots.jsons());
   console.log("animating roots");
+  emitStyleEventForExplainerText(cy, "Animating roots", "", true, false);
   const dur = 1000;
   await Promise.all(
     roots.map((ele, i, eles) => {
+      const msg = "animated " + ele.id();
       return new Promise((resolve, reject) => {
         const ani = ele.animation(
           {
@@ -969,57 +983,48 @@ export const bfsAnimation = async (
           },
           {
             duration: dur,
-            complete: () => resolve(),
+            complete: () => {
+              emitStyleEventForExplainerText(cy, "", msg, false, true);
+              resolve(msg);
+            },
           }
         );
+        emitStyleEventForExplainerText(cy, "", msg, true, false);
         ani.play();
         // await eles.pon("style");
       });
     })
   );
-  console.log("animating roots completed");
-  // await cy.pon("style");
+  emitStyleEventForExplainerText(cy, "Animating roots", "", false, true);
+  // console.log("animating roots completed");
 
-  console.log("animating roots successors");
+  // console.log("animating roots successors");
+
+  emitStyleEventForExplainerText(
+    cy,
+    "Animating roots successors",
+    "",
+    true,
+    false
+  );
   let color = "blue";
   for (const r of roots) {
     const animatedRootSuccessors = await animateNodesAndWait(
+      cy,
       r.successors(),
       dur,
       color
     );
-    console.log(animatedRootSuccessors);
-    // animateNodes(r.successors(), dur, color);
+    // console.log(animatedRootSuccessors);
   }
 
-  // await cy.pon("style");
-  // const rootSuccessorAnimations = roots.map((ele, i, eles) => {
-  //   // return new Promise((resolve, reject) => {
-  //   //   ele
-  //   //     .successors()
-  //   //     .filter("nodes")
-  //   //     .animate(
-  //   //       {
-  //   //         style: { backgroundColor: "blue" },
-  //   //       },
-  //   //       {
-  //   //         duration: 10000,
-  //   //         complete: () => {
-  //   //           console.log("animated " + ele.id() + "'s successors");
-  //   //           resolve();
-  //   //         },
-  //   //       }
-  //   //     );
-  //   // });
-
-  //   return animateSuccessorsOfEle(ele);
-  // });
-
-  // for (const s of rootSuccessorAnimations) {
-  //   await s;
-  // }
-
-  console.log("animating roots successors completed");
+  emitStyleEventForExplainerText(
+    cy,
+    "Animating roots successors",
+    "",
+    false,
+    true
+  );
 
   const rows = [];
   const rowNum = 0;
@@ -1027,22 +1032,39 @@ export const bfsAnimation = async (
   let currRowPosY = 160;
   let nextRowYAdd = 240;
 
-  console.log("animating row of nodes");
+  emitStyleEventForExplainerText(cy, "Animating row of nodes", "", true, false);
   for (const r of roots) {
     const rowNodes = getRowOfNodesFromRoot(r);
-    const animatedNodes = await animateNodesAndWait(rowNodes, 1000, "green");
-    console.log(animatedNodes);
+    const animatedNodes = await animateNodesAndWait(
+      cy,
+      rowNodes,
+      1000,
+      "green"
+    );
+    // console.log(animatedNodes);
   }
-  console.log("animating row of nodes completed");
+  emitStyleEventForExplainerText(cy, "Animating row of nodes", "", false, true);
 
-  console.log("animating row of nodes and edges");
+  emitStyleEventForExplainerText(
+    cy,
+    "Animating row of nodes and edges",
+    "",
+    true,
+    false
+  );
   for (const r of roots) {
     const rowNodes = getRowOfNodesFromRoot(r);
     const row = rowNodes.union(rowNodes.connectedEdges());
-    const animatedEles = await animateElesAndWait(row, 1000, "red");
+    const animatedEles = await animateElesAndWait(cy, row, 1000, "red");
     console.log(animatedEles);
   }
-  console.log("animating row of nodes and edges completed");
+  emitStyleEventForExplainerText(
+    cy,
+    "Animating row of nodes and edges",
+    "",
+    false,
+    true
+  );
 
   for (const ele of roots) {
     const currNodeAnimations = [];
@@ -1111,8 +1133,10 @@ export const bfsAnimation = async (
         });
 
         anis.push({
+          prevID: prev?.id(),
           prevAniProm: prevNodeAniProm,
           prevAni: prevNodeAni,
+          currID: v.id(),
           currAni: currNodeAni,
           currAniProm: currNodeAniProm,
         });
@@ -1182,19 +1206,49 @@ export const bfsAnimation = async (
       directed: true,
     });
 
+    // console.log("animating bfs");
+    emitStyleEventForExplainerText(cy, "Breadth First Search", "", true, false);
     for (const a of anis) {
-      console.log(a);
-      const { prevAniProm, prevAni, currAni, currAniProm } = a;
+      const { prevID, prevAniProm, prevAni, currID, currAni, currAniProm } = a;
       if (prevAniProm && prevAni) {
+        emitStyleEventForExplainerText(
+          cy,
+          "",
+          "animating " + prevID,
+          true,
+          false
+        );
         prevAni.play();
         const prevAnimated = await prevAniProm;
-        console.log(prevAnimated);
+        emitStyleEventForExplainerText(
+          cy,
+          "",
+          "animating " + prevID,
+          false,
+          true
+        );
+        // console.log(prevAnimated);
       }
+      emitStyleEventForExplainerText(
+        cy,
+        "",
+        "animating " + currID,
+        true,
+        false
+      );
       currAni.play();
       const currAnimated = await currAniProm;
-      console.log(currAnimated);
+      emitStyleEventForExplainerText(
+        cy,
+        "",
+        "animating " + currID,
+        false,
+        true
+      );
+      // console.log(currAnimated);
     }
-    // }
+    emitStyleEventForExplainerText(cy, "Breadth First Search", "", false, true);
+    // console.log("animating bfs completed");
   }
 
   console.log();
@@ -1264,7 +1318,6 @@ export const getFlowJSON = (ogFlowJSON, cy) => {
   ogFlowJSON.enabledGraphData.elements.edges = cyJSON.elements.edges;
   return ogFlowJSON;
 };
-
 // export const writeFlowJSON = (outputFilePath, ogFlowJSON, cy) => {
 //   writeFileSync(outputFilePath, getFlowJSON(ogFlowJSON, cy));
 // };

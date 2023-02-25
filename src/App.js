@@ -1,10 +1,12 @@
 import logo from "./logo.svg";
 import "./App.css";
 import Container from "react-bootstrap/Container";
+import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
+import Card from "react-bootstrap/Card";
 import { useState, useEffect, useRef } from "react";
 import {
   createCytoscapeGraphForViz,
@@ -12,16 +14,19 @@ import {
   getCopyOfElementsObj,
   convertStrToJSON,
   bfsAnimation,
-  shiftAnnotationRenderedPosFromNodes,
+  shiftAnnosPosFromNodes,
 } from "./Cy";
 import CytoscapeComponent from "react-cytoscapejs";
+import CustomToggle from "./AccordionToggle";
 
 function App() {
   const [file, setFile] = useState("");
   const [flowJSON, setFlowJSON] = useState("");
   const [ogNodesClone, setOGNodesClone] = useState("");
   const [elements, setElements] = useState("");
-  const [anniesShifted, setAnniesShifted] = useState(false);
+  const [aniText, setAniText] = useState("Ready!");
+  const [aniDescriptionText, setAniDescriptionText] = useState("");
+  const [anniesShifted, setAnnosShifted] = useState(false);
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
   const [cyHeight, setCyHeight] = useState("70vh");
   const cyRef = useRef(null);
@@ -31,13 +36,6 @@ function App() {
   const cyHeightAccOpen = "70vh";
   const cyHeightAccClosed = "80vh";
 
-  const shiftAnnies = () => {
-    if (!anniesShifted) {
-      shiftAnnotationRenderedPosFromNodes(cyRef.current.nodes());
-      setAnniesShifted(true);
-    }
-  };
-
   const loadFlowJSONFromFile = async (e) => {
     e.preventDefault();
 
@@ -46,7 +44,7 @@ function App() {
       const text = e.target.result;
       const flowJSON = convertStrToJSON(text);
       setElements(getCopyOfElementsObj(flowJSON));
-      setAnniesShifted(false);
+      setAnnosShifted(false);
     };
 
     setFile(e.target.files[0]);
@@ -67,38 +65,79 @@ function App() {
     }
   };
 
-  const getClonedNodes = (cyRef) => {
-    if (cyRef.current) {
-      setOGNodesClone(cyRef.current.$("*").clone());
+  const createClonedNodes = (cy) => {
+    if (cy && cy.$("*")) {
+      const clones = cyRef.current.$("*").clone();
+      setOGNodesClone(clones);
+      return clones;
+    }
+  };
+
+  const shiftAnnos = (nodes) => {
+    if (!anniesShifted) {
+      shiftAnnosPosFromNodes(nodes);
+      setAnnosShifted(true);
     }
   };
 
   const clear = (e) => {
     e.preventDefault();
+    if (cyRef.current) {
+      cyRef.current.stop(true);
+    }
     document.getElementById("fileInput").value = "";
     setFile("");
     setElements("");
-    setAnniesShifted(false);
+    setAnnosShifted(false);
   };
 
   const reset = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      cyRef.current.remove("*");
-      cyRef.current.add(ogNodesClone);
+      const cy = cyRef.current;
+      console.log(cy.animated());
+      cy.stop(true, true);
+      cy.$("*").forEach((ele, i, eles) => {
+        ele.stop(true, true);
+      });
+      console.log(cy.animated());
+      cy.remove("*");
+      cy.add(ogNodesClone);
     }
   };
 
-  const accordionToggle = (evKey, e) => {
-    e.preventDefault();
+  const toggleAccordion = (evKey) => {
     const currAccState = !isAccordionOpen;
     setIsAccordionOpen(currAccState);
   };
 
+  if (cyRef.current) {
+    const cy = cyRef.current;
+    cy.on("style", (e, ani, aniDes, start, end) => {
+      if (ani) {
+        if (start) {
+          setAniText(ani);
+        } else if (end) {
+          setAniText(ani + " completed");
+        }
+      }
+      if (aniDes) {
+        if (start) {
+          setAniDescriptionText(aniDes);
+        } else if (end) {
+          setAniDescriptionText(aniDes + " completed");
+        }
+      }
+    });
+  }
+  useEffect(() => {
+    if (!anniesShifted && cyRef.current) {
+      shiftAnnos(cyRef.current.nodes());
+    }
+  });
   useEffect(() => {
     if (cyRef.current) {
-      getClonedNodes(cyRef);
-      shiftAnnies();
+      const clones = createClonedNodes(cyRef.current);
     }
   }, [cyRef.current]);
 
@@ -159,7 +198,7 @@ function App() {
                           return "orange";
                         }
                       },
-                      label: (ele) => ele.data("nodeType").slice(0, 4),
+                      label: (ele) => ele.data("nodeType")?.slice(0, 4),
                       "font-size": "40rem",
                       color: "cyan",
                     },
@@ -192,19 +231,40 @@ function App() {
         </Row>
         <Row height="10vh">
           <Accordion
-            className="bg-dark text-light bs-headings-color-light"
+            className=" text-light bs-headings-color-light"
             defaultActiveKey="0"
             flush
-            onSelect={(eKey, e) => accordionToggle(eKey, e)}
+            onSelect={(eKey, e) => toggleAccordion(eKey)}
           >
             <Accordion.Item
               eventKey="0"
-              className="bg-dark bs-text-light bs-headings-color-light"
+              className=" bs-text-light bs-headings-color-light"
             >
-              <Accordion.Header className="bg-dark bs-text-light bs-headings-color-light">
-                Accordion Item #1
-              </Accordion.Header>
-              <Accordion.Body className="bg-dark bs-headings-color-light">
+              {/* <Accordion.Header className="bg-dark bs-text-light bs-headings-color-light"> */}
+              <Card className="bg-dark">
+                <Card.Header>
+                  <CustomToggle
+                    eventKey="0"
+                    setAccordionCollapsedState={toggleAccordion}
+                  >
+                    Expand
+                  </CustomToggle>
+                </Card.Header>
+                <Accordion.Collapse eventKey="0">
+                  <Card.Body>
+                    <Stack gap={1} className="" style={{ minHeight: "8vh" }}>
+                      <h1 className="display-6 fs-4 text-light text-center">
+                        {aniText}
+                      </h1>
+                      <p className="lead text-light">
+                        <small>{aniDescriptionText}</small>
+                      </p>
+                    </Stack>
+                  </Card.Body>
+                </Accordion.Collapse>
+              </Card>
+              {/* </Accordion.Header> */}
+              {/* <Accordion.Body className="">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
                 enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -212,7 +272,7 @@ function App() {
                 in reprehenderit in voluptate velit esse cillum dolore eu fugiat
                 nulla pariatur. Excepteur sint occaecat cupidatat non proident,
                 sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </Accordion.Body>
+              </Accordion.Body> */}
             </Accordion.Item>
           </Accordion>
         </Row>
