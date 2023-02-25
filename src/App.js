@@ -153,7 +153,7 @@ function App() {
     <div className="bg-dark" style={{ minHeight: "100vh" }}>
       <Container fluid className="bg-dark">
         <Row>
-          <Col xs={12} id="cyContainerCol" style={{ height: cyHeight }}>
+          <Col xs={12} id="cyContainerCol" style={{ minHeight: cyHeight, maxHeight: cyHeight }}>
             {elements ? (
               <CytoscapeComponent
                 id="cy"
@@ -207,14 +207,14 @@ function App() {
                   {
                     selector: "edge",
                     style: {
-                      width: 10,
+                      width: 8,
                       "line-color": "#fff",
                       "target-arrow-color": "purple",
                       "target-arrow-shape": "triangle-backcurve",
                       "curve-style": "bezier",
                       "source-distance-from-node": "20rem",
                       "target-distance-from-node": "0rem",
-                      "arrow-scale": 3,
+                      "arrow-scale": 2,
                     },
                   },
                 ]}
