@@ -7,6 +7,8 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
 import { useState, useEffect, useRef } from "react";
 import {
   createCytoscapeGraphForViz,
@@ -17,7 +19,7 @@ import {
   shiftAnnosPosFromNodes,
 } from "./Cy";
 import CytoscapeComponent from "react-cytoscapejs";
-import CustomToggle from "./AccordionToggle";
+import CustomToggle from "./CustomToggle";
 
 function App() {
   const [file, setFile] = useState("");
@@ -28,10 +30,12 @@ function App() {
   const [aniDescriptionText, setAniDescriptionText] = useState("");
   const [anniesShifted, setAnnosShifted] = useState(false);
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
-  const cyHeightAccOpen = "70vh";
-  const cyHeightAccClosed = "80vh";
-  const [cyHeight, setCyHeight] = useState(cyHeightAccOpen);
+  // const [cyHeight, setCyHeight] = useState(cyHeightAccOpen);
+  const defaultAnimationDuration = 0.5;
+  const maxAnimationDuration = 10;
+  const [aniDur, setAniDur] = useState(defaultAnimationDuration);
   const cyRef = useRef(null);
+
   const cyContainerID = "cyContainer";
   const filename =
     "/home/adombrowski/workspace/beautiflowify/testFlows/WO_subflow_condensed_columns and rows - Beautiflow - Demo 3 - PingOne Sign-On, Password Forgot and Reset, User Registration_Export_2023-02-19T14_27_48.361Z.json";
@@ -47,8 +51,10 @@ function App() {
       setAnnosShifted(false);
     };
 
-    setFile(e.target.files[0]);
-    reader.readAsText(e.target.files[0]);
+    if (e.target.files[0]) {
+      setFile(e.target.files[0]);
+      reader.readAsText(e.target.files[0]);
+    }
   };
 
   const formatSpacing = (e) => {
@@ -110,6 +116,11 @@ function App() {
     setIsAccordionOpen(currAccState);
   };
 
+  const onAnimationDurationChange = (e) => {
+    e.preventDefault();
+    setAniDur(e.currentTarget.value);
+  };
+
   useEffect(() => {
     if (!anniesShifted && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
@@ -117,18 +128,11 @@ function App() {
   });
 
   useEffect(() => {
-    if (cyRef.current) {
+    if (elements && cyRef.current) {
       const clones = createClonedNodes(cyRef.current);
+      console.log(typeof cyRef.current);
     }
-  }, [file]);
-
-  useEffect(() => {
-    if (isAccordionOpen) {
-      setCyHeight(cyHeightAccOpen);
-    } else {
-      setCyHeight(cyHeightAccClosed);
-    }
-  }, [isAccordionOpen]);
+  }, [elements]);
 
   if (cyRef.current) {
     const cy = cyRef.current;
@@ -155,15 +159,11 @@ function App() {
   }
 
   return (
-    <div className="bg-dark" style={{ minHeight: "100vh", maxHeight: "100vh" }}>
-      <Container fluid className="bg-dark">
-        <Row>
-          <Col
-            xs={12}
-            id="cyContainerCol"
-            style={{ minHeight: cyHeight, maxHeight: cyHeight }}
-          >
-            {elements ? (
+    <Container fluid className="bg-dark" style={{ height: "100vh" }}>
+      {elements ? (
+        <Form className="h-100">
+          <Row className="h-100">
+            <Col xs={12} id="cyContainerCol">
               <CytoscapeComponent
                 id="cy"
                 elements={CytoscapeComponent.normalizeElements(elements)}
@@ -271,107 +271,164 @@ function App() {
                 wheelSensitivity={0.1}
                 zoom={4}
               ></CytoscapeComponent>
-            ) : (
-              ""
-            )}
-          </Col>
-        </Row>
-        <Row height="10vh">
-          <Accordion
-            className=" text-light bs-headings-color-light"
-            defaultActiveKey="0"
-            flush
-            onSelect={(eKey, e) => toggleAccordion(eKey)}
-          >
-            <Accordion.Item
-              eventKey="0"
-              className=" bs-text-light bs-headings-color-light"
-            >
-              {/* <Accordion.Header className="bg-dark bs-text-light bs-headings-color-light"> */}
-              <Card className="bg-dark">
-                <Card.Header>
-                  <CustomToggle
-                    eventKey="0"
-                    setAccordionCollapsedState={toggleAccordion}
+            </Col>
+            <Col xs={12}>
+              <Row height="20vh">
+                <Col xs={8}>
+                  <Accordion
+                    className="h-100 text-light bs-headings-color-light"
+                    defaultActiveKey="0"
+                    flush
+                    onSelect={(eKey, e) => toggleAccordion(eKey)}
                   >
-                    Expand/Collapse
-                  </CustomToggle>
-                </Card.Header>
-                <Accordion.Collapse eventKey="0">
-                  <Card.Body>
-                    <Stack gap={1} className="" style={{ minHeight: "8vh" }}>
-                      <h1 className="display-6 fs-4 text-light text-center">
-                        {aniText}
-                      </h1>
-                      <p className="lead text-light">
-                        <small>{aniDescriptionText}</small>
-                      </p>
-                    </Stack>
-                  </Card.Body>
-                </Accordion.Collapse>
-              </Card>
-            </Accordion.Item>
-          </Accordion>
-        </Row>
-        <Row className="bg-dark pb-3" height="5vh">
-          <Col xs={3}>
-            <div className="d-grid gap-5">
-              <Button variant="outline-light" size="lg" onClick={(e) => bfs(e)}>
-                BFS
-              </Button>
-            </div>
-          </Col>
-          <Col xs={6}>
-            <div className="d-grid gap-5">
-              <Button
-                id="fileInput"
-                variant="light"
-                as="input"
-                type="file"
-                accept=".json,text/*"
-                size="lg"
-                onChange={(e) => loadFlowJSONFromFile(e)}
-              ></Button>
-            </div>
-          </Col>
-          <Col xs={3}>
-            <div className="d-grid gap-5">
-              <Button
-                variant="outline-light"
-                size="lg"
-                onClick={(e) => formatSpacing(e)}
-              >
-                Space Out
-              </Button>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={3}>
-            <div className="d-grid gap-5">
-              <Button
-                variant="outline-light"
-                size="lg"
-                onClick={(e) => clear(e)}
-              >
-                Clear
-              </Button>
-            </div>
-          </Col>
-          <Col xs={3}>
-            <div className="d-grid gap-5">
-              <Button
-                variant="outline-light"
-                size="lg"
-                onClick={(e) => reset(e)}
-              >
-                Reset
-              </Button>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-    </div>
+                    <Accordion.Item
+                      eventKey="0"
+                      className="h-100 bs-text-light bs-headings-color-light"
+                    >
+                      {/* <Accordion.Header className="bg-dark bs-text-light bs-headings-color-light"> */}
+                      <Card className="h-100 bg-dark">
+                        <Card.Header>
+                          <CustomToggle
+                            eventKey="0"
+                            setAccordionCollapsedState={toggleAccordion}
+                          >
+                            Expand/Collapse
+                          </CustomToggle>
+                        </Card.Header>
+                        <Accordion.Collapse eventKey="0">
+                          <Card.Body>
+                            <Stack
+                              className=""
+                              style={{ minHeight: "8vh", height: "100%" }}
+                            >
+                              <h1 className="display-6 fs-4 text-light text-center">
+                                {aniText}
+                              </h1>
+                              <p className="lead text-light">
+                                <small>{aniDescriptionText}</small>
+                              </p>
+                            </Stack>
+                          </Card.Body>
+                        </Accordion.Collapse>
+                      </Card>
+                    </Accordion.Item>
+                  </Accordion>
+                </Col>
+                <Col xs={4}>
+                  <Row className="gap-1 justify-content-center">
+                    <Col xs={12} className="pb-4">
+                      <Form.Floating className="mt-2">
+                        {/* controlId="floatingInput"
+                    label={"Animation Duration:" + aniDur}
+                    className="text-light pb-2 mt-2"
+                  > */}
+                        <Form.Label
+                          className="pb-4 mt-1 text-center"
+                          placeholder=".5"
+                        >
+                          <p className="text-light">
+                            Animation Duration: {aniDur}
+                          </p>
+                        </Form.Label>
+                        <Form.Range
+                          onChange={(e) => onAnimationDurationChange(e)}
+                          value={aniDur}
+                          min={0.5}
+                          max={10}
+                          step={0.5}
+                        />
+                      </Form.Floating>
+                    </Col>
+                    <Col xs={5} className="">
+                      <div className="d-grid gap-5">
+                        <Button
+                          variant="outline-light"
+                          size="lg"
+                          onClick={(e) => bfs(e)}
+                        >
+                          BFS
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col xs={5} className="">
+                      <div className="d-grid gap-5">
+                        <Button
+                          variant="outline-light"
+                          size="lg"
+                          onClick={(e) => formatSpacing(e)}
+                        >
+                          Space Out
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col xs={12} className="pb-4 pt-4">
+                      <div className="d-grid gap-5">
+                        <Button
+                          id="fileInput"
+                          variant="light"
+                          as="input"
+                          type="file"
+                          accept=".json,text/*"
+                          size="lg"
+                          onChange={(e) => loadFlowJSONFromFile(e)}
+                        ></Button>
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row className="justify-content-center">
+                    <Col xs={3}>
+                      <div className="d-grid gap-5">
+                        <Button
+                          variant="outline-light"
+                          size="lg"
+                          onClick={(e) => clear(e)}
+                        >
+                          Clear
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col xs={3}>
+                      <div className="d-grid gap-5">
+                        <Button
+                          variant="outline-light"
+                          size="lg"
+                          onClick={(e) => reset(e)}
+                        >
+                          Reset
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Form>
+      ) : (
+        <Form className="h-100 p-5">
+          <Row className="h-100 justify-content-center align-content-center">
+            <Col xs={12} className="pb-5">
+              <h1 className="display-1 text-light text-center">
+                Choose a DV flow JSON export file to get started!
+              </h1>
+            </Col>
+            <Col xs={12} className="p-5 m-5">
+              <div className="d-grid gap-5">
+                <Button
+                  id="fileInput"
+                  variant="light"
+                  as="input"
+                  type="file"
+                  accept=".json,text/*"
+                  size="lg"
+                  onChange={(e) => loadFlowJSONFromFile(e)}
+                ></Button>
+              </div>
+            </Col>
+          </Row>
+        </Form>
+      )}
+    </Container>
   );
 }
 
