@@ -129,7 +129,7 @@ function App() {
 
   useEffect(() => {
     if (elements && cyRef.current) {
-      const clones = createClonedNodes(cyRef.current);
+      createClonedNodes(cyRef.current);
       console.log(typeof cyRef.current);
     }
   }, [elements]);
