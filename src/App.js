@@ -22,7 +22,7 @@ import CustomToggle from "./AccordionToggle";
 function App() {
   const [file, setFile] = useState("");
   const [flowJSON, setFlowJSON] = useState("");
-  const [ogNodesClone, setOGNodesClone] = useState("");
+  const [ogNodesClone, setOGNodesClone] = useState(null);
   const [elements, setElements] = useState("");
   const [aniText, setAniText] = useState("Ready!");
   const [aniDescriptionText, setAniDescriptionText] = useState("");
@@ -66,7 +66,7 @@ function App() {
   };
 
   const createClonedNodes = (cy) => {
-    if (cy && cy.$("*")) {
+    if (cy && cy.$("*") && !ogNodesClone) {
       const clones = cyRef.current.$("*").clone();
       setOGNodesClone(clones);
       return clones;
@@ -89,6 +89,7 @@ function App() {
     setFile("");
     setElements("");
     setAnnosShifted(false);
+    setOGNodesClone(null);
   };
 
   const reset = (e) => {
@@ -111,6 +112,26 @@ function App() {
     setIsAccordionOpen(currAccState);
   };
 
+  useEffect(() => {
+    if (!anniesShifted && cyRef.current) {
+      shiftAnnos(cyRef.current.nodes());
+    }
+  });
+
+  useEffect(() => {
+    if (cyRef.current) {
+      const clones = createClonedNodes(cyRef.current);
+    }
+  }, [elements]);
+
+  useEffect(() => {
+    if (isAccordionOpen) {
+      setCyHeight(cyHeightAccOpen);
+    } else {
+      setCyHeight(cyHeightAccClosed);
+    }
+  }, [isAccordionOpen]);
+
   if (cyRef.current) {
     const cy = cyRef.current;
     cy.on("style", (e, ani, aniDes, start, end) => {
@@ -130,30 +151,16 @@ function App() {
       }
     });
   }
-  useEffect(() => {
-    if (!anniesShifted && cyRef.current) {
-      shiftAnnos(cyRef.current.nodes());
-    }
-  });
-  useEffect(() => {
-    if (cyRef.current) {
-      const clones = createClonedNodes(cyRef.current);
-    }
-  }, [cyRef.current]);
-
-  useEffect(() => {
-    if (isAccordionOpen) {
-      setCyHeight(cyHeightAccOpen);
-    } else {
-      setCyHeight(cyHeightAccClosed);
-    }
-  }, [isAccordionOpen]);
 
   return (
     <div className="bg-dark" style={{ minHeight: "100vh" }}>
       <Container fluid className="bg-dark">
         <Row>
-          <Col xs={12} id="cyContainerCol" style={{ minHeight: cyHeight, maxHeight: cyHeight }}>
+          <Col
+            xs={12}
+            id="cyContainerCol"
+            style={{ minHeight: cyHeight, maxHeight: cyHeight }}
+          >
             {elements ? (
               <CytoscapeComponent
                 id="cy"
@@ -164,6 +171,8 @@ function App() {
                   {
                     selector: "node",
                     style: {
+                      "background-opacity": 0.75,
+                      // "background-blacken": -.1,
                       shape: (ele) => {
                         if (ele.data("nodeType") !== "EVAL") {
                           return "rectangle";
@@ -189,17 +198,43 @@ function App() {
                         }
                       },
                       "background-color": (ele) => {
-                        if (ele.data("nodeType") === "CONNECTION") {
-                          return "#000";
-                        } else if (ele.data("nodeType") === "ANNOTATION") {
-                          return ele.data("properties").backgroundColor.value;
-                          // return "#4462edff";
+                        const props = ele.data("properties");
+                        console.log(props);
+                        const readBGColor = props
+                          ? props.backgroundColor
+                          : null;
+                        if (readBGColor) {
+                          return readBGColor.value.slice(0, 7);
                         } else {
-                          return "orange";
+                          if (ele.data("nodeType") === "CONNECTION") {
+                            return "#ffffff";
+                          } else if (ele.data("nodeType") === "ANNOTATION") {
+                            return "#f2f3f4";
+                          } else {
+                            return "orange";
+                          }
                         }
                       },
-                      label: (ele) => ele.data("nodeType")?.slice(0, 4),
-                      "font-size": "40rem",
+                      label: (ele) => {
+                        if (ele.data("nodeType") === "ANNOTATION") {
+                          return ele.data("nodeType").slice(0, 4);
+                        } else {
+                          return (
+                            ele.data("nodeType")?.slice(0, 4) +
+                            ":\n" +
+                            ele.id() +
+                            "\n(" +
+                            ele.position("x") +
+                            "," +
+                            ele.position("y") +
+                            ")"
+                          );
+                        }
+                      },
+                      "font-size": "25rem",
+                      "text-wrap": "wrap",
+                      "text-valign": "bottom",
+                      "text-transform": "lowercase",
                       color: "cyan",
                     },
                   },
@@ -208,11 +243,22 @@ function App() {
                     selector: "edge",
                     style: {
                       width: 8,
-                      "line-color": "#fff",
-                      "target-arrow-color": "purple",
+                      color: "cyan",
+                      opacity: 0.7,
+                      "font-size": "30rem",
+                      "text-justification": "center",
+                      "text-margin-x": "-10rem",
+                      "text-margin-y": "25rem",
+                      "text-rotation": "autorotate",
+                      label: (ele) =>
+                        ele.target().position("x") - ele.source().position("x"),
+                      "line-color": "#777",
+                      "target-arrow-color": "#000",
                       "target-arrow-shape": "triangle-backcurve",
                       "curve-style": "bezier",
-                      "source-distance-from-node": "20rem",
+                      "source-endpoint": "outside-to-line-or-label",
+                      "target-endpoint": "outside-to-line-or-label",
+                      "source-distance-from-node": "10rem",
                       "target-distance-from-node": "0rem",
                       "arrow-scale": 2,
                     },

@@ -507,7 +507,7 @@ export const normalizeNodePositions = (nodes) => {
 };
 
 export const normalizeCyNodePos = (nodes) => {
-  const minX = getMinXCyNode(nodes);
+  const minX = getMinXCyNode(nodes.filter('[nodeType != "ANNOTATION"]'));
   const minXPos = minX.position("x");
   const minY = getMinYCyNode(nodes);
   const minYPos = minY.position("y");
@@ -971,10 +971,14 @@ export const spaceHorizontally = async (
 };
 
 export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
-  const testNode1ID = "bb45iggzc5";
-  const testNode2ID = "ze3omkafya";
-  const testNode3ID = "bviv3cclyg";
-  const testNode4ID = "w7jmfry8oc";
+  // const testNode1ID = "bb45iggzc5";
+  // const testNode2ID = "ze3omkafya";
+  // const testNode3ID = "bviv3cclyg";
+  // const testNode4ID = "w7jmfry8oc";
+  const testNode1ID = "cnebm2o1f8";
+  const testNode2ID = "yph1ptw3e7";
+  const testNode3ID = "cdev73rs44";
+  const testNode4ID = "nppc861ktr";
   // const cy = createCytoscapeGraph(flowJSON);
 
   // console.log(cy.getElementById(testNode3ID).json());
@@ -990,6 +994,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
   const nodesOG = nodes.clone();
   const nodesSorted = sortNodes(nodes, verticalTolerance);
   const normalizedNodes = normalizeCyNodePos(nodesSorted);
+  cy.fit();
   const normalizedNodesUntouched = normalizedNodes.clone();
   const normalizedNodesWOAnnotations = normalizedNodes.filter(
     '[nodeType != "ANNOTATION"]'
@@ -1212,15 +1217,16 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
             const prevNodeOgPosX = prevNodeOgPos.x;
             const prevNodeOgPosY = prevNodeOgPos.y;
             const prevNodePosY = prev.position("y");
-            const nextPosX = prevNodePosX + spacing;
+            // const nextPosX = prevNodePosX + spacing;
+            const nextPosX = spacing * depth;
             const currNodePosY = v.position("y");
             const nextRowPosY = prevNodePosY + 240;
             //
             // v.position("x", nextPosX);
             //
-            // let pos = { x: nextPosX, y: currNodePosY };
-            let pos = { x: 0, y: currNodePosY };
-            await animateElePosAndPlay(cy, v, 5000, "red", "x", pos);
+            let pos = { x: nextPosX, y: currNodePosY };
+            await animateElePosAndPlay(cy, v, 5000, "red", pos);
+            v.position(pos);
 
             if (v.id() === testNode3ID) {
               console.log();
