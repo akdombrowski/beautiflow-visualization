@@ -1135,7 +1135,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
 
   const rowStartPosX = 400;
   const firstRowStartPosY = 400;
-  let sectionBasePosY = [];
+  let sectionBaselinePosY = [];
   let nextRowPosY = 400;
   const rowSpacingY = 540;
   let highestYPosValueInSection = [];
@@ -1159,12 +1159,12 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
      * use the first row y pos (firstRowStartPosY)
      *
      * */
-    sectionBasePosY[row] = row
+    sectionBaselinePosY[row] = row
       ? highestYPosValueInSection[row - 1] + rowSpacingY
       : firstRowStartPosY;
     // init highest (lowest on screen visually) y-value for this new section to
     // be at this section's row height
-    highestYPosValueInSection[row] = sectionBasePosY[row];
+    highestYPosValueInSection[row] = sectionBaselinePosY[row];
 
     /**
      * BFS
@@ -1224,7 +1224,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
            * color and position
            */
           let rootAni;
-          let pos = { x: rowStartPosX, y: sectionBasePosY[row] };
+          let pos = { x: rowStartPosX, y: sectionBaselinePosY[row] };
           const rootAniProm = new Promise((resolve, reject) => {
             rootAni = v.animation(
               {
@@ -1263,7 +1263,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
             const vPosY = vPos.y;
             const sameRowDiffHeightSpacingY = 240;
             // new x pos
-            const posX = spacing * depth;
+            const posX = spacing * depth + rowStartPosX;
             // object to store new position value
             let pos = {};
             let y;
@@ -1320,20 +1320,44 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
 
             /**
              * New y position
-             * Check if this node is in a stack
+             *
+             * Check if this node is in a stack by seeing if the previous
+             * (source) node has more than 1 outgoer
+             *
+             * if it does, sort the previous node's outgoers by y value (from
+             * lowest value to highest value)
+             * then, the index of where the current node is found of that
+             * sorted array of outgoers will be the level at which to place the
+             * current node. with 0 being at the same baseline row height, and
+             * higher values being successively visually lower rows
+             *
+             * if it doesn't, set new y pos value to be at the same y pos value
+             * as its prev (source) node
              */
             if (prevOutgoerNodes.size() > 1) {
               const prevOutgoerNodesSorted = prevOutgoerNodes.sort(
                 (ele1, ele2) => ele2.position("y") - ele1.position("y")
               );
-
               const prevOutgoerNodesSortedArr =
                 prevOutgoerNodesSorted.toArray();
               for (let j = 0; j < prevOutgoerNodesSortedArr.length; j++) {
-                const outgoerFromPrev = prevOutgoerNodesSortedArr[j].id();
-                if (outgoerFromPrev === vID) {
-                  const prevNewPosY = prevNodePos[prevID];
-                  pos.y = prevPosY + j * sameRowDiffHeightSpacingY;
+                const outgoerFromPrevID = prevOutgoerNodesSortedArr[j].id();
+                if (outgoerFromPrevID === vID) {
+                  // get the updated position of the previous (source) node
+                  const prevNewPos = prevNodePos[prevID];
+                  const prevNewPosY = prevNewPos?.y;
+                  // it should have a position object with a y value
+                  if (!prevNewPosY) {
+                    throw new Error(
+                      "Missing y position value on the source node"
+                    );
+                  }
+
+                  // new y pos will be the previous node's y pos + what
+                  // vertical level in the column stack this node is
+                  // calculated by multiplying the current array index
+                  // value with the row spacing for nodes in the same section
+                  pos.y = prevNewPosY + j * sameRowDiffHeightSpacingY;
                 }
               }
 
@@ -1342,7 +1366,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
                 pos.y
               );
             } else {
-              pos.y = prevPosY;
+              pos.y = prevNodePos[prevID].y;
             }
             /**
              *
@@ -1375,7 +1399,6 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
             });
             vMoveAni.play();
             // v.position(pos);
-
 
             // add v's movement animation to current animations object
             currStepAnimations.vMovePos = pos;
@@ -1439,7 +1462,16 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
     // console.log("animating bfs");
     emitStyleEventForExplainerText(cy, "Breadth First Search", "", true, false);
     for (const ani of animations) {
-      const { preID, preAniProm, preAni, currID, currAni, currAniProm, rootID, rootAniProm } = ani;
+      const {
+        preID,
+        preAniProm,
+        preAni,
+        currID,
+        currAni,
+        currAniProm,
+        rootID,
+        rootAniProm,
+      } = ani;
       let msg;
 
       if (preAniProm && preAni) {
@@ -1475,7 +1507,16 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
 
       // change prev node to green as its processing is complete
       if (preID) {
-        await getAnimationPromiseForEle(cy.$("#" + preID), dur, "green");
+        msg = "prev node " + preID + " processing is complete animation";
+        const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
+          cy.$("#" + preID),
+          dur,
+          "green"
+        );
+        emitStyleEventForExplainerText(cy, "", msg, true, false);
+        doneWithPrevNodeAni.play();
+        const doneWithPrevNodeAnimated = await prom;
+        emitStyleEventForExplainerText(cy, "", msg, false, true);
       }
     }
     emitStyleEventForExplainerText(cy, "Breadth First Search", "", false, true);
