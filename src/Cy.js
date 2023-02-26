@@ -1225,15 +1225,15 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
            */
         } else {
           if (prev) {
-            const prevNodePosX = prev.position("x");
-            const prevNodePosY = prev.position("y");
-            const prevNodeOg = cyBeforeRepositioning.getElementById(prev.id());
-            const prevNodeOgPos = prevNodeOg.position();
-            const prevNodeOgPosX = prevNodeOgPos.x;
-            const prevNodeOgPosY = prevNodeOgPos.y;
+            const prevPosX = prev.position("x");
+            const prevPosY = prev.position("y");
+            const prevOG = cyBeforeRepositioning.getElementById(prev.id());
+            const prevOGPos = prevOG.position();
+            const prevOGPosX = prevOGPos.x;
+            const prevOGPosY = prevOGPos.y;
+            const prevOutgoerNodes = prev.outgoers("nodes");
             const vPosY = vPos.y;
             const sameRowDiffHeightSpacingY = 240;
-            const prevOutgoerNodes = prev.outgoers("nodes");
             // new x pos
             const posX = spacing * depth;
             // object to store new position value
@@ -1303,13 +1303,13 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
                 prevOutgoerNodesSorted.toArray();
               for (let j = 0; j < prevOutgoerNodesSortedArr.length; j++) {
                 if (prevOutgoerNodesSortedArr[j].id() === v.id()) {
-                  pos.y = prevNodePosY + j * sameRowDiffHeightSpacingY;
+                  pos.y = prevPosY + j * sameRowDiffHeightSpacingY;
                 }
               }
 
               lowestRowNode[row] = Math.max(lowestRowNode[row], pos.y);
             } else {
-              pos.y = prevNodePosY;
+              pos.y = prevPosY;
             }
             /**
              *
