@@ -1166,6 +1166,11 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
     // be at this section's row height
     highestYPosValueInSection[row] = sectionBasePosY[row];
 
+    /**
+     * BFS
+     *
+     * runs {@see breadthFirstSearch}
+     */
     nodesInCurrRow.breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
@@ -1327,7 +1332,10 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
                 }
               }
 
-              highestYPosValueInSection[row] = Math.max(highestYPosValueInSection[row], pos.y);
+              highestYPosValueInSection[row] = Math.max(
+                highestYPosValueInSection[row],
+                pos.y
+              );
             } else {
               pos.y = prevPosY;
             }
