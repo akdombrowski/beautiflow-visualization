@@ -638,14 +638,14 @@ export const getSourceNode = (cy, targetNodeID) => {
 //   });
 // };
 
-export const animateSuccessorsOfEle = (ele, dur) => {
+export const animateSuccessorsOfEle = (ele, dur, color) => {
   const anis = ele
     .successors()
     .filter("nodes")
     .map((el, i, els) => {
       const ani = el.animation(
         {
-          style: { backgroundColor: "blue" },
+          style: { backgroundColor: color },
         },
         {
           duration: dur,
@@ -1136,6 +1136,8 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
   //   true
   // );
 
+  let rowPosY = 400;
+  const rowSpacingY = 540;
   // for (const ele of roots) {
   for (let row = 0; row < roots.length; row++) {
     const ele = roots[row];
@@ -1144,6 +1146,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
     const anis = [];
     const nodesInCurrRow = getRowOfNodesFromRoot(ele);
     const nodesInCurrRowClone = nodesInCurrRow.clone();
+    rowPosY += rowSpacingY * row;
     nodesInCurrRow.breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
