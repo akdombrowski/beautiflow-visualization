@@ -96,12 +96,10 @@ function App() {
     e.preventDefault();
     if (cyRef.current) {
       const cy = cyRef.current;
-      console.log(cy.animated());
       cy.stop(true, true);
       cy.$("*").forEach((ele, i, eles) => {
         ele.stop(true, true);
       });
-      console.log(cy.animated());
       cy.remove("*");
       cy.add(ogNodesClone);
     }
@@ -122,7 +120,7 @@ function App() {
     if (cyRef.current) {
       const clones = createClonedNodes(cyRef.current);
     }
-  }, [elements]);
+  }, [file]);
 
   useEffect(() => {
     if (isAccordionOpen) {
@@ -199,7 +197,6 @@ function App() {
                       },
                       "background-color": (ele) => {
                         const props = ele.data("properties");
-                        console.log(props);
                         const readBGColor = props
                           ? props.backgroundColor
                           : null;
@@ -293,7 +290,7 @@ function App() {
                     eventKey="0"
                     setAccordionCollapsedState={toggleAccordion}
                   >
-                    Expand
+                    Expand/Collapse
                   </CustomToggle>
                 </Card.Header>
                 <Accordion.Collapse eventKey="0">
@@ -309,16 +306,6 @@ function App() {
                   </Card.Body>
                 </Accordion.Collapse>
               </Card>
-              {/* </Accordion.Header> */}
-              {/* <Accordion.Body className="">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </Accordion.Body> */}
             </Accordion.Item>
           </Accordion>
         </Row>

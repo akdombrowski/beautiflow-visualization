@@ -638,7 +638,7 @@ export const getSourceNode = (cy, targetNodeID) => {
 //   });
 // };
 
-export const animateSuccessorsOfEle = (ele) => {
+export const animateSuccessorsOfEle = (ele, dur) => {
   const anis = ele
     .successors()
     .filter("nodes")
@@ -648,7 +648,7 @@ export const animateSuccessorsOfEle = (ele) => {
           style: { backgroundColor: "blue" },
         },
         {
-          duration: 10000,
+          duration: dur,
           complete: () => console.log("animated " + ele.id() + "'s successors"),
         }
       );
@@ -657,11 +657,20 @@ export const animateSuccessorsOfEle = (ele) => {
   return anis;
 };
 
-export const emitStyleEventForExplainerText = (cy, ani, aniDes, start, end) => {
-  if (start) {
-    console.log(ani, aniDes);
-  } else if (end) {
-    console.log(ani, aniDes, "completed");
+export const emitStyleEventForExplainerText = (
+  cy,
+  ani,
+  aniDes,
+  start,
+  end,
+  debugAnimations
+) => {
+  if (debugAnimations) {
+    if (start) {
+      console.log(ani, aniDes);
+    } else if (end) {
+      console.log(ani, aniDes, "completed");
+    }
   }
 
   cy.emit("style", [ani, aniDes, start, end]);
@@ -733,7 +742,10 @@ export const animateNodes = (nodes, dur, color) => {
       },
       {
         duration: dur,
-        complete: () => console.log(ele.id() + " animated"),
+        complete: () => {
+          // console.log(ele.id() + " animated");
+          return;
+        },
       }
     );
     ani.play();
@@ -866,10 +878,10 @@ export const spaceHorizontally = async (
     getRowOfNodesFromRoot(ele).breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
-        console.log("edge"); // we're getting null here
-        console.log(edge.id());
-        console.log("v");
-        console.log(v.id());
+        // console.log("edge"); // we're getting null here
+        // console.log(edge.id());
+        // console.log("v");
+        // console.log(v.id());
         if (roots.getElementById(v.id())) {
           currRowPosY += nextRowYAdd;
           v.position({ x: rowStartPosX, y: currRowPosY });
@@ -987,8 +999,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
     cy.$("*").clone().jsons()
   );
 
-  console.log('cyBeforeRepositioning.$(" *").jsons().length');
-  console.log(cyBeforeRepositioning.$("*").jsons().length);
+  // console.log('cyBeforeRepositioning.$(" *").jsons().length');
 
   const nodes = cy.nodes();
   const nodesOG = nodes.clone();
@@ -1025,8 +1036,8 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
   const rootsArr = roots.toArray();
   const rootsArr1 = rootsArr.slice(0, 1);
 
-  console.log("roots");
-  console.log(roots.jsons());
+  // console.log("roots");
+  // console.log(roots.jsons());
 
   // let dur = 1000;
   let dur = 500;
@@ -1125,19 +1136,22 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
   //   true
   // );
 
-  for (const ele of roots) {
+  // for (const ele of roots) {
+  for (let row = 0; row < roots.length; row++) {
+    const ele = roots[row];
     const currNodeAnimations = [];
     const prevNodeAnimations = [];
     const anis = [];
-    const row = getRowOfNodesFromRoot(ele);
-    const rowClone = row.clone();
-    row.breadthFirstSearch({
+    const nodesInCurrRow = getRowOfNodesFromRoot(ele);
+    const nodesInCurrRowClone = nodesInCurrRow.clone();
+    nodesInCurrRow.breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
         let prevNodeAniProm;
         let prevNodeAni;
         let currNodeAniProm;
         let currNodeAni;
+        let ani = {};
         if (prev) {
           const prevPos = prev.position();
           // prev.animate(
@@ -1155,7 +1169,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
             prevNodeAni = prev.animation(
               {
                 // position: prevPos,
-                style: { backgroundColor: "green" },
+                style: { backgroundColor: "blue" },
               },
               {
                 duration: dur,
@@ -1167,10 +1181,10 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
 
         // await cy.pon("style");
 
-        if (edge) {
-          console.log("edge:", edge.id());
-        }
-        console.log("v:", v.id());
+        // if (edge) {
+        // console.log("edge:", edge.id());
+        // }
+        // console.log("v:", v.id());
         const vPos = v.position();
 
         currNodeAniProm = new Promise((resolve, reject) => {
@@ -1186,29 +1200,36 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
           );
         });
 
-        anis.push({
-          prevID: prev?.id(),
-          prevAniProm: prevNodeAniProm,
-          prevAni: prevNodeAni,
-          currID: v.id(),
-          currAni: currNodeAni,
-          currAniProm: currNodeAniProm,
-        });
+        ani.prevID = prev?.id();
+        ani.prevAniProm = prevNodeAniProm;
+        ani.prevAni = prevNodeAni;
+        ani.currID = v.id();
+        ani.currAni = currNodeAni;
+        ani.currAniProm = currNodeAniProm;
 
         if (roots.getElementById(v.id()).length) {
           // at a root node, don't need to reposition
 
-          const a = v.animation(
-            {
-              // position: prevPos,
-              style: { backgroundColor: "white" },
-            },
-            {
-              duration: 500,
-              complete: () => console.log("animated " + v.id()),
-            }
-          );
-          a.play();
+          let rootAni;
+          const rootAniProm = new Promise((resolve, reject) => {
+            rootAni = v.animation(
+              {
+                // position: prevPos,
+                style: { backgroundColor: "white" },
+              },
+              {
+                duration: dur,
+                complete: () => {
+                  // console.log("animated " + v.id())
+                  resolve("animating root " + v.id());
+                },
+              }
+            );
+          });
+          ani.rootID = v.id();
+          ani.rootAniProm = rootAniProm;
+          ani.rootAni = rootAni;
+          anis.push(ani);
         } else {
           if (prev) {
             const prevNodePosX = prev.position("x");
@@ -1225,37 +1246,62 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
             // v.position("x", nextPosX);
             //
             let pos = { x: nextPosX, y: currNodePosY };
-            await animateElePosAndPlay(cy, v, 5000, "red", pos);
-            v.position(pos);
-
-            if (v.id() === testNode3ID) {
-              console.log();
-              console.log();
-              console.log(
-                "currNodePos:",
-                v.id(),
-                v.data("nodeType"),
-                v.data("name"),
-                v.position()
+            // await animateElePosAndPlay(cy, v, 5000, "red", pos);
+            let vMoveAni;
+            let vMoveAniProm = new Promise((resolve, reject) => {
+              vMoveAni = v.animation(
+                {
+                  position: pos,
+                  style: { backgroundColor: "purple" },
+                },
+                {
+                  duration: dur,
+                  complete: () => {
+                    // console.log("animated " + v.id())
+                    resolve(
+                      "animating " +
+                        v.id() +
+                        "'s position to " +
+                        JSON.stringify(pos)
+                    );
+                  },
+                }
               );
-              // console.log(v.json());
+            });
+            ani.vMovePos = pos;
+            ani.vMoveAniProm = vMoveAniProm;
+            ani.vMoveAni = vMoveAni;
+            anis.push(ani);
+            // v.position(pos);
 
-              // console.log(
-              //   "prevNodeOgPos:",
-              //   prevNodeOg.id(),
-              //   prevNodeOg.data("nodeType"),
-              //   prevNodeOg.position()
-              // );
-              console.log();
-            }
+            // if (v.id() === testNode3ID) {
+            // console.log();
+            // console.log();
+            // console.log(
+            //   "currNodePos:",
+            //   v.id(),
+            //   v.data("nodeType"),
+            //   v.data("name"),
+            //   v.position()
+            // );
+            // console.log(v.json());
+
+            // console.log(
+            //   "prevNodeOgPos:",
+            //   prevNodeOg.id(),
+            //   prevNodeOg.data("nodeType"),
+            //   prevNodeOg.position()
+            // );
+            // console.log();
+            // }
 
             // i think the diff calc is using the updated pos of the prev node, so it's not reliable
             // calc row y pos ahead of time
             if (currNodePosY - prevNodeOgPosY > verticalTolerance) {
-              console.log();
-              console.log(v.id());
-              console.log(prevNodeOg.id());
-              console.log();
+              // console.log();
+              // console.log(v.id());
+              // console.log(prevNodeOg.id());
+              // console.log();
               // 240 is where the next node should start accounting for space for an annotation above it with 150 spacing to that annotation from the row above
               // const numberOfRowsBelow = Math.floor(
               //   (currNodePosY - prevNodeOgPosY) / verticalTolerance
@@ -1263,19 +1309,19 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
               // const nextPosY = (currRowPosY + 240) * numberOfRowsBelow;
               // // v.position("y", nextPosY);
               // //
-              if (v.id() === testNode3ID) {
-                console.log("verticalTolerance:", verticalTolerance);
-                console.log("after move currNodePos:", v.position());
-                console.log();
-                console.log();
-              }
+              // if (v.id() === testNode3ID) {
+              //   console.log("verticalTolerance:", verticalTolerance);
+              //   console.log("after move currNodePos:", v.position());
+              //   console.log();
+              //   console.log();
+              // }
             } else {
               // v.position("y", currRowPosY);
             }
           } else {
             // We should have a previous node because we didn't find the
             // current node in roots
-            console.log(v.id() + " doesn't have a previous node.");
+            console.error(v.id() + " doesn't have a previous node.");
           }
         }
       },
@@ -1286,76 +1332,77 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
     emitStyleEventForExplainerText(cy, "Breadth First Search", "", true, false);
     for (const a of anis) {
       const { prevID, prevAniProm, prevAni, currID, currAni, currAniProm } = a;
+      let msg;
+
       if (prevAniProm && prevAni) {
-        emitStyleEventForExplainerText(
-          cy,
-          "",
-          "animating " + prevID,
-          true,
-          false
-        );
+        msg = "animating " + prevID;
+        emitStyleEventForExplainerText(cy, "", msg, true, false);
         prevAni.play();
         const prevAnimated = await prevAniProm;
-        emitStyleEventForExplainerText(
-          cy,
-          "",
-          "animating " + prevID,
-          false,
-          true
-        );
+        emitStyleEventForExplainerText(cy, "", msg, false, true);
         // console.log(prevAnimated);
       }
-      emitStyleEventForExplainerText(
-        cy,
-        "",
-        "animating " + currID,
-        true,
-        false
-      );
+
+      msg = "animating " + currID;
+      emitStyleEventForExplainerText(cy, "", msg, true, false);
       currAni.play();
       const currAnimated = await currAniProm;
-      emitStyleEventForExplainerText(
-        cy,
-        "",
-        "animating " + currID,
-        false,
-        true
-      );
+      emitStyleEventForExplainerText(cy, "", msg, false, true);
+
+      if (a.vMovePos) {
+        msg = "animating " + a.currID + " to " + JSON.stringify(a.vMovePos);
+        emitStyleEventForExplainerText(cy, "", msg, true, false);
+        a.vMoveAni.play();
+        const vMoveAnimated = await a.vMoveAniProm;
+        emitStyleEventForExplainerText(cy, "", msg, false, true);
+      }
+
+      if (a.rootID) {
+        msg = "animating root " + a.rootID;
+        emitStyleEventForExplainerText(cy, "", msg, true, false);
+        a.rootAni.play();
+        const rootAnimated = await a.rootAniProm;
+        emitStyleEventForExplainerText(cy, "", msg, false, true);
+      }
+
+      if (prevID) {
+        await getAnimationPromiseForEle(cy.$("#" + prevID), dur, "green");
+      }
       // console.log(currAnimated);
     }
     emitStyleEventForExplainerText(cy, "Breadth First Search", "", false, true);
     // console.log("animating bfs completed");
   }
 
-  console.log();
-  console.log("old positions");
-  console.log(testNode1ID);
-  console.log(cyBeforeRepositioning.getElementById(testNode1ID).position());
-  console.log(testNode2ID);
-  console.log(cyBeforeRepositioning.getElementById(testNode2ID).position());
-  console.log();
-  console.log();
-  console.log("new positions");
-  console.log(testNode1ID);
-  console.log(cy.getElementById(testNode1ID).position());
-  console.log(testNode2ID);
-  console.log(cy.getElementById(testNode2ID).position());
-  console.log();
+  // console.log();
+  // console.log("old positions");
+  // console.log(testNode1ID);
+  // console.log(cyBeforeRepositioning.getElementById(testNode1ID).position());
+  // console.log(testNode2ID);
+  // console.log(cyBeforeRepositioning.getElementById(testNode2ID).position());
+  // console.log();
+  // console.log();
+  // console.log("new positions");
+  // console.log(testNode1ID);
+  // console.log(cy.getElementById(testNode1ID).position());
+  // console.log(testNode2ID);
+  // console.log(cy.getElementById(testNode2ID).position());
+  // console.log();
 
-  console.log();
-  console.log("old positions");
-  console.log(testNode3ID);
-  console.log(cyBeforeRepositioning.getElementById(testNode3ID).position());
-  console.log(testNode4ID);
-  console.log(cyBeforeRepositioning.getElementById(testNode4ID).position());
-  console.log();
-  console.log();
-  console.log("new positions");
-  console.log(testNode3ID);
-  console.log(cy.getElementById(testNode3ID).position());
-  console.log(testNode4ID);
-  console.log(cy.getElementById(testNode4ID).position());
-  console.log();
+  // console.log();
+  // console.log("old positions");
+  // console.log(testNode3ID);
+  // console.log(cyBeforeRepositioning.getElementById(testNode3ID).position());
+  // console.log(testNode4ID);
+  // console.log(cyBeforeRepositioning.getElementById(testNode4ID).position());
+  // console.log();
+  // console.log();
+  // console.log("new positions");
+  // console.log(testNode3ID);
+  // console.log(cy.getElementById(testNode3ID).position());
+  // console.log(testNode4ID);
+  // console.log(cy.getElementById(testNode4ID).position());
+  // console.log();
 
   // return await createCytoscapeGraphFromEles(
   //   cy.json(normalizedNodesWOAnnotations.jsons())
