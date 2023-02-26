@@ -990,7 +990,7 @@ export const spaceHorizontally = async (
   return cy;
 };
 
-export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
+export const bfsAnimation = async (cy, spacing, verticalTolerance, dur) => {
   // const testNode1ID = "bb45iggzc5";
   // const testNode2ID = "ze3omkafya";
   // const testNode3ID = "bviv3cclyg";
@@ -1013,7 +1013,6 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
   const nodesOG = nodes.clone();
   const nodesSorted = sortNodes(nodes, verticalTolerance);
   const normalizedNodes = normalizeCyNodePos(nodesSorted);
-  cy.fit();
   const normalizedNodesUntouched = normalizedNodes.clone();
   const normalizedNodesWOAnnotations = normalizedNodes.filter(
     '[nodeType != "ANNOTATION"]'
@@ -1023,6 +1022,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
   cy.json(collWithNormalizedNodePos.jsons());
 
   const roots = normalizedNodesWOAnnotations.roots();
+  cy.fit(getRowOfNodesFromRoot(roots.first()), 150);
   // const startNode = getStartNode(nodesWOAnnotations, verticalTolerance);
 
   // just in case, lock annotations' pos
@@ -1048,7 +1048,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
   // console.log(roots.jsons());
 
   // let dur = 1000;
-  let dur = 500;
+  // let dur = 500;
   // "animating roots"
   // emitStyleEventForExplainerText(cy, "Animating roots", "", true, false);
   // await Promise.all(
@@ -1410,6 +1410,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
           currStepAnimations.vMovePos = pos;
           currStepAnimations.vMoveAniProm = vMoveAniProm;
           currStepAnimations.vMoveAni = vMoveAni;
+          // currStepAnimations.rootID = ele.id();
           // curr animations object to collective animations holder
           animations.push(currStepAnimations);
           // v.position(pos);
@@ -1468,7 +1469,8 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
      */
     // console.log("animating bfs");
     emitStyleEventForExplainerText(cy, "Breadth First Search", "", true, false);
-    for (const ani of animations) {
+    for (let i = 0; i < animations.length; i++) {
+      const ani = animations[i];
       const {
         preID,
         preAniProm,
@@ -1484,6 +1486,13 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
         vMoveAniProm,
       } = ani;
       let msg;
+
+      // need to figure out how to calculate for rows with multiple levels
+      if (rootID) {
+        const nextRowOfNodes = getRowOfNodesFromRoot(cy.$("#" + rootID));
+        // cy.fit(nextRowOfNodes, 150);
+        // cy.panBy({x: 0, y: 300})
+      }
 
       if (preAniProm && preAni) {
         msg = "animating " + preID;
@@ -1505,7 +1514,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
         currAniProm
       );
 
-      if (ani.vMovePos) {
+      if (vMovePos) {
         msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
         const resolvedMsg = await emitAndWaitForAni(
           msg,
@@ -1516,7 +1525,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
         );
       }
 
-      if (ani.rootID) {
+      if (rootAni) {
         msg = "animating root " + rootID;
         const resolvedMsg = await emitAndWaitForAni(
           msg,

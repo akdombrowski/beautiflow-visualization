@@ -54,14 +54,14 @@ function App() {
   const formatSpacing = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      bfsAnimation(cyRef.current, 150, 330);
+      bfsAnimation(cyRef.current, 150, 330, 500);
     }
   };
 
   const bfs = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      bfsAnimation(cyRef.current, 150, 330);
+      bfsAnimation(cyRef.current, 150, 330, 500);
     }
   };
 
