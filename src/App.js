@@ -28,13 +28,13 @@ function App() {
   const [aniDescriptionText, setAniDescriptionText] = useState("");
   const [anniesShifted, setAnnosShifted] = useState(false);
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
-  const [cyHeight, setCyHeight] = useState("70vh");
+  const cyHeightAccOpen = "70vh";
+  const cyHeightAccClosed = "80vh";
+  const [cyHeight, setCyHeight] = useState(cyHeightAccOpen);
   const cyRef = useRef(null);
   const cyContainerID = "cyContainer";
   const filename =
     "/home/adombrowski/workspace/beautiflowify/testFlows/WO_subflow_condensed_columns and rows - Beautiflow - Demo 3 - PingOne Sign-On, Password Forgot and Reset, User Registration_Export_2023-02-19T14_27_48.361Z.json";
-  const cyHeightAccOpen = "70vh";
-  const cyHeightAccClosed = "80vh";
 
   const loadFlowJSONFromFile = async (e) => {
     e.preventDefault();
@@ -138,6 +138,10 @@ function App() {
           setAniText(ani);
         } else if (end) {
           setAniText(ani + " completed");
+
+          if ("Breadth First Search" === ani) {
+            setAniDescriptionText("animations completed");
+          }
         }
       }
       if (aniDes) {
@@ -151,7 +155,7 @@ function App() {
   }
 
   return (
-    <div className="bg-dark" style={{ minHeight: "100vh" }}>
+    <div className="bg-dark" style={{ minHeight: "100vh", maxHeight: "100vh" }}>
       <Container fluid className="bg-dark">
         <Row>
           <Col
@@ -164,7 +168,7 @@ function App() {
                 id="cy"
                 elements={CytoscapeComponent.normalizeElements(elements)}
                 layout={{ name: "preset" }}
-                style={{ width: "100vw", height: "100%" }}
+                style={{ width: "99vw", height: "100%" }}
                 stylesheet={[
                   {
                     selector: "node",
