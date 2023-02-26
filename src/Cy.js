@@ -1133,10 +1133,12 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
   //   true
   // );
 
-  let rowPosY = [];
+  const rowStartPosX = 400;
+  const firstRowStartPosY = 400;
+  let sectionBasePosY = [];
   let nextRowPosY = 400;
   const rowSpacingY = 540;
-  let lowestRowNode = [];
+  let highestYPosValueInSection = [];
   // for (const ele of roots) {
   for (let row = 0; row < roots.length; row++) {
     const ele = roots[row];
@@ -1146,8 +1148,23 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
     const anis = [];
     const nodesInCurrRow = getRowOfNodesFromRoot(ele);
     const nodesInCurrRowClone = nodesInCurrRow.clone();
-    rowPosY[row] = row ? lowestRowNode[row - 1] + rowSpacingY : 400;
-    lowestRowNode[row] = rowPosY[row];
+    /**
+     * sectionBasePosY is the y-value for the starting nodes and any following
+     * nodes along that same horizontal line
+     *
+     * if row > 0,
+     * take the lowest y value of the previous section and add our row spacing
+     *  to it
+     * else,
+     * use the first row y pos (firstRowStartPosY)
+     *
+     * */
+    sectionBasePosY[row] = row
+      ? highestYPosValueInSection[row - 1] + rowSpacingY
+      : firstRowStartPosY;
+    // init highest (lowest on screen visually) y-value for this new section to
+    // be at this section's row height
+    highestYPosValueInSection[row] = sectionBasePosY[row];
 
     nodesInCurrRow.breadthFirstSearch({
       root: ele,
@@ -1200,10 +1217,11 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
            * color and position
            */
           let rootAni;
+          let pos = { x: rowStartPosX, y: sectionBasePosY[row] };
           const rootAniProm = new Promise((resolve, reject) => {
             rootAni = v.animation(
               {
-                position: { x: v.position("x"), y: rowPosY[row] },
+                position: pos,
                 style: { backgroundColor: "white" },
               },
               {
@@ -1215,6 +1233,8 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
               }
             );
           });
+
+          prevNodePos[v.id()] = pos;
 
           ani.rootID = v.id();
           ani.rootAniProm = rootAniProm;
@@ -1307,7 +1327,7 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
                 }
               }
 
-              lowestRowNode[row] = Math.max(lowestRowNode[row], pos.y);
+              highestYPosValueInSection[row] = Math.max(highestYPosValueInSection[row], pos.y);
             } else {
               pos.y = prevPosY;
             }
