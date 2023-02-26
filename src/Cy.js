@@ -794,6 +794,14 @@ export const animateElePosAndPlay = (cy, ele, dur, color, pos) => {
   });
 };
 
+export const emitAndWaitForAni = async (msg, id, cy, ani, aniProm) => {
+  emitStyleEventForExplainerText(cy, "", msg, true, false);
+  ani.play();
+  const animated = await aniProm;
+  emitStyleEventForExplainerText(cy, "", msg, false, true);
+  return animated;
+};
+
 export const getRowOfNodesFromRoot = (root) => {
   const row = root.successors();
   return row.union(root);
@@ -1469,38 +1477,54 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
         currAni,
         currAniProm,
         rootID,
+        rootAni,
         rootAniProm,
+        vMovePos,
+        vMoveAni,
+        vMoveAniProm,
       } = ani;
       let msg;
 
       if (preAniProm && preAni) {
         msg = "animating " + preID;
-        emitStyleEventForExplainerText(cy, "", msg, true, false);
-        preAni.play();
-        const prevAnimated = await preAniProm;
-        emitStyleEventForExplainerText(cy, "", msg, false, true);
+        const resolvedMsg = await emitAndWaitForAni(
+          msg,
+          preID,
+          cy,
+          preAni,
+          preAniProm
+        );
       }
 
       msg = "animating " + currID;
-      emitStyleEventForExplainerText(cy, "", msg, true, false);
-      currAni.play();
-      const currAnimated = await currAniProm;
-      emitStyleEventForExplainerText(cy, "", msg, false, true);
+      const currAniResolvedMsg = await emitAndWaitForAni(
+        msg,
+        currID,
+        cy,
+        currAni,
+        currAniProm
+      );
 
       if (ani.vMovePos) {
-        msg = "animating " + ani.currID + " to " + JSON.stringify(ani.vMovePos);
-        emitStyleEventForExplainerText(cy, "", msg, true, false);
-        ani.vMoveAni.play();
-        const vMoveAnimated = await ani.vMoveAniProm;
-        emitStyleEventForExplainerText(cy, "", msg, false, true);
+        msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
+        const resolvedMsg = await emitAndWaitForAni(
+          msg,
+          currID,
+          cy,
+          vMoveAni,
+          vMoveAniProm
+        );
       }
 
       if (ani.rootID) {
         msg = "animating root " + rootID;
-        emitStyleEventForExplainerText(cy, "", msg, true, false);
-        ani.rootAni.play();
-        const rootAnimated = await rootAniProm;
-        emitStyleEventForExplainerText(cy, "", msg, false, true);
+        const resolvedMsg = await emitAndWaitForAni(
+          msg,
+          rootID,
+          cy,
+          rootAni,
+          rootAniProm
+        );
       }
 
       // change prev node to green as its processing is complete
@@ -1511,10 +1535,13 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
           dur,
           "green"
         );
-        emitStyleEventForExplainerText(cy, "", msg, true, false);
-        doneWithPrevNodeAni.play();
-        const doneWithPrevNodeAnimated = await prom;
-        emitStyleEventForExplainerText(cy, "", msg, false, true);
+        const resolvedMsg = await emitAndWaitForAni(
+          msg,
+          preID,
+          cy,
+          doneWithPrevNodeAni,
+          prom
+        );
       }
 
       if (
@@ -1523,16 +1550,16 @@ export const bfsAnimation = async (cy, spacing, verticalTolerance) => {
           .outgoers()
           .size()
       ) {
-        msg = "prev node " + preID + " processing is complete animation";
-        const { ani: doneWithCurrLeafNodeAni, prom } = getAnimationPromiseForEle(
-          cy.$("#" + currID),
-          dur,
-          "green"
+        msg = "prev node " + preID + " processing is finished animation";
+        const { ani: doneWithCurrLeafNodeAni, prom } =
+          getAnimationPromiseForEle(cy.$("#" + currID), dur, "green");
+        const resolvedMsg = await emitAndWaitForAni(
+          msg,
+          preID,
+          cy,
+          doneWithCurrLeafNodeAni,
+          prom
         );
-        emitStyleEventForExplainerText(cy, "", msg, true, false);
-        doneWithCurrLeafNodeAni.play();
-        const doneWithCurrLeafNodeAnimated = await prom;
-        emitStyleEventForExplainerText(cy, "", msg, false, true);
       }
     }
     emitStyleEventForExplainerText(cy, "Breadth First Search", "", false, true);
@@ -1623,6 +1650,7 @@ export const getFlowJSON = (ogFlowJSON, cy) => {
   ogFlowJSON.enabledGraphData.elements.edges = cyJSON.elements.edges;
   return ogFlowJSON;
 };
+
 // export const writeFlowJSON = (outputFilePath, ogFlowJSON, cy) => {
 //   writeFileSync(outputFilePath, getFlowJSON(ogFlowJSON, cy));
 // };
