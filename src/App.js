@@ -31,9 +31,9 @@ function App() {
   const [aniDescriptionText, setAniDescriptionText] = useState("");
   const [anniesShifted, setAnnosShifted] = useState(false);
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
-  // const [cyHeight, setCyHeight] = useState(cyHeightAccOpen);
   const defaultAnimationDuration = 0.5;
   const maxAnimationDuration = 10;
+  const minAnimationDuration = 0.1;
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
   const cyRef = useRef(null);
   const [cy, setCy] = useState(null);
@@ -354,8 +354,8 @@ function App() {
                         <Form.Range
                           onChange={(e) => onAnimationDurationChange(e)}
                           value={aniDur}
-                          min={0.1}
-                          max={10}
+                          min={minAnimationDuration}
+                          max={maxAnimationDuration}
                           step={0.1}
                         />
                       </Form.Floating>
