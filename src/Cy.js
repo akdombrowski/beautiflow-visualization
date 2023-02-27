@@ -1828,6 +1828,7 @@ export const beautiflowifyWithAnimation = async (
     const animations = [];
     const nodesInCurrRow = getRowOfNodesFromRoot(ele);
     const nodesInCurrRowClone = nodesInCurrRow.clone();
+    let rootNodePosAdj = { x: 0, y: 0 };
     /**
      * sectionBasePosY is the y-value for the starting nodes and any following
      * nodes along that same horizontal line
@@ -1929,7 +1930,7 @@ export const beautiflowifyWithAnimation = async (
            *    to the same source node
            */
           if (roots.getElementById(vID).length) {
-            // at a root node, only move y position
+            // at a root node
             posY = sectionBaselinePosY[row];
 
             /**
@@ -1954,12 +1955,16 @@ export const beautiflowifyWithAnimation = async (
               );
             });
 
+            rootNodePosAdj.x = ele.position("x") - pos.x;
+            rootNodePosAdj.y = ele.position("y") - pos.y;
+
             prevNodePos[vID] = pos;
             updatedPos[vID] = pos;
 
             currStepAnimations.rootID = vID;
             currStepAnimations.rootAniProm = rootAniProm;
             currStepAnimations.rootAni = rootAni;
+            currStepAnimations.newRootPos = pos;
             animations.push(currStepAnimations);
             /**
              *
@@ -2180,6 +2185,20 @@ export const beautiflowifyWithAnimation = async (
      */
     // console.log("animating bfs");
     emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
+    let viewportAni;
+    let viewportAniProm = new Promise((resolve, reject) => {
+      viewportAni = cy.animation({
+        // zoom: { level: 1, position: ele.position() },
+        panBy: rootNodePosAdj,
+        duration: dur / 2,
+        complete: () =>
+          resolve("Adjusted viewport (pan) to animating elements"),
+      });
+    });
+    cy.fit(nodesInCurrRow, 150);
+    viewportAni.play();
+    await viewportAniProm;
+
     for (let i = 0; i < animations.length; i++) {
       const ani = animations[i];
       const {
@@ -2192,6 +2211,7 @@ export const beautiflowifyWithAnimation = async (
         rootID,
         rootAni,
         rootAniProm,
+        newRootPos,
         vMovePos,
         vMoveAni,
         vMoveAniProm,
@@ -2199,8 +2219,20 @@ export const beautiflowifyWithAnimation = async (
       let msg;
 
       // need to figure out how to calculate for rows with multiple levels
-      if (rootID) {
-        const nextRowOfNodes = getRowOfNodesFromRoot(cy.$("#" + rootID));
+      if (vMovePos) {
+        // viewportAniProm = new Promise((resolve, reject) => {
+        //   viewportAni = cy.animation({
+        //     panBy: {
+        //       x: 150,
+        //       y: -150,
+        //     },
+        //     duration: dur / 2,
+        //     complete: () =>
+        //       resolve("Adjusted viewport (panBy) to animating elements"),
+        //   });
+        // });
+        // viewportAni.play();
+        // await viewportAniProm;
         // cy.fit(nextRowOfNodes, 150);
         // cy.panBy({x: 0, y: 300})
       }
@@ -2336,6 +2368,9 @@ export const beautiflowifyWithAnimation = async (
   // return await createCytoscapeGraphFromEles(
   //   cy.json(normalizedNodesWOAnnotations.jsons())
   // );
+
+  cy.fit();
+
   return cy;
 };
 
