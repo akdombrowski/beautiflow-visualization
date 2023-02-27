@@ -389,12 +389,12 @@ function App() {
                           size="sm"
                           onClick={(e) => handleFileInputLabelClick(e)}
                         >
-                          <Form.Label
+                          {/* <Form.Label
                             className="text-dark text-center"
                             htmlFor="fileInput"
-                          >
-                            <h6>Choose a DV flow export JSON file</h6>
-                          </Form.Label>
+                          > */}
+                          <h6>Choose a DV flow export JSON file</h6>
+                          {/* </Form.Label> */}
                         </Button>
                         <input
                           type="file"
@@ -439,25 +439,37 @@ function App() {
       ) : (
         <Form className="h-100 p-5">
           <Row className="h-100 justify-content-center align-content-center">
-            <Col xs={12} className="pb-5">
+            <Col xs={12} className="pt-5">
               <h1 className="display-1 text-light text-center">
                 Choose a DV flow JSON export file to get started!
               </h1>
             </Col>
-            <Col xs={12} className="p-5 m-5">
-              <div className="d-grid gap-5">
+            <Col xs={12} className="pb-5 m-5">
+              <div className="d-grid">
                 <Form.Label htmlFor="fileInput">
                   Choose a DV flow export JSON file
                 </Form.Label>
+
                 <Button
-                  id="fileInput"
                   variant="light"
-                  as="input"
-                  type="file"
-                  accept=".json,text/*"
                   size="lg"
+                  onClick={(e) => handleFileInputLabelClick(e)}
+                >
+                  {/* <Form.Label
+                            className="text-dark text-center"
+                            htmlFor="fileInput"
+                          > */}
+                  <h6>Choose a DV flow export JSON file</h6>
+                  {/* </Form.Label> */}
+                </Button>
+                <input
+                  type="file"
+                  id="fileInput"
+                  name="fileInput"
+                  accept=".json"
                   onChange={(e) => loadFlowJSONFromFile(e)}
-                ></Button>
+                  style={{ display: "none" }}
+                ></input>
               </div>
             </Col>
           </Row>
