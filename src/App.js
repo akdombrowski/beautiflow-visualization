@@ -292,7 +292,7 @@ function App() {
                             eventKey="0"
                             setAccordionCollapsedState={toggleAccordion}
                           >
-                            Expand/Collapse
+                            Description of Animation - Expand/Collapse
                           </CustomToggle>
                         </Card.Header>
                         <Accordion.Collapse eventKey="0">
@@ -327,7 +327,7 @@ function App() {
                           placeholder=".5"
                         >
                           <p className="text-light">
-                            Animation Duration: {aniDur}
+                            Animation Duration: {aniDur}s
                           </p>
                         </Form.Label>
                         <Form.Range
@@ -346,7 +346,7 @@ function App() {
                           size="lg"
                           onClick={(e) => bfs(e)}
                         >
-                          BFS
+                          Beautiflowify
                         </Button>
                       </div>
                     </Col>
