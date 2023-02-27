@@ -990,7 +990,12 @@ export const spaceHorizontally = async (
   return cy;
 };
 
-export const beautiflowifyWithAnimation = async (cy, spacing, verticalTolerance, dur) => {
+export const beautiflowifyWithAnimation = async (
+  cy,
+  spacing,
+  verticalTolerance,
+  dur
+) => {
   // const testNode1ID = "bb45iggzc5";
   // const testNode2ID = "ze3omkafya";
   // const testNode3ID = "bviv3cclyg";
@@ -1403,7 +1408,7 @@ export const beautiflowifyWithAnimation = async (cy, spacing, verticalTolerance,
               }
             );
           });
-          vMoveAni.play();
+          // vMoveAni.play();
           // v.position(pos);
 
           // add v's movement animation to current animations object
