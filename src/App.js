@@ -49,8 +49,6 @@ function App() {
 
   const handleFileInputLabelClick = (e) => {
     e.preventDefault();
-    console.log('document.getElementById("fileInput")');
-    console.log(document.getElementById("fileInput"));
     document.getElementById("fileInput").click();
   };
 

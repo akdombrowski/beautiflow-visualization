@@ -45,7 +45,6 @@ export const readFlowJSONFileWithFileReader = async (filename) => {
     type: "text/plain",
   });
   reader.onload = (evt) => {
-    console.log(evt.target.result);
     const flowJSON = convertStrToJSON(text);
     return flowJSON;
   };
@@ -92,7 +91,6 @@ export const getEdges = (flowJSON) => {
 export const getCopyOfElementsObj = (flowJSON) => {
   try {
     const elementsCopy = JSON.parse(JSON.stringify(getElements(flowJSON)));
-    console.log(elementsCopy);
     return elementsCopy;
   } catch (e) {
     throw new Error("Could not get a copy of elements.", { cause: e });
@@ -270,7 +268,7 @@ export const createCytoscapeGraphForViz = (flowJSON, containerID) => {
     const elementsCopy = getCopyOfElementsObj(parsedJSONFlow);
     const containerEl = document.getElementById(containerID);
 
-    console.log(elementsCopy.jsons());
+    // console.log(elementsCopy.jsons());
 
     const cy = cytoscape({
       container: containerEl,
@@ -859,9 +857,6 @@ export const spaceHorizontally = async (
   const testNode4ID = "w7jmfry8oc";
 
   const cy = createCytoscapeGraph(flowJSON);
-
-  console.log(cy.getElementById(testNode3ID).json());
-
   const cyBeforeRepositioning = createCytoscapeGraph(flowJSON);
   const nodes = cy.nodes();
   const nodesOG = nodes.clone();
@@ -874,8 +869,6 @@ export const spaceHorizontally = async (
   const collWithNormalizedNodePos = cy.edges().union(normalizedNodes);
   // (normalizedNodes.jsons());
   cy.json(collWithNormalizedNodePos.jsons());
-
-  console.log(cy.getElementById(testNode3ID).json());
 
   // this creates an object with the updated elements
   const roots = normalizedNodesWOAnnotations.roots();
@@ -931,22 +924,22 @@ export const spaceHorizontally = async (
 
           v.position("x", nextPosX);
 
-          if (v.id() === testNode3ID) {
-            console.log();
-            console.log();
-            console.log("currNodePos");
-            console.log(v.id());
-            console.log(v.data("nodeType"));
-            console.log(v.data("name"));
-            console.log(v.position());
-            // console.log(v.json());
+          // if (v.id() === testNode3ID) {
+          //   console.log();
+          //   console.log();
+          //   console.log("currNodePos");
+          //   console.log(v.id());
+          //   console.log(v.data("nodeType"));
+          //   console.log(v.data("name"));
+          //   console.log(v.position());
+          //   // console.log(v.json());
 
-            console.log("prevNodeOgPos");
-            console.log(prevNodeOg.id());
-            console.log(prevNodeOg.data("nodeType"));
-            console.log(prevNodeOg.position());
-            console.log();
-          }
+          //   console.log("prevNodeOgPos");
+          //   console.log(prevNodeOg.id());
+          //   console.log(prevNodeOg.data("nodeType"));
+          //   console.log(prevNodeOg.position());
+          //   console.log();
+          // }
 
           // i think the diff calc is using the updated pos of the prev node, so it's not reliable
           // calc row y pos ahead of time
