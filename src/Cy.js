@@ -1218,6 +1218,8 @@ export const beautiflowifyWithAnimationAllAtOnce = async (
          *
          */
 
+        cy.fit();
+
         /**
          * Decide new position based on whether if it's a root node or not
          *
@@ -1253,6 +1255,7 @@ export const beautiflowifyWithAnimationAllAtOnce = async (
               }
             );
           });
+          rootAni.play();
 
           prevNodePos[vID] = pos;
 
@@ -1473,7 +1476,7 @@ export const beautiflowifyWithAnimationAllAtOnce = async (
      *  remove await's
      */
     // console.log("animating bfs");
-    // emitStyleEventForExplainerText(cy, "Breadth First Search", "", true, false);
+    // emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
     // for (let i = 0; i < animations.length; i++) {
     //   const ani = animations[i];
     //   const {
@@ -1576,7 +1579,7 @@ export const beautiflowifyWithAnimationAllAtOnce = async (
     //     );
     //   }
     // }
-    // emitStyleEventForExplainerText(cy, "Breadth First Search", "", false, true);
+    // emitStyleEventForExplainerText(cy, "Beautiflowifying", "", false, true);
     // // console.log("animating bfs completed");
     /**
      *
@@ -2116,7 +2119,7 @@ export const beautiflowifyWithAnimation = async (
      *  remove await's
      */
     // console.log("animating bfs");
-    emitStyleEventForExplainerText(cy, "Breadth First Search", "", true, false);
+    emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
     for (let i = 0; i < animations.length; i++) {
       const ani = animations[i];
       const {
@@ -2219,7 +2222,7 @@ export const beautiflowifyWithAnimation = async (
         );
       }
     }
-    emitStyleEventForExplainerText(cy, "Breadth First Search", "", false, true);
+    emitStyleEventForExplainerText(cy, "Beautiflowifying", "", false, true);
     // console.log("animating bfs completed");
     /**
      *

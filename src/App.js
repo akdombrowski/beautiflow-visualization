@@ -339,7 +339,7 @@ function App() {
                   > */}
                         <Form.Label
                           className="pb-4 mt-1 text-center"
-                          placeholder=".5"
+                          placeholder=".1"
                         >
                           <p className="text-light">
                             Animation Duration: {aniDur}s
@@ -348,9 +348,9 @@ function App() {
                         <Form.Range
                           onChange={(e) => onAnimationDurationChange(e)}
                           value={aniDur}
-                          min={0.5}
+                          min={0.1}
                           max={10}
-                          step={0.5}
+                          step={0.1}
                         />
                       </Form.Floating>
                     </Col>
