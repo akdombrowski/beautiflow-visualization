@@ -15,7 +15,7 @@ import {
   readFlowJSONFileWithFileReader,
   getCopyOfElementsObj,
   convertStrToJSON,
-  bfsAnimation,
+  beautiflowifyWithAnimation,
   shiftAnnosPosFromNodes,
 } from "./Cy";
 import CytoscapeComponent from "react-cytoscapejs";
@@ -60,14 +60,14 @@ function App() {
   const formatSpacing = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      bfsAnimation(cyRef.current, 150, 330, 500);
+      beautiflowifyWithAnimation(cyRef.current, 150, 330, 500);
     }
   };
 
-  const bfs = (e) => {
+  const watchBeautiflowify = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      bfsAnimation(cyRef.current, 150, 330, 500);
+      beautiflowifyWithAnimation(cyRef.current, 150, 330, 500);
     }
   };
 
@@ -344,7 +344,7 @@ function App() {
                         <Button
                           variant="outline-light"
                           size="lg"
-                          onClick={(e) => bfs(e)}
+                          onClick={(e) => watchBeautiflowify(e)}
                         >
                           Beautiflowify
                         </Button>

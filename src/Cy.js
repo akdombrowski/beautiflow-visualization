@@ -990,7 +990,7 @@ export const spaceHorizontally = async (
   return cy;
 };
 
-export const bfsAnimation = async (cy, spacing, verticalTolerance, dur) => {
+export const beautiflowifyWithAnimation = async (cy, spacing, verticalTolerance, dur) => {
   // const testNode1ID = "bb45iggzc5";
   // const testNode2ID = "ze3omkafya";
   // const testNode3ID = "bviv3cclyg";
