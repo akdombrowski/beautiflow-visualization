@@ -60,14 +60,14 @@ function App() {
   const formatSpacing = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      beautiflowifyWithAnimation(cyRef.current, 150, 330, 500);
+      beautiflowifyWithAnimation(cyRef.current, 150, 330, aniDur * 1000);
     }
   };
 
   const watchBeautiflowify = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      beautiflowifyWithAnimation(cyRef.current, 150, 330, 500);
+      beautiflowifyWithAnimation(cyRef.current, 150, 330, aniDur * 1000);
     }
   };
 
