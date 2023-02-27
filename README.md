@@ -4,6 +4,18 @@
 
 Upload a DaVinci flow JSON export file and hit BFS to transform that pumpkin of a flow into a beautiflow one
 
+### Beautiflowify
+
+Makes a flow beautiflow
+
+### Animation Duration
+
+Adjust animation duration if you want to see the flow update with slower or faster animations
+
+### Expand/Collapse
+
+Expand this section if you want to see a description of what's being animated
+
 ## Available Scripts
 
 In the project directory, you can run:
