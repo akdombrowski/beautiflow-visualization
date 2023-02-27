@@ -168,11 +168,6 @@ function App() {
   };
 
   useEffect(() => {
-    console.log(cyRef.current);
-    console.log(cyRef);
-    console.log("flowJSON");
-    console.log(flowJSON);
-
     if (!annosShifted && flowJSON && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
       createClonedNodes(cyRef.current);
@@ -187,9 +182,6 @@ function App() {
   useEffect(() => {
     setAnnosShifted(false);
     if (flowJSON) {
-      console.log("");
-      console.log("using new flowJSON");
-      console.log("");
       const normEles = CytoscapeComponent.normalizeElements(
         getCopyOfElementsObj(flowJSON)
       );
