@@ -19,8 +19,8 @@ import {
   shiftAnnosPosFromNodes,
   beautiflowifyWithAnimationAllAtOnce,
 } from "./Cy";
-import CytoscapeComponent from "react-cytoscapejs";
 import CustomToggle from "./CustomToggle";
+import CytoscapeComponent from "react-cytoscapejs";
 
 function App() {
   const [file, setFile] = useState("");
@@ -36,6 +36,7 @@ function App() {
   const maxAnimationDuration = 10;
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
   const cyRef = useRef(null);
+  const [cy, setCy] = useState(null);
 
   const cyContainerID = "cyContainer";
   const filename =
@@ -132,23 +133,23 @@ function App() {
   };
 
   useEffect(() => {
-    if (!anniesShifted && cyRef.current) {
+    console.log(cyRef.current);
+    console.log(cyRef);
+    if (!anniesShifted && elements && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
-    }
-  });
-
-  useEffect(() => {
-    if (elements && cyRef.current) {
       createClonedNodes(cyRef.current);
     } else if (!elements && cyRef.current) {
       setOGNodesClone(null);
       cyRef.current.unmount();
       cyRef.current.destroy();
     }
-  }, [elements]);
+  });
 
-  if (cyRef.current) {
-    const cy = cyRef.current;
+  useEffect(() => {
+    setCy(cyRef.current);
+  }, [cyRef.current]);
+
+  if (cy) {
     cy.on("style", (e, ani, aniDes, start, end) => {
       if (ani) {
         if (start) {
@@ -171,6 +172,10 @@ function App() {
     });
   }
 
+  const setCyRef = (cy) => {
+    cyRef.current = cy;
+  };
+
   return (
     <Container
       fluid
@@ -189,6 +194,7 @@ function App() {
                 height: "70vh",
                 border: ".1rem solid black",
               }}
+              //  cy={(cy) => setCyRef(cy)}
               cy={(cy) => {
                 cyRef.current = cy;
               }}
@@ -383,7 +389,10 @@ function App() {
                           size="sm"
                           onClick={(e) => handleFileInputLabelClick(e)}
                         >
-                          <Form.Label className="text-dark text-center" for="fileInput">
+                          <Form.Label
+                            className="text-dark text-center"
+                            htmlFor="fileInput"
+                          >
                             <h6>Choose a DV flow export JSON file</h6>
                           </Form.Label>
                         </Button>
@@ -437,7 +446,7 @@ function App() {
             </Col>
             <Col xs={12} className="p-5 m-5">
               <div className="d-grid gap-5">
-                <Form.Label for="fileInput">
+                <Form.Label htmlFor="fileInput">
                   Choose a DV flow export JSON file
                 </Form.Label>
                 <Button
