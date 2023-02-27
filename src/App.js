@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
@@ -8,16 +7,12 @@ import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
-import FloatingLabel from "react-bootstrap/FloatingLabel";
 import { useState, useEffect, useRef } from "react";
 import {
-  createCytoscapeGraphForViz,
-  readFlowJSONFileWithFileReader,
   getCopyOfElementsObj,
   convertStrToJSON,
   beautiflowifyWithAnimation,
   beautiflowifyWithAnimationAllAtOnce,
-  shiftAnnosRenderedPosFromNodes,
   shiftAnnosPosFromNodes,
   resetAnnosPosFromNodes,
   getFlowJSON,
@@ -27,25 +22,20 @@ import CustomToggle from "./CustomToggle";
 import CytoscapeComponent from "react-cytoscapejs";
 
 function App() {
-  const [file, setFile] = useState("");
+  const defaultAnimationDuration = 0.5;
+  const maxAnimationDuration = 10;
+  const minAnimationDuration = 0.1;
+  const cyRef = useRef(null);
+  const fileRef = useRef(null);
   const [eles, setEles] = useState(null);
   const [flowJSON, setFlowJSON] = useState("");
   const [ogElesClone, setOGElesClone] = useState(null);
-  const [elements, setElements] = useState("");
   const [aniText, setAniText] = useState("Ready!");
   const [aniDescriptionText, setAniDescriptionText] = useState("");
   const [annosShifted, setAnnosShifted] = useState(false);
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
-  const defaultAnimationDuration = 0.5;
-  const maxAnimationDuration = 10;
-  const minAnimationDuration = 0.1;
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
-  const cyRef = useRef(null);
-  const [cy, setCy] = useState(null);
 
-  const cyContainerID = "cyContainer";
-  const filename =
-    "/home/adombrowski/workspace/beautiflowify/testFlows/WO_subflow_condensed_columns and rows - Beautiflow - Demo 3 - PingOne Sign-On, Password Forgot and Reset, User Registration_Export_2023-02-19T14_27_48.361Z.json";
 
   const handleFileInputLabelClick = (e) => {
     e.preventDefault();
@@ -59,18 +49,27 @@ function App() {
     reader.onload = async (e) => {
       const text = e.target.result;
       const flowJSON = convertStrToJSON(text);
-      console.log("flowJSON");
-      console.log(flowJSON);
       setFlowJSON(flowJSON);
-      console.log("annosShifted");
-      console.log(annosShifted);
-      // setElements(getCopyOfElementsObj(flowJSON));
       setAnnosShifted(false);
     };
 
     if (e.target.files[0]) {
-      setFile(e.target.files[0]);
+      fileRef.current = e.target.files[0];
       reader.readAsText(e.target.files[0]);
+    }
+  };
+
+  const reloadFlowJSONFromFile = async () => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target.result;
+      const flowJSON = convertStrToJSON(text);
+      setFlowJSON(flowJSON);
+      setAnnosShifted(false);
+    };
+
+    if (fileRef.current) {
+      reader.readAsText(fileRef.current);
     }
   };
 
@@ -119,8 +118,9 @@ function App() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       const dateTime = getDateTime();
-      if (file?.name) {
-        link.download = "beautiflowified---" + dateTime + "---" + file.name;
+      if (fileRef.current?.name) {
+        link.download =
+          "beautiflowified---" + dateTime + "---" + fileRef.current.name;
       } else {
         link.download = "dvBeautiflow---" + dateTime;
       }
@@ -136,7 +136,7 @@ function App() {
       cyRef.current.unmount();
       cyRef.current.destroy();
     }
-    setFile("");
+    fileRef.current = null;
     setEles("");
     setAnnosShifted(false);
     setOGElesClone(null);
@@ -144,19 +144,20 @@ function App() {
 
   const reset = (e) => {
     e.preventDefault();
-    if (cyRef.current) {
-      const cy = cyRef.current;
-      cy.stop(true, true);
-      cy.$("*").forEach((ele, i, eles) => {
-        ele.stop(true, true);
-      });
-      cy.remove("*");
-      cy.add(ogElesClone);
-      cy.fit();
-    }
+    // if (cyRef.current) {
+    //   const cy = cyRef.current;
+    //   cy.stop(true, true);
+    //   cy.$("*").forEach((ele, i, eles) => {
+    //     ele.stop(true, true);
+    //   });
+    //   cy.remove("*");
+    //   cy.add(ogElesClone);
+    //   cy.fit();
+    // }
+    reloadFlowJSONFromFile();
   };
 
-  const toggleAccordion = (evKey) => {
+  const toggleAccordion = () => {
     const currAccState = !isAccordionOpen;
     setIsAccordionOpen(currAccState);
   };
@@ -181,27 +182,31 @@ function App() {
       cyRef.current.destroy();
       console.log(cyRef.current);
     }
-  });
+  }, [eles]);
 
   useEffect(() => {
     setAnnosShifted(false);
     if (flowJSON) {
+      console.log("");
+      console.log("using new flowJSON");
+      console.log("");
       const normEles = CytoscapeComponent.normalizeElements(
         getCopyOfElementsObj(flowJSON)
       );
 
       setOGElesClone(null);
       setEles(normEles);
+    } else if (!flowJSON && cyRef.current) {
+      setOGElesClone(null);
+      cyRef.current.unmount();
+      cyRef.current.destroy();
+      console.log(cyRef.current);
     } else {
     }
   }, [flowJSON]);
 
-  useEffect(() => {
-    setCy(cyRef.current);
-  }, [cyRef.current]);
-
-  if (cy) {
-    cy.on("style", (e, ani, aniDes, start, end) => {
+  if (cyRef.current) {
+    cyRef.current.on("style", (e, ani, aniDes, start, end) => {
       if (ani) {
         if (start) {
           setAniText(ani);
@@ -351,7 +356,7 @@ function App() {
                     className="h-100 text-light bs-headings-color-light"
                     defaultActiveKey="0"
                     flush
-                    onSelect={(eKey, e) => toggleAccordion(eKey)}
+                    onSelect={(eKey) => toggleAccordion(eKey)}
                   >
                     <Accordion.Item
                       eventKey="0"

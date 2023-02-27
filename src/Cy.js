@@ -1864,10 +1864,6 @@ export const beautiflowifyWithAnimation = async (
         let currNodeAni;
         let posY;
 
-        console.log("visitedNodes");
-        console.log(visitedNodes);
-        console.log("visitedNodes.anySame(v)");
-        console.log(visitedNodes.anySame(v));
         // skip if we've already visited and modified this node
         if (!visitedNodes.anySame(v)) {
           /**
