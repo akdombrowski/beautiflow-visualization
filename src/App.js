@@ -16,20 +16,25 @@ import {
   getCopyOfElementsObj,
   convertStrToJSON,
   beautiflowifyWithAnimation,
-  shiftAnnosPosFromNodes,
   beautiflowifyWithAnimationAllAtOnce,
+  shiftAnnosRenderedPosFromNodes,
+  shiftAnnosPosFromNodes,
+  resetAnnosPosFromNodes,
+  getFlowJSON,
+  getDateTime,
 } from "./Cy";
 import CustomToggle from "./CustomToggle";
 import CytoscapeComponent from "react-cytoscapejs";
 
 function App() {
   const [file, setFile] = useState("");
+  const [eles, setEles] = useState(null);
   const [flowJSON, setFlowJSON] = useState("");
-  const [ogNodesClone, setOGNodesClone] = useState(null);
+  const [ogElesClone, setOGElesClone] = useState(null);
   const [elements, setElements] = useState("");
   const [aniText, setAniText] = useState("Ready!");
   const [aniDescriptionText, setAniDescriptionText] = useState("");
-  const [anniesShifted, setAnnosShifted] = useState(false);
+  const [annosShifted, setAnnosShifted] = useState(false);
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
   const defaultAnimationDuration = 0.5;
   const maxAnimationDuration = 10;
@@ -42,6 +47,13 @@ function App() {
   const filename =
     "/home/adombrowski/workspace/beautiflowify/testFlows/WO_subflow_condensed_columns and rows - Beautiflow - Demo 3 - PingOne Sign-On, Password Forgot and Reset, User Registration_Export_2023-02-19T14_27_48.361Z.json";
 
+  const handleFileInputLabelClick = (e) => {
+    e.preventDefault();
+    console.log('document.getElementById("fileInput")');
+    console.log(document.getElementById("fileInput"));
+    document.getElementById("fileInput").click();
+  };
+
   const loadFlowJSONFromFile = async (e) => {
     e.preventDefault();
 
@@ -49,7 +61,12 @@ function App() {
     reader.onload = async (e) => {
       const text = e.target.result;
       const flowJSON = convertStrToJSON(text);
-      setElements(getCopyOfElementsObj(flowJSON));
+      console.log("flowJSON");
+      console.log(flowJSON);
+      setFlowJSON(flowJSON);
+      console.log("annosShifted");
+      console.log(annosShifted);
+      // setElements(getCopyOfElementsObj(flowJSON));
       setAnnosShifted(false);
     };
 
@@ -79,17 +96,38 @@ function App() {
   };
 
   const createClonedNodes = (cy) => {
-    if (cy && cy.$("*") && !ogNodesClone) {
+    if (cy && cy.$("*") && !ogElesClone) {
       const clones = cyRef.current.$("*").clone();
-      setOGNodesClone(clones);
+      setOGElesClone(clones);
       return clones;
     }
   };
 
   const shiftAnnos = (nodes) => {
-    if (!anniesShifted) {
+    if (!annosShifted) {
       shiftAnnosPosFromNodes(nodes);
       setAnnosShifted(true);
+    }
+  };
+
+  const exportToDVJSON = (e) => {
+    e.preventDefault();
+    if (cyRef.current) {
+      cyRef.current.stop(true);
+      resetAnnosPosFromNodes(cyRef.current.nodes());
+      const updatedDVFlowJSON = getFlowJSON(flowJSON, cyRef.current);
+      const updatedDVFlowJSONStr = JSON.stringify(updatedDVFlowJSON);
+      const blob = new Blob([updatedDVFlowJSONStr], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const dateTime = getDateTime();
+      if (file?.name) {
+        link.download = "beautiflowified---" + dateTime + "---" + file.name;
+      } else {
+        link.download = "dvBeautiflow---" + dateTime;
+      }
+      link.href = url;
+      link.click();
     }
   };
 
@@ -97,11 +135,13 @@ function App() {
     e.preventDefault();
     if (cyRef.current) {
       cyRef.current.stop(true);
+      cyRef.current.unmount();
+      cyRef.current.destroy();
     }
     setFile("");
-    setElements("");
+    setEles("");
     setAnnosShifted(false);
-    setOGNodesClone(null);
+    setOGElesClone(null);
   };
 
   const reset = (e) => {
@@ -113,13 +153,9 @@ function App() {
         ele.stop(true, true);
       });
       cy.remove("*");
-      cy.add(ogNodesClone);
+      cy.add(ogElesClone);
+      cy.fit();
     }
-  };
-
-  const handleFileInputLabelClick = (e) => {
-    e.preventDefault();
-    document.getElementById("fileInput").click();
   };
 
   const toggleAccordion = (evKey) => {
@@ -135,15 +171,32 @@ function App() {
   useEffect(() => {
     console.log(cyRef.current);
     console.log(cyRef);
-    if (!anniesShifted && elements && cyRef.current) {
+    console.log("flowJSON");
+    console.log(flowJSON);
+
+    if (!annosShifted && flowJSON && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
       createClonedNodes(cyRef.current);
-    } else if (!elements && cyRef.current) {
-      setOGNodesClone(null);
+    } else if (!flowJSON && cyRef.current) {
+      setOGElesClone(null);
       cyRef.current.unmount();
       cyRef.current.destroy();
+      console.log(cyRef.current);
     }
   });
+
+  useEffect(() => {
+    setAnnosShifted(false);
+    if (flowJSON) {
+      const normEles = CytoscapeComponent.normalizeElements(
+        getCopyOfElementsObj(flowJSON)
+      );
+
+      setOGElesClone(null);
+      setEles(normEles);
+    } else {
+    }
+  }, [flowJSON]);
 
   useEffect(() => {
     setCy(cyRef.current);
@@ -172,22 +225,18 @@ function App() {
     });
   }
 
-  const setCyRef = (cy) => {
-    cyRef.current = cy;
-  };
-
   return (
     <Container
       fluid
       className="bg-dark justify-content-center"
       style={{ height: "100vh", overflow: "auto" }}
     >
-      {elements ? (
+      {eles ? (
         <Row className="h-100">
           <Col xs={12} id="cyContainerCol">
             <CytoscapeComponent
               id="cy"
-              elements={CytoscapeComponent.normalizeElements(elements)}
+              elements={eles}
               layout={{ name: "preset" }}
               style={{
                 width: "97.5vw",
@@ -382,7 +431,7 @@ function App() {
                         </Button>
                       </div>
                     </Col>
-                    <Col xs={12} className="pb-4 pt-4">
+                    <Col xs={5} className="pb-4 pt-4">
                       <div className="d-grid gap-5">
                         <Button
                           id="clickableLableForFileInput"
@@ -411,8 +460,17 @@ function App() {
                         ></input>
                       </div>
                     </Col>
-                  </Row>
-                  <Row className="justify-content-center">
+                    <Col xs={5}>
+                      <div className="d-grid gap-5">
+                        <Button
+                          variant="outline-light"
+                          size="sm"
+                          onClick={(e) => exportToDVJSON(e)}
+                        >
+                          Export
+                        </Button>
+                      </div>
+                    </Col>
                     <Col xs={3}>
                       <div className="d-grid gap-5">
                         <Button
