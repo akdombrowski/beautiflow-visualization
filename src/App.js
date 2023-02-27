@@ -451,6 +451,9 @@ function App() {
                 </Form.Label>
 
                 <Button
+                  id="clickableLableForFileInput"
+                  name="clickableLableForFileInput"
+                  className=""
                   variant="light"
                   size="lg"
                   onClick={(e) => handleFileInputLabelClick(e)}
@@ -459,7 +462,9 @@ function App() {
                             className="text-dark text-center"
                             htmlFor="fileInput"
                           > */}
-                  <h6>Choose a DV flow export JSON file</h6>
+                  <p className="text-dark text-center">
+                    Choose a DV flow export JSON file
+                  </p>
                   {/* </Form.Label> */}
                 </Button>
                 <input
