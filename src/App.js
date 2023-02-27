@@ -130,7 +130,10 @@ function App() {
   useEffect(() => {
     if (elements && cyRef.current) {
       createClonedNodes(cyRef.current);
-      console.log(typeof cyRef.current);
+    } else if (!elements && cyRef.current) {
+      setOGNodesClone(null);
+      cyRef.current.unmount();
+      cyRef.current.destroy();
     }
   }, [elements]);
 
@@ -159,120 +162,126 @@ function App() {
   }
 
   return (
-    <Container fluid className="bg-dark" style={{ height: "100vh" }}>
+    <Container
+      fluid
+      className="bg-dark justify-content-center"
+      style={{ height: "100vh", overflow: "auto" }}
+    >
       {elements ? (
-        <Form className="h-100">
-          <Row className="h-100">
-            <Col xs={12} id="cyContainerCol">
-              <CytoscapeComponent
-                id="cy"
-                elements={CytoscapeComponent.normalizeElements(elements)}
-                layout={{ name: "preset" }}
-                style={{ width: "99vw", height: "100%" }}
-                stylesheet={[
-                  {
-                    selector: "node",
-                    style: {
-                      "background-opacity": 0.75,
-                      // "background-blacken": -.1,
-                      shape: (ele) => {
-                        if (ele.data("nodeType") !== "EVAL") {
-                          return "rectangle";
-                        }
-                      },
-                      width: (ele) => {
-                        if (ele.data("nodeType") === "CONNECTION") {
-                          return "75rem";
-                        } else if (ele.data("nodeType") === "ANNOTATION") {
-                          return ele.data("properties").width.value;
-                        } else {
-                          return "50rem";
-                        }
-                      },
-                      height: (ele) => {
-                        if (ele.data("nodeType") === "CONNECTION") {
-                          return "75rem";
-                        } else if (ele.data("nodeType") === "ANNOTATION") {
-                          const h = ele.data("properties").height?.value;
-                          return h ? 25 : 20;
-                        } else {
-                          return "50rem";
-                        }
-                      },
-                      "background-color": (ele) => {
-                        const props = ele.data("properties");
-                        const readBGColor = props
-                          ? props.backgroundColor
-                          : null;
-                        if (readBGColor) {
-                          return readBGColor.value.slice(0, 7);
-                        } else {
-                          if (ele.data("nodeType") === "CONNECTION") {
-                            return "#ffffff";
-                          } else if (ele.data("nodeType") === "ANNOTATION") {
-                            return "#f2f3f4";
-                          } else {
-                            return "orange";
-                          }
-                        }
-                      },
-                      label: (ele) => {
-                        if (ele.data("nodeType") === "ANNOTATION") {
-                          return ele.data("nodeType").slice(0, 4);
-                        } else {
-                          return (
-                            ele.data("nodeType")?.slice(0, 4) +
-                            ":\n" +
-                            ele.id() +
-                            "\n(" +
-                            ele.position("x") +
-                            "," +
-                            ele.position("y") +
-                            ")"
-                          );
-                        }
-                      },
-                      "font-size": "25rem",
-                      "text-wrap": "wrap",
-                      "text-valign": "bottom",
-                      "text-transform": "lowercase",
-                      color: "cyan",
+        <Row className="h-100">
+          <Col xs={12} id="cyContainerCol">
+            <CytoscapeComponent
+              id="cy"
+              elements={CytoscapeComponent.normalizeElements(elements)}
+              layout={{ name: "preset" }}
+              style={{
+                width: "97.5vw",
+                height: "70vh",
+                border: ".1rem solid black",
+              }}
+              cy={(cy) => {
+                cyRef.current = cy;
+              }}
+              wheelSensitivity={0.1}
+              zoom={4}
+              stylesheet={[
+                {
+                  selector: "node",
+                  style: {
+                    "background-opacity": 0.75,
+                    // "background-blacken": -.1,
+                    shape: (ele) => {
+                      if (ele.data("nodeType") !== "EVAL") {
+                        return "rectangle";
+                      }
                     },
+                    width: (ele) => {
+                      if (ele.data("nodeType") === "CONNECTION") {
+                        return "75rem";
+                      } else if (ele.data("nodeType") === "ANNOTATION") {
+                        return ele.data("properties").width.value;
+                      } else {
+                        return "50rem";
+                      }
+                    },
+                    height: (ele) => {
+                      if (ele.data("nodeType") === "CONNECTION") {
+                        return "75rem";
+                      } else if (ele.data("nodeType") === "ANNOTATION") {
+                        const h = ele.data("properties").height?.value;
+                        return h ? 25 : 20;
+                      } else {
+                        return "50rem";
+                      }
+                    },
+                    "background-color": (ele) => {
+                      const props = ele.data("properties");
+                      const readBGColor = props ? props.backgroundColor : null;
+                      if (readBGColor) {
+                        return readBGColor.value.slice(0, 7);
+                      } else {
+                        if (ele.data("nodeType") === "CONNECTION") {
+                          return "#ffffff";
+                        } else if (ele.data("nodeType") === "ANNOTATION") {
+                          return "#f2f3f4";
+                        } else {
+                          return "orange";
+                        }
+                      }
+                    },
+                    label: (ele) => {
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return ele.data("nodeType").slice(0, 4);
+                      } else {
+                        return (
+                          ele.data("nodeType")?.slice(0, 4) +
+                          ":\n" +
+                          ele.id() +
+                          "\n(" +
+                          ele.position("x") +
+                          "," +
+                          ele.position("y") +
+                          ")"
+                        );
+                      }
+                    },
+                    "font-size": "25rem",
+                    "text-wrap": "wrap",
+                    "text-valign": "bottom",
+                    "text-transform": "lowercase",
+                    color: "cyan",
                   },
+                },
 
-                  {
-                    selector: "edge",
-                    style: {
-                      width: 8,
-                      color: "cyan",
-                      opacity: 0.7,
-                      "font-size": "30rem",
-                      "text-justification": "center",
-                      "text-margin-x": "-10rem",
-                      "text-margin-y": "25rem",
-                      "text-rotation": "autorotate",
-                      label: (ele) =>
-                        ele.target().position("x") - ele.source().position("x"),
-                      "line-color": "#777",
-                      "target-arrow-color": "#000",
-                      "target-arrow-shape": "triangle-backcurve",
-                      "curve-style": "bezier",
-                      "source-endpoint": "outside-to-line-or-label",
-                      "target-endpoint": "outside-to-line-or-label",
-                      "source-distance-from-node": "10rem",
-                      "target-distance-from-node": "0rem",
-                      "arrow-scale": 2,
-                    },
+                {
+                  selector: "edge",
+                  style: {
+                    width: 8,
+                    color: "cyan",
+                    opacity: 0.7,
+                    "font-size": "30rem",
+                    "text-justification": "center",
+                    "text-margin-x": "-10rem",
+                    "text-margin-y": "25rem",
+                    "text-rotation": "autorotate",
+                    label: (ele) =>
+                      ele.target().position("x") - ele.source().position("x"),
+                    "line-color": "#777",
+                    "target-arrow-color": "#000",
+                    "target-arrow-shape": "triangle-backcurve",
+                    "curve-style": "bezier",
+                    "source-endpoint": "outside-to-line-or-label",
+                    "target-endpoint": "outside-to-line-or-label",
+                    "source-distance-from-node": "10rem",
+                    "target-distance-from-node": "0rem",
+                    "arrow-scale": 2,
                   },
-                ]}
-                cy={(cy) => {
-                  cyRef.current = cy;
-                }}
-                wheelSensitivity={0.1}
-                zoom={4}
-              ></CytoscapeComponent>
-            </Col>
-            <Col xs={12}>
+                },
+              ]}
+            ></CytoscapeComponent>
+          </Col>
+          <Col xs={12}>
+            <Form className="h-100">
               <Row height="20vh">
                 <Col xs={8}>
                   <Accordion
@@ -343,7 +352,7 @@ function App() {
                       <div className="d-grid gap-5">
                         <Button
                           variant="outline-light"
-                          size="lg"
+                          size="sm"
                           onClick={(e) => watchBeautiflowify(e)}
                         >
                           Beautiflowify
@@ -354,7 +363,7 @@ function App() {
                       <div className="d-grid gap-5">
                         <Button
                           variant="outline-light"
-                          size="lg"
+                          size="sm"
                           onClick={(e) => formatSpacing(e)}
                         >
                           Space Out
@@ -368,7 +377,7 @@ function App() {
                           variant="light"
                           as="input"
                           type="file"
-                          accept=".json,text/*"
+                          accept=".json"
                           size="lg"
                           onChange={(e) => loadFlowJSONFromFile(e)}
                         ></Button>
@@ -380,7 +389,7 @@ function App() {
                       <div className="d-grid gap-5">
                         <Button
                           variant="outline-light"
-                          size="lg"
+                          size="sm"
                           onClick={(e) => clear(e)}
                         >
                           Clear
@@ -391,7 +400,7 @@ function App() {
                       <div className="d-grid gap-5">
                         <Button
                           variant="outline-light"
-                          size="lg"
+                          size="sm"
                           onClick={(e) => reset(e)}
                         >
                           Reset
@@ -401,9 +410,9 @@ function App() {
                   </Row>
                 </Col>
               </Row>
-            </Col>
-          </Row>
-        </Form>
+            </Form>
+          </Col>
+        </Row>
       ) : (
         <Form className="h-100 p-5">
           <Row className="h-100 justify-content-center align-content-center">
