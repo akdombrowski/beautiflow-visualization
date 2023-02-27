@@ -97,7 +97,6 @@ function App() {
     if (cyRef.current) {
       cyRef.current.stop(true);
     }
-    document.getElementById("fileInput").value = "";
     setFile("");
     setElements("");
     setAnnosShifted(false);
@@ -115,6 +114,11 @@ function App() {
       cy.remove("*");
       cy.add(ogNodesClone);
     }
+  };
+
+  const handleFileInputLabelClick = (e) => {
+    e.preventDefault();
+    document.getElementById("fileInput").click();
   };
 
   const toggleAccordion = (evKey) => {
@@ -333,10 +337,6 @@ function App() {
                   <Row className="gap-1 justify-content-center">
                     <Col xs={12} className="pb-4">
                       <Form.Floating className="mt-2">
-                        {/* controlId="floatingInput"
-                    label={"Animation Duration:" + aniDur}
-                    className="text-light pb-2 mt-2"
-                  > */}
                         <Form.Label
                           className="pb-4 mt-1 text-center"
                           placeholder=".1"
@@ -379,14 +379,22 @@ function App() {
                     <Col xs={12} className="pb-4 pt-4">
                       <div className="d-grid gap-5">
                         <Button
-                          id="fileInput"
                           variant="light"
-                          as="input"
+                          size="sm"
+                          onClick={(e) => handleFileInputLabelClick(e)}
+                        >
+                          <Form.Label className="text-dark text-center" for="fileInput">
+                            <h6>Choose a DV flow export JSON file</h6>
+                          </Form.Label>
+                        </Button>
+                        <input
                           type="file"
+                          id="fileInput"
+                          name="fileInput"
                           accept=".json"
-                          size="lg"
                           onChange={(e) => loadFlowJSONFromFile(e)}
-                        ></Button>
+                          style={{ display: "none" }}
+                        ></input>
                       </div>
                     </Col>
                   </Row>
@@ -429,6 +437,9 @@ function App() {
             </Col>
             <Col xs={12} className="p-5 m-5">
               <div className="d-grid gap-5">
+                <Form.Label for="fileInput">
+                  Choose a DV flow export JSON file
+                </Form.Label>
                 <Button
                   id="fileInput"
                   variant="light"
