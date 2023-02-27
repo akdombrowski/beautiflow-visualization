@@ -2185,19 +2185,19 @@ export const beautiflowifyWithAnimation = async (
      */
     // console.log("animating bfs");
     emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
-    let viewportAni;
-    let viewportAniProm = new Promise((resolve, reject) => {
-      viewportAni = cy.animation({
-        // zoom: { level: 1, position: ele.position() },
-        panBy: rootNodePosAdj,
-        duration: dur / 2,
-        complete: () =>
-          resolve("Adjusted viewport (pan) to animating elements"),
-      });
-    });
-    cy.fit(nodesInCurrRow, 150);
-    viewportAni.play();
-    await viewportAniProm;
+    // let viewportAni;
+    // let viewportAniProm = new Promise((resolve, reject) => {
+    //   viewportAni = cy.animation({
+    //     // zoom: { level: 1, position: ele.position() },
+    //     panBy: rootNodePosAdj,
+    //     duration: dur / 2,
+    //     complete: () =>
+    //       resolve("Adjusted viewport (pan) to animating elements"),
+    //   });
+    // });
+    // cy.fit(nodesInCurrRow, 150);
+    // viewportAni.play();
+    // await viewportAniProm;
 
     for (let i = 0; i < animations.length; i++) {
       const ani = animations[i];
@@ -2217,6 +2217,7 @@ export const beautiflowifyWithAnimation = async (
         vMoveAniProm,
       } = ani;
       let msg;
+      cy.fit();
 
       // need to figure out how to calculate for rows with multiple levels
       if (vMovePos) {
