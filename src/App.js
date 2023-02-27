@@ -17,6 +17,7 @@ import {
   convertStrToJSON,
   beautiflowifyWithAnimation,
   shiftAnnosPosFromNodes,
+  beautiflowifyWithAnimationAllAtOnce,
 } from "./Cy";
 import CytoscapeComponent from "react-cytoscapejs";
 import CustomToggle from "./CustomToggle";
@@ -60,7 +61,12 @@ function App() {
   const formatSpacing = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      beautiflowifyWithAnimation(cyRef.current, 150, 330, aniDur * 1000);
+      beautiflowifyWithAnimationAllAtOnce(
+        cyRef.current,
+        150,
+        330,
+        aniDur * 1000
+      );
     }
   };
 
