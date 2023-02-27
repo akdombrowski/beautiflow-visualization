@@ -45,7 +45,6 @@ export const readFlowJSONFileWithFileReader = async (filename) => {
     type: "text/plain",
   });
   reader.onload = (evt) => {
-    console.log(evt.target.result);
     const flowJSON = convertStrToJSON(text);
     return flowJSON;
   };
@@ -92,7 +91,6 @@ export const getEdges = (flowJSON) => {
 export const getCopyOfElementsObj = (flowJSON) => {
   try {
     const elementsCopy = JSON.parse(JSON.stringify(getElements(flowJSON)));
-    console.log(elementsCopy);
     return elementsCopy;
   } catch (e) {
     throw new Error("Could not get a copy of elements.", { cause: e });
@@ -270,7 +268,7 @@ export const createCytoscapeGraphForViz = (flowJSON, containerID) => {
     const elementsCopy = getCopyOfElementsObj(parsedJSONFlow);
     const containerEl = document.getElementById(containerID);
 
-    console.log(elementsCopy.jsons());
+    // console.log(elementsCopy.jsons());
 
     const cy = cytoscape({
       container: containerEl,
@@ -859,9 +857,6 @@ export const spaceHorizontally = async (
   const testNode4ID = "w7jmfry8oc";
 
   const cy = createCytoscapeGraph(flowJSON);
-
-  console.log(cy.getElementById(testNode3ID).json());
-
   const cyBeforeRepositioning = createCytoscapeGraph(flowJSON);
   const nodes = cy.nodes();
   const nodesOG = nodes.clone();
@@ -874,8 +869,6 @@ export const spaceHorizontally = async (
   const collWithNormalizedNodePos = cy.edges().union(normalizedNodes);
   // (normalizedNodes.jsons());
   cy.json(collWithNormalizedNodePos.jsons());
-
-  console.log(cy.getElementById(testNode3ID).json());
 
   // this creates an object with the updated elements
   const roots = normalizedNodesWOAnnotations.roots();
@@ -931,22 +924,22 @@ export const spaceHorizontally = async (
 
           v.position("x", nextPosX);
 
-          if (v.id() === testNode3ID) {
-            console.log();
-            console.log();
-            console.log("currNodePos");
-            console.log(v.id());
-            console.log(v.data("nodeType"));
-            console.log(v.data("name"));
-            console.log(v.position());
-            // console.log(v.json());
+          // if (v.id() === testNode3ID) {
+          //   console.log();
+          //   console.log();
+          //   console.log("currNodePos");
+          //   console.log(v.id());
+          //   console.log(v.data("nodeType"));
+          //   console.log(v.data("name"));
+          //   console.log(v.position());
+          //   // console.log(v.json());
 
-            console.log("prevNodeOgPos");
-            console.log(prevNodeOg.id());
-            console.log(prevNodeOg.data("nodeType"));
-            console.log(prevNodeOg.position());
-            console.log();
-          }
+          //   console.log("prevNodeOgPos");
+          //   console.log(prevNodeOg.id());
+          //   console.log(prevNodeOg.data("nodeType"));
+          //   console.log(prevNodeOg.position());
+          //   console.log();
+          // }
 
           // i think the diff calc is using the updated pos of the prev node, so it's not reliable
           // calc row y pos ahead of time
@@ -1835,6 +1828,7 @@ export const beautiflowifyWithAnimation = async (
     const animations = [];
     const nodesInCurrRow = getRowOfNodesFromRoot(ele);
     const nodesInCurrRowClone = nodesInCurrRow.clone();
+    let rootNodePosAdj = { x: 0, y: 0 };
     /**
      * sectionBasePosY is the y-value for the starting nodes and any following
      * nodes along that same horizontal line
@@ -1871,10 +1865,6 @@ export const beautiflowifyWithAnimation = async (
         let currNodeAni;
         let posY;
 
-        console.log("visitedNodes");
-        console.log(visitedNodes);
-        console.log("visitedNodes.anySame(v)");
-        console.log(visitedNodes.anySame(v));
         // skip if we've already visited and modified this node
         if (!visitedNodes.anySame(v)) {
           /**
@@ -1940,7 +1930,7 @@ export const beautiflowifyWithAnimation = async (
            *    to the same source node
            */
           if (roots.getElementById(vID).length) {
-            // at a root node, only move y position
+            // at a root node
             posY = sectionBaselinePosY[row];
 
             /**
@@ -1965,12 +1955,16 @@ export const beautiflowifyWithAnimation = async (
               );
             });
 
+            rootNodePosAdj.x = ele.position("x") - pos.x;
+            rootNodePosAdj.y = ele.position("y") - pos.y;
+
             prevNodePos[vID] = pos;
             updatedPos[vID] = pos;
 
             currStepAnimations.rootID = vID;
             currStepAnimations.rootAniProm = rootAniProm;
             currStepAnimations.rootAni = rootAni;
+            currStepAnimations.newRootPos = pos;
             animations.push(currStepAnimations);
             /**
              *
@@ -2191,6 +2185,20 @@ export const beautiflowifyWithAnimation = async (
      */
     // console.log("animating bfs");
     emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
+    let viewportAni;
+    let viewportAniProm = new Promise((resolve, reject) => {
+      viewportAni = cy.animation({
+        // zoom: { level: 1, position: ele.position() },
+        panBy: rootNodePosAdj,
+        duration: dur / 2,
+        complete: () =>
+          resolve("Adjusted viewport (pan) to animating elements"),
+      });
+    });
+    cy.fit(nodesInCurrRow, 150);
+    viewportAni.play();
+    await viewportAniProm;
+
     for (let i = 0; i < animations.length; i++) {
       const ani = animations[i];
       const {
@@ -2203,6 +2211,7 @@ export const beautiflowifyWithAnimation = async (
         rootID,
         rootAni,
         rootAniProm,
+        newRootPos,
         vMovePos,
         vMoveAni,
         vMoveAniProm,
@@ -2210,8 +2219,20 @@ export const beautiflowifyWithAnimation = async (
       let msg;
 
       // need to figure out how to calculate for rows with multiple levels
-      if (rootID) {
-        const nextRowOfNodes = getRowOfNodesFromRoot(cy.$("#" + rootID));
+      if (vMovePos) {
+        // viewportAniProm = new Promise((resolve, reject) => {
+        //   viewportAni = cy.animation({
+        //     panBy: {
+        //       x: 150,
+        //       y: -150,
+        //     },
+        //     duration: dur / 2,
+        //     complete: () =>
+        //       resolve("Adjusted viewport (panBy) to animating elements"),
+        //   });
+        // });
+        // viewportAni.play();
+        // await viewportAniProm;
         // cy.fit(nextRowOfNodes, 150);
         // cy.panBy({x: 0, y: 300})
       }
@@ -2347,6 +2368,9 @@ export const beautiflowifyWithAnimation = async (
   // return await createCytoscapeGraphFromEles(
   //   cy.json(normalizedNodesWOAnnotations.jsons())
   // );
+
+  cy.fit();
+
   return cy;
 };
 
