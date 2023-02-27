@@ -385,6 +385,9 @@ function App() {
                     <Col xs={12} className="pb-4 pt-4">
                       <div className="d-grid gap-5">
                         <Button
+                          id="clickableLableForFileInput"
+                          name="clickableLableForFileInput"
+                          className=""
                           variant="light"
                           size="sm"
                           onClick={(e) => handleFileInputLabelClick(e)}
@@ -393,7 +396,9 @@ function App() {
                             className="text-dark text-center"
                             htmlFor="fileInput"
                           > */}
-                          <h6>Choose a DV flow export JSON file</h6>
+                          <p className="text-dark text-center pt-3">
+                            Choose JSON file
+                          </p>
                           {/* </Form.Label> */}
                         </Button>
                         <input
@@ -441,15 +446,11 @@ function App() {
           <Row className="h-100 justify-content-center align-content-center">
             <Col xs={12} className="pt-5">
               <h1 className="display-1 text-light text-center">
-                Choose a DV flow JSON export file to get started!
+                Import a DV flow JSON export file to get started!
               </h1>
             </Col>
             <Col xs={12} className="pb-5 m-5">
               <div className="d-grid">
-                <Form.Label htmlFor="fileInput">
-                  Choose a DV flow export JSON file
-                </Form.Label>
-
                 <Button
                   id="clickableLableForFileInput"
                   name="clickableLableForFileInput"
@@ -462,9 +463,7 @@ function App() {
                             className="text-dark text-center"
                             htmlFor="fileInput"
                           > */}
-                  <p className="text-dark text-center">
-                    Choose a DV flow export JSON file
-                  </p>
+                  <p className="text-dark text-center pt-3">Choose JSON file</p>
                   {/* </Form.Label> */}
                 </Button>
                 <input
