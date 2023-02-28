@@ -27,15 +27,16 @@ function App() {
   const minAnimationDuration = 0.1;
   const cyRef = useRef(null);
   const fileRef = useRef(null);
-  const [eles, setEles] = useState(null);
-  const [flowJSON, setFlowJSON] = useState("");
+  const flowJSONRef = useRef(null);
+  const cloneElesRef = useRef(null);
+  const [elesForCyInit, setElesForCyInit] = useState(null);
+  // const [flowJSON, setFlowJSON] = useState("");
   const [ogElesClone, setOGElesClone] = useState(null);
   const [aniText, setAniText] = useState("Ready!");
   const [aniDescriptionText, setAniDescriptionText] = useState("");
   const [annosShifted, setAnnosShifted] = useState(false);
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
-
 
   const handleFileInputLabelClick = (e) => {
     e.preventDefault();
@@ -48,8 +49,13 @@ function App() {
     const reader = new FileReader();
     reader.onload = async (e) => {
       const text = e.target.result;
-      const flowJSON = convertStrToJSON(text);
-      setFlowJSON(flowJSON);
+      const fileJSON = convertStrToJSON(text);
+      flowJSONRef.current = fileJSON;
+      const normEles = CytoscapeComponent.normalizeElements(
+        getCopyOfElementsObj(fileJSON)
+      );
+
+      setElesForCyInit(normEles);
       setAnnosShifted(false);
     };
 
@@ -59,17 +65,22 @@ function App() {
     }
   };
 
-  const reloadFlowJSONFromFile = async () => {
+  const reloadFlowJSONFromFile = async (file) => {
     const reader = new FileReader();
     reader.onload = async (e) => {
       const text = e.target.result;
-      const flowJSON = convertStrToJSON(text);
-      setFlowJSON(flowJSON);
+      const fileJSON = convertStrToJSON(text);
+      flowJSONRef.current = fileJSON;
+      const normEles = CytoscapeComponent.normalizeElements(
+        getCopyOfElementsObj(fileJSON)
+      );
+
+      setElesForCyInit(normEles);
       setAnnosShifted(false);
     };
 
-    if (fileRef.current) {
-      reader.readAsText(fileRef.current);
+    if (file) {
+      reader.readAsText(file);
     }
   };
 
@@ -94,9 +105,8 @@ function App() {
 
   const createClonedNodes = (cy) => {
     if (cy && cy.$("*") && !ogElesClone) {
-      const clones = cyRef.current.$("*").clone();
-      setOGElesClone(clones);
-      return clones;
+      const clonedEles = cyRef.current.$("*").clone();
+      return clonedEles;
     }
   };
 
@@ -109,10 +119,11 @@ function App() {
 
   const exportToDVJSON = (e) => {
     e.preventDefault();
-    if (cyRef.current) {
+    if (cyRef.current && flowJSONRef.current) {
       cyRef.current.stop(true);
       resetAnnosPosFromNodes(cyRef.current.nodes());
-      const updatedDVFlowJSON = getFlowJSON(flowJSON, cyRef.current);
+
+      const updatedDVFlowJSON = getFlowJSON(flowJSONRef.current, cyRef.current);
       const updatedDVFlowJSONStr = JSON.stringify(updatedDVFlowJSON);
       const blob = new Blob([updatedDVFlowJSONStr], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
@@ -135,26 +146,53 @@ function App() {
       cyRef.current.stop(true);
       cyRef.current.unmount();
       cyRef.current.destroy();
+      cyRef.current = null;
     }
+
     fileRef.current = null;
-    setEles("");
+    setElesForCyInit(null);
     setAnnosShifted(false);
-    setOGElesClone(null);
   };
 
   const reset = (e) => {
     e.preventDefault();
-    // if (cyRef.current) {
-    //   const cy = cyRef.current;
-    //   cy.stop(true, true);
-    //   cy.$("*").forEach((ele, i, eles) => {
-    //     ele.stop(true, true);
-    //   });
-    //   cy.remove("*");
-    //   cy.add(ogElesClone);
-    //   cy.fit();
-    // }
-    reloadFlowJSONFromFile();
+    const file = fileRef.current;
+    // intermediate node elemnent to reset state
+    setElesForCyInit([
+      {
+        data: {
+          id: "reloading",
+          nodeType: "RELOADING",
+          name: "Reloading",
+          properties: {
+            backgroundColor: { value: "#ffffffff" },
+            annotation: { value: "Reloading" },
+            annotationTextColor: { value: "#000000ff" },
+            strokeEnabled: { value: false },
+            strokeWidth: { value: 0 },
+            strokeColor: { value: "#000000ff" },
+            cornerRadius: { value: 5 },
+            fontSize: { value: 0 },
+            fontFamily: { value: "sans-serif" },
+            height: { value: 50 },
+            width: { value: 180 },
+          },
+          status: "configured",
+          idUnique: "reloading",
+        },
+        position: { x: 0, y: 0 },
+        group: "nodes",
+        removed: false,
+        selected: false,
+        selectable: false,
+        locked: true,
+        grabbable: false,
+        pannable: false,
+        classes: "",
+      },
+    ]);
+
+    reloadFlowJSONFromFile(file);
   };
 
   const toggleAccordion = () => {
@@ -168,34 +206,18 @@ function App() {
   };
 
   useEffect(() => {
-    if (!annosShifted && flowJSON && cyRef.current) {
+    if (!annosShifted && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
-      createClonedNodes(cyRef.current);
-    } else if (!flowJSON && cyRef.current) {
-      setOGElesClone(null);
+      cloneElesRef.current = createClonedNodes(cyRef.current);
+      cyRef.current.fit();
+    } else if (!flowJSONRef.current && cyRef.current) {
       cyRef.current.unmount();
       cyRef.current.destroy();
-      console.log(cyRef.current);
-    }
-  }, [eles]);
-
-  useEffect(() => {
-    setAnnosShifted(false);
-    if (flowJSON) {
-      const normEles = CytoscapeComponent.normalizeElements(
-        getCopyOfElementsObj(flowJSON)
-      );
-
+      cyRef.current = null;
       setOGElesClone(null);
-      setEles(normEles);
-    } else if (!flowJSON && cyRef.current) {
-      setOGElesClone(null);
-      cyRef.current.unmount();
-      cyRef.current.destroy();
-      console.log(cyRef.current);
-    } else {
+      setAnnosShifted(false);
     }
-  }, [flowJSON]);
+  }, [elesForCyInit]);
 
   if (cyRef.current) {
     cyRef.current.on("style", (e, ani, aniDes, start, end) => {
@@ -226,12 +248,12 @@ function App() {
       className="bg-dark justify-content-center"
       style={{ height: "100vh", overflow: "auto" }}
     >
-      {eles ? (
+      {elesForCyInit ? (
         <Row className="h-100">
           <Col xs={12} id="cyContainerCol">
             <CytoscapeComponent
               id="cy"
-              elements={eles}
+              elements={elesForCyInit}
               layout={{ name: "preset" }}
               style={{
                 width: "97.5vw",
@@ -489,6 +511,13 @@ function App() {
                       </div>
                     </Col>
                   </Row>
+                  <Row>
+                    <Col xs={12}>
+                      <p className="text-light text-center mb-0 mt-3">
+                        <small>*work in progress</small>
+                      </p>
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </Form>
@@ -512,12 +541,20 @@ function App() {
                   size="lg"
                   onClick={(e) => handleFileInputLabelClick(e)}
                 >
-                  {/* <Form.Label
-                            className="text-dark text-center"
-                            htmlFor="fileInput"
-                          > */}
-                  <p className="text-dark text-center pt-3">Choose JSON file</p>
-                  {/* </Form.Label> */}
+                  <Row>
+                    <Col xs={12} className="pb-3">
+                      <h3 className="text-dark text-center pt-3">
+                        Import a JSON file
+                      </h3>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col xs={12}>
+                      <p>
+                        <small>*(imports client-side only)</small>
+                      </p>
+                    </Col>
+                  </Row>
                 </Button>
                 <input
                   type="file"
@@ -528,6 +565,13 @@ function App() {
                   style={{ display: "none" }}
                 ></input>
               </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12}>
+              <p className="text-light text-center">
+                <small>*work in progress</small>
+              </p>
             </Col>
           </Row>
         </Form>

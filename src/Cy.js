@@ -39,7 +39,7 @@ export const readFlowJSONFileWithFileReader = async (filename) => {
     throw new Error(errMsg);
   }
 
-  const blob = new Blob(new Array());
+  const blob = new Blob([]);
   const reader = new FileReader();
   const data = new File(blob, filename, {
     type: "text/plain",

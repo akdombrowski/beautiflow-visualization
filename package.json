@@ -22,7 +22,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "analyze": "source-map-explorer 'build/static/js/*.js' --html analyze/result.html"
   },
   "eslintConfig": {
     "extends": [
@@ -42,5 +43,8 @@
       "last 1 safari version"
     ]
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "source-map-explorer": "^2.5.3"
+  }
 }
