@@ -525,7 +525,7 @@ function App() {
         </Row>
       ) : (
         <Form className="h-100 p-5">
-          <Row className="h-100 justify-content-center align-content-center">
+          <Row className="justify-content-center align-content-center">
             <Col xs={12} className="pt-5">
               <h1 className="display-1 text-light text-center">
                 Import a DV flow JSON export file to get started!
@@ -569,10 +569,12 @@ function App() {
           </Row>
           <Row>
             <Col xs={12}>
-              <p>
-                Okay, so beauty is in the eye of the beholder. It spaces nodes
-                out nicely (skipping annotations) and only works for simple
-                flows... for now.
+              <p className="text-light text-center">
+                <small>
+                  Okay, so beauty is in the eye of the beholder. It spaces nodes
+                  out nicely (skipping annotations) and only works for simple
+                  flows... for now.
+                </small>
               </p>
             </Col>
             <Col xs={12}>
