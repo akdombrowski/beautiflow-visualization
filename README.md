@@ -6,7 +6,9 @@ Upload a DaVinci flow JSON export file and hit BFS to transform that pumpkin of 
 
 ### Beautiflowify
 
-Makes a flow beautiflow
+Makes a flow beautiflow.
+
+Okay, so beauty is in the eye of the beholder. It spaces nodes out nicely (skipping annotations) and only works for simple flows... for now.
 
 ### Animation Duration
 

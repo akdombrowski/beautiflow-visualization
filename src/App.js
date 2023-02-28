@@ -569,6 +569,13 @@ function App() {
           </Row>
           <Row>
             <Col xs={12}>
+              <p>
+                Okay, so beauty is in the eye of the beholder. It spaces nodes
+                out nicely (skipping annotations) and only works for simple
+                flows... for now.
+              </p>
+            </Col>
+            <Col xs={12}>
               <p className="text-light text-center">
                 <small>*work in progress</small>
               </p>
