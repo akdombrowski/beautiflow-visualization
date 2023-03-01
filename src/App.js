@@ -18,6 +18,7 @@ import {
   getDateTime,
 } from "./Cy";
 import CustomToggle from "./CustomToggle";
+import HomeFileImportForm from "./HomeFileImportForm";
 import CytoscapeComponent from "react-cytoscapejs";
 
 function App() {
