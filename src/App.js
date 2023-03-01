@@ -11,8 +11,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   getCopyOfElementsObj,
   convertStrToJSON,
-  beautiflowifyWithAnimation,
-  beautiflowifyWithAnimationAllAtOnce,
+  beautiflowify,
   shiftAnnosPosFromNodes,
   resetAnnosPosFromNodes,
   getFlowJSON,
@@ -87,19 +86,14 @@ function App() {
   const formatSpacing = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      beautiflowifyWithAnimationAllAtOnce(
-        cyRef.current,
-        150,
-        330,
-        aniDur * 1000
-      );
+      beautiflowify(cyRef.current, 150, 0, aniDur * 1000, false);
     }
   };
 
   const watchBeautiflowify = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      beautiflowifyWithAnimation(cyRef.current, 150, 330, aniDur * 1000);
+      beautiflowify(cyRef.current, 150, 330, aniDur * 1000, true);
     }
   };
 
@@ -263,7 +257,7 @@ function App() {
               cy={(cy) => {
                 cyRef.current = cy;
               }}
-              wheelSensitivity={0.1}
+              // wheelSensitivity={0.1}
               zoom={4}
               stylesheet={[
                 {
@@ -274,6 +268,8 @@ function App() {
                     shape: (ele) => {
                       if (ele.data("nodeType") !== "EVAL") {
                         return "rectangle";
+                      } else {
+                        return "round-diamond"
                       }
                     },
                     width: (ele) => {

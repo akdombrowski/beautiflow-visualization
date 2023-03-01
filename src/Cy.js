@@ -611,6 +611,39 @@ export const sortNodes = (nodes, verticalTolerance) => {
   return nodesSorted;
 };
 
+export const sortRoots = (roots, verticalTolerance) => {
+  const rootsSorted = roots.sort((ele1, ele2) => {
+    const ele1X = ele1.position("x");
+    const ele1Y = ele1.position("y");
+    const ele2X = ele2.position("x");
+    const ele2Y = ele2.position("y");
+
+    if (ele1Y < ele2Y - verticalTolerance) {
+      return -1;
+    }
+
+    if (ele2Y < ele1Y - verticalTolerance) {
+      return 1;
+    }
+
+    if (ele2Y > ele1Y + verticalTolerance) {
+      return -1;
+    }
+
+    if (ele1Y > ele2Y + verticalTolerance) {
+      return 1;
+    }
+
+    if (ele1X < ele2X) {
+      return -1;
+    }
+
+    return 1;
+  });
+
+  return rootsSorted;
+};
+
 export const getSourceNode = (cy, targetNodeID) => {
   const sourceNode = cy.$("#" + targetNodeID).incomers("node");
   return sourceNode;
@@ -665,7 +698,7 @@ export const getSourceNode = (cy, targetNodeID) => {
 export const animateSuccessorsOfEle = (ele, dur, color) => {
   const anis = ele
     .successors()
-    .filter("nodes")
+    .filter("node")
     .map((el, i, els) => {
       const ani = el.animation(
         {
@@ -831,207 +864,47 @@ export const getRowOfNodesFromRoot = (root) => {
   return row.union(root);
 };
 
-/**
- * normalize nodes
- * lock annotations
- *
- * a)
- * get nodes of a row with cy.filter(function(ele, i, eles))
- *  using the function to capture nodes at a certain y position +- tolerance
- * run grid layout on that row with eles.layout(options)
- * or
- * b)
- * start at first node find the node it targets by its connecting edge,
- * add spacing to target node x position
- *
- *  repeat on next row of nodes
- **/
-export const spaceHorizontally = async (
-  flowJSON,
+export const doesNodePathMergeWithAlreadyVisitedNodes = (
+  vSuccessors,
+  v,
   spacing,
-  verticalTolerance
+  visitedNodes
 ) => {
-  const testNode1ID = "bb45iggzc5";
-  const testNode2ID = "ze3omkafya";
-  const testNode3ID = "bviv3cclyg";
-  const testNode4ID = "w7jmfry8oc";
-
-  const cy = createCytoscapeGraph(flowJSON);
-  const cyBeforeRepositioning = createCytoscapeGraph(flowJSON);
-  const nodes = cy.nodes();
-  const nodesOG = nodes.clone();
-  const nodesSorted = sortNodes(nodes, verticalTolerance);
-  const normalizedNodes = normalizeCyNodePos(nodesSorted);
-  const normalizedNodesUntouched = normalizedNodes.clone();
-  const normalizedNodesWOAnnotations = normalizedNodes.filter(
-    '[nodeType != "ANNOTATION"]'
+  const vSuccessorsPredecessors = vSuccessors.predecessors();
+  // get the already visited elements up to the point where v's path
+  // hits an already visited node
+  // this should give the eles which should be above the current node
+  const visitedElesBeforePathMerge = vSuccessorsPredecessors.not(
+    vSuccessors.union(v)
   );
-  const collWithNormalizedNodePos = cy.edges().union(normalizedNodes);
-  // (normalizedNodes.jsons());
-  cy.json(collWithNormalizedNodePos.jsons());
 
-  // this creates an object with the updated elements
-  const roots = normalizedNodesWOAnnotations.roots();
-  // const startNode = getStartNode(nodesWOAnnotations, verticalTolerance);
+  const removeUnvisitedNodes =
+    visitedElesBeforePathMerge.intersection(visitedNodes);
 
-  // just in case, lock annotations' pos
-  lockAnnotationPositions(cy);
-
-  // console.log();
-  // console.log(normalizedNodesWOAnnotations.jsons().slice(0, 2));
-  // console.log();
-
-  // console.log();
-  // console.log("cy");
-  // console.log(cy);
-  // console.log();
-  // console.log();
-  // console.log("cyWOAnnotations");
-  // console.log(cyWOAnnotations);
-  // console.log();
-
-  const rootsArr = roots.toArray();
-  const rootsArr1 = rootsArr.slice(0, 1);
-
-  const rows = [];
-  const rowNum = 0;
-  let rowStartPosX = 300;
-  let currRowPosY = 160;
-  let nextRowYAdd = 240;
-  roots.forEach(async (ele, i, eles) => {
-    // if (i === 2) {
-    // rootsArr1.forEach((ele, i, eles) => {
-    await animateNodesAndWait(cy, getRowOfNodesFromRoot(ele), 5000, "green");
-    getRowOfNodesFromRoot(ele).breadthFirstSearch({
-      root: ele,
-      visit: async (v, edge, prev, j, depth) => {
-        // console.log("edge"); // we're getting null here
-        // console.log(edge.id());
-        // console.log("v");
-        // console.log(v.id());
-        if (roots.getElementById(v.id())) {
-          currRowPosY += nextRowYAdd;
-          v.position({ x: rowStartPosX, y: currRowPosY });
-        } else {
-          const prevNodePosX = prev.position("x");
-          const prevNodeOg = cyBeforeRepositioning.getElementById(prev.id());
-          const prevNodeOgPos = prevNodeOg.position();
-          const prevNodeOgPosX = prevNodeOgPos.x;
-          const prevNodeOgPosY = prevNodeOgPos.y;
-          const prevNodePosY = prev.position("y");
-          const currNodePosY = v.position("y");
-          const nextPosX = prevNodePosX + spacing;
-
-          v.position("x", nextPosX);
-
-          // if (v.id() === testNode3ID) {
-          //   console.log();
-          //   console.log();
-          //   console.log("currNodePos");
-          //   console.log(v.id());
-          //   console.log(v.data("nodeType"));
-          //   console.log(v.data("name"));
-          //   console.log(v.position());
-          //   // console.log(v.json());
-
-          //   console.log("prevNodeOgPos");
-          //   console.log(prevNodeOg.id());
-          //   console.log(prevNodeOg.data("nodeType"));
-          //   console.log(prevNodeOg.position());
-          //   console.log();
-          // }
-
-          // i think the diff calc is using the updated pos of the prev node, so it's not reliable
-          // calc row y pos ahead of time
-          if (currNodePosY - prevNodeOgPosY > verticalTolerance) {
-            console.log();
-            console.log(v.id());
-            console.log(prevNodeOg.id());
-            console.log();
-            // 240 is where the next node should start accounting for space for an annotation above it with 150 spacing to that annotation from the row above
-            const numberOfRowsBelow = Math.floor(
-              (currNodePosY - prevNodeOgPosY) / verticalTolerance
-            );
-            const nextPosY = (currRowPosY + 240) * numberOfRowsBelow;
-            v.position("y", nextPosY);
-
-            if (v.id() === testNode3ID) {
-              console.log("verticalTolerance");
-              console.log(verticalTolerance);
-              console.log("after move currNodePos");
-              console.log(v.position());
-              console.log();
-              console.log();
-            }
-          } else {
-            v.position("y", currRowPosY);
-          }
-        }
-      },
-      directed: true,
-    });
-    // }
+  console.log("removeUnvisitedNodes");
+  console.log(removeUnvisitedNodes.jsons());
+  const { value, ele } = removeUnvisitedNodes.max((ele, i, eles) => {
+    return ele.position("y");
   });
 
-  console.log();
-  console.log("old positions");
-  console.log(testNode1ID);
-  console.log(cyBeforeRepositioning.getElementById(testNode1ID).position());
-  console.log(testNode2ID);
-  console.log(cyBeforeRepositioning.getElementById(testNode2ID).position());
-  console.log();
-  console.log();
-  console.log("new positions");
-  console.log(testNode1ID);
-  console.log(cy.getElementById(testNode1ID).position());
-  console.log(testNode2ID);
-  console.log(cy.getElementById(testNode2ID).position());
-  console.log();
+  console.log("max y value");
+  console.log(value);
 
-  console.log();
-  console.log("old positions");
-  console.log(testNode3ID);
-  console.log(cyBeforeRepositioning.getElementById(testNode3ID).position());
-  console.log(testNode4ID);
-  console.log(cyBeforeRepositioning.getElementById(testNode4ID).position());
-  console.log();
-  console.log();
-  console.log("new positions");
-  console.log(testNode3ID);
-  console.log(cy.getElementById(testNode3ID).position());
-  console.log(testNode4ID);
-  console.log(cy.getElementById(testNode4ID).position());
-  console.log();
+  const posY = value + spacing;
 
-  // return await createCytoscapeGraphFromEles(
-  //   cy.json(normalizedNodesWOAnnotations.jsons())
-  // );
-  return cy;
+  return posY;
 };
 
-export const beautiflowifyWithAnimationAllAtOnce = async (
+export const beautiflowify = async (
   cy,
   spacing,
   verticalTolerance,
-  dur
+  dur,
+  watchAnimation
 ) => {
-  // const testNode1ID = "bb45iggzc5";
-  // const testNode2ID = "ze3omkafya";
-  // const testNode3ID = "bviv3cclyg";
-  // const testNode4ID = "w7jmfry8oc";
-  // const testNode1ID = "cnebm2o1f8";
-  // const testNode2ID = "yph1ptw3e7";
-  // const testNode3ID = "cdev73rs44";
-  // const testNode4ID = "nppc861ktr";
-  // const cy = createCytoscapeGraph(flowJSON);
-
-  // console.log(cy.getElementById(testNode3ID).json());
-
   const cyBeforeRepositioning = await createCytoscapeGraphFromEles(
     cy.$("*").clone().jsons()
   );
-
-  // console.log('cyBeforeRepositioning.$(" *").jsons().length');
 
   const nodes = cy.nodes();
   const nodesOG = nodes.clone();
@@ -1042,789 +915,27 @@ export const beautiflowifyWithAnimationAllAtOnce = async (
     '[nodeType != "ANNOTATION"]'
   );
   const collWithNormalizedNodePos = cy.edges().union(normalizedNodes);
-  // (normalizedNodes.jsons());
   cy.json(collWithNormalizedNodePos.jsons());
 
   const roots = normalizedNodesWOAnnotations.roots();
-  cy.fit(getRowOfNodesFromRoot(roots.first()), 150);
-  // const startNode = getStartNode(nodesWOAnnotations, verticalTolerance);
+  const rootsSorted = sortRoots(roots, verticalTolerance);
+  cy.fit(getRowOfNodesFromRoot(rootsSorted.first()), 150);
 
   // just in case, lock annotations' pos
   lockAnnotationPositions(cy);
-
-  // console.log();
-  // console.log(normalizedNodesWOAnnotations.jsons().slice(0, 2));
-  // console.log();
-
-  // console.log();
-  // console.log("cy");
-  // console.log(cy);
-  // console.log();
-  // console.log();
-  // console.log("cyWOAnnotations");
-  // console.log(cyWOAnnotations);
-  // console.log();
-
-  const rootsArr = roots.toArray();
-  const rootsArr1 = rootsArr.slice(0, 1);
-
-  // console.log("roots");
-  // console.log(roots.jsons());
-
-  // let dur = 1000;
-  // let dur = 500;
-  // "animating roots"
-  // emitStyleEventForExplainerText(cy, "Animating roots", "", true, false);
-  // await Promise.all(
-  //   roots.map((ele, i, eles) => {
-  //     const msg = "animated " + ele.id();
-  //     return new Promise((resolve, reject) => {
-  //       const ani = ele.animation(
-  //         {
-  //           style: { backgroundColor: "red" },
-  //         },
-  //         {
-  //           duration: dur,
-  //           complete: () => {
-  //             emitStyleEventForExplainerText(cy, "", msg, false, true);
-  //             resolve(msg);
-  //           },
-  //         }
-  //       );
-  //       emitStyleEventForExplainerText(cy, "", msg, true, false);
-  //       ani.play();
-  //       // await eles.pon("style");
-  //     });
-  //   })
-  // );
-  // emitStyleEventForExplainerText(cy, "Animating roots", "", false, true);
-
-  // "Animating roots successors"
-  // emitStyleEventForExplainerText(
-  //   cy,
-  //   "Animating roots successors",
-  //   "",
-  //   true,
-  //   false
-  // );
-  // let color = "blue";
-  // for (const r of roots) {
-  //   const animatedRootSuccessors = await animateNodesAndWait(
-  //     cy,
-  //     r.successors(),
-  //     dur,
-  //     color
-  //   );
-  //   // console.log(animatedRootSuccessors);
-  // }
-
-  // emitStyleEventForExplainerText(
-  //   cy,
-  //   "Animating roots successors",
-  //   "",
-  //   false,
-  //   true
-  // );
-
-  const rows = [];
-  const rowNum = 0;
-
-  // Animating row of nodes
-  // emitStyleEventForExplainerText(cy, "Animating row of nodes", "", true, false);
-  // for (const r of roots) {
-  //   const rowNodes = getRowOfNodesFromRoot(r);
-  //   const animatedNodes = await animateNodesAndWait(
-  //     cy,
-  //     rowNodes,
-  //     1000,
-  //     "green"
-  //   );
-  //   // console.log(animatedNodes);
-  // }
-  // emitStyleEventForExplainerText(cy, "Animating row of nodes", "", false, true);
-
-  // Animating row of nodes and edges
-  // emitStyleEventForExplainerText(
-  //   cy,
-  //   "Animating row of nodes and edges",
-  //   "",
-  //   true,
-  //   false
-  // );
-  // for (const r of roots) {
-  //   const rowNodes = getRowOfNodesFromRoot(r);
-  //   const row = rowNodes.union(rowNodes.connectedEdges());
-  //   const animatedEles = await animateElesAndWait(cy, row, 1000, "red");
-  //   console.log(animatedEles);
-  // }
-  // emitStyleEventForExplainerText(
-  //   cy,
-  //   "Animating row of nodes and edges",
-  //   "",
-  //   false,
-  //   true
-  // );
-
-  const rowStartPosX = 0;
-  const firstRowStartPosY = 180;
-  let sectionBaselinePosY = [];
-  let nextRowPosY = 400;
-  const rowSpacingY = 300;
-  let highestYPosValueInSection = [];
-  // for (const ele of roots) {
-  for (let row = 0; row < roots.length; row++) {
-    const ele = roots[row];
-    const prevNodePos = {};
-    const currNodeAnimations = [];
-    const prevNodeAnimations = [];
-    const animations = [];
-    const nodesInCurrRow = getRowOfNodesFromRoot(ele);
-    const nodesInCurrRowClone = nodesInCurrRow.clone();
-    /**
-     * sectionBasePosY is the y-value for the starting nodes and any following
-     * nodes along that same horizontal line
-     *
-     * if row > 0,
-     * take the lowest y value of the previous section and add our row spacing
-     *  to it
-     * else,
-     * use the first row y pos (firstRowStartPosY)
-     *
-     * */
-    sectionBaselinePosY[row] = row
-      ? highestYPosValueInSection[row - 1] + rowSpacingY
-      : firstRowStartPosY;
-    // init highest (lowest on screen visually) y-value for this new section to
-    // be at this section's row height
-    highestYPosValueInSection[row] = sectionBaselinePosY[row];
-
-    /**
-     * BFS
-     *
-     * runs @see {@link Cytoscape#breadthFirstSearch} on nodes in the same
-     * section as the current iterated root node
-     */
-    nodesInCurrRow.breadthFirstSearch({
-      root: ele,
-      visit: async (v, edge, prev, j, depth) => {
-        const currStepAnimations = {};
-        const vPos = v.position();
-        const vID = v.id();
-        let prevNodeAniProm;
-        let prevNodeAni;
-        let currNodeAniProm;
-        let currNodeAni;
-
-        /**
-         * Current node color animation
-         */
-        currNodeAniProm = new Promise((resolve, reject) => {
-          currNodeAni = v.animation(
-            {
-              style: { backgroundColor: "yellow" },
-            },
-            {
-              duration: dur,
-              complete: () => resolve("animated " + vID),
-            }
-          );
-        });
-
-        currStepAnimations.currID = vID;
-        currStepAnimations.currAni = currNodeAni;
-        currStepAnimations.currAniProm = currNodeAniProm;
-        /**
-         *
-         */
-
-        cy.fit();
-
-        /**
-         * Decide new position based on whether if it's a root node or not
-         *
-         * Root nodes
-         *  go to start of row's y pos, x pos should be 0
-         *
-         * Non-root nodes
-         *  x pos will depend on how deep into bfs we are
-         *  y pos depends on whether it's in a column with other nodes connected
-         *    to the same source node
-         */
-        if (roots.getElementById(vID).length) {
-          // at a root node, only move y position
-
-          /**
-           * Root node animation
-           * color and position
-           */
-          let rootAni;
-          let pos = { x: rowStartPosX, y: sectionBaselinePosY[row] };
-          const rootAniProm = new Promise((resolve, reject) => {
-            rootAni = v.animation(
-              {
-                position: pos,
-                style: { backgroundColor: "white" },
-              },
-              {
-                duration: dur,
-                complete: () => {
-                  // console.log("animated " + vID)
-                  resolve("animating root " + vID);
-                },
-              }
-            );
-          });
-          rootAni.play();
-
-          prevNodePos[vID] = pos;
-
-          currStepAnimations.rootID = vID;
-          currStepAnimations.rootAniProm = rootAniProm;
-          currStepAnimations.rootAni = rootAni;
-          animations.push(currStepAnimations);
-          /**
-           *
-           */
-        } else if (prev) {
-          const prevID = prev.id();
-          const prevPosX = prev.position("x");
-          const prevPosY = prev.position("y");
-          const prevOG = cyBeforeRepositioning.getElementById(prevID);
-          const prevOGPos = prevOG.position();
-          const prevOGPosX = prevOGPos.x;
-          const prevOGPosY = prevOGPos.y;
-          const prevOutgoerNodes = prev.outgoers("nodes");
-          const vPosY = vPos.y;
-          const sameRowDiffHeightSpacingY = 240;
-          // new x pos
-          const posX = spacing * depth + rowStartPosX;
-          // object to store new position value
-          let pos = {};
-          let y;
-
-          /**
-           * Animate prev node color
-           */
-          const prevPos = prev.position();
-          // prev.animate(
-          //   {
-          //     // position: prevPos,
-          //     style: { backgroundColor: "green" },
-          //   },
-          //   {
-          //     duration: dur,
-          //   }
-          // );
-          // .delay(dur * (i + 1));
-
-          prevNodeAniProm = new Promise((resolve, reject) => {
-            prevNodeAni = prev.animation(
-              {
-                style: { backgroundColor: "blue" },
-              },
-              {
-                duration: dur,
-                complete: () => resolve("animated " + prevID),
-              }
-            );
-          });
-          prevNodeAni.play();
-
-          currStepAnimations.preID = prev?.id();
-          currStepAnimations.preAniProm = prevNodeAniProm;
-          currStepAnimations.preAni = prevNodeAni;
-          /**
-           *
-           */
-
-          /**
-           *
-           *
-           * Calculate and move current node to new position
-           *
-           *
-           */
-          /**
-           * New x position
-           */
-          pos.x = posX;
-          /**
-           *
-           */
-
-          /**
-           * New y position
-           *
-           * Check if this node is in a stack by seeing if the previous
-           * (source) node has more than 1 outgoer
-           *
-           * if it does, sort the previous node's outgoers by y value (from
-           * lowest value to highest value)
-           * then, the index of where the current node is found of that
-           * sorted array of outgoers will be the level at which to place the
-           * current node. with 0 being at the same baseline row height, and
-           * higher values being successively visually lower rows
-           *
-           * if it doesn't, set new y pos value to be at the same y pos value
-           * as its prev (source) node
-           */
-          if (prevOutgoerNodes.size() > 1) {
-            const prevOutgoerNodesSorted = prevOutgoerNodes.sort(
-              (ele1, ele2) => ele1.position("y") - ele2.position("y")
-            );
-            const prevOutgoerNodesSortedArr = prevOutgoerNodesSorted.toArray();
-            for (let j = 0; j < prevOutgoerNodesSortedArr.length; j++) {
-              const outgoerFromPrevID = prevOutgoerNodesSortedArr[j].id();
-              if (outgoerFromPrevID === vID) {
-                // get the updated position of the previous (source) node
-                const prevNewPos = prevNodePos[prevID];
-                const prevNewPosY = prevNewPos?.y;
-                // it should have a position object with a y value
-                if (!prevNewPosY && prevNewPosY !== 0) {
-                  throw new Error(
-                    "Missing y position value on the previous (source) node " +
-                      prevID +
-                      " in array:\n" +
-                      JSON.stringify(prevNodePos)
-                  );
-                }
-
-                // new y pos will be the previous node's y pos + what
-                // vertical level in the column stack this node is
-                // calculated by multiplying the current array index
-                // value with the row spacing for nodes in the same section
-                pos.y = prevNewPosY + j * sameRowDiffHeightSpacingY;
-              }
-            }
-
-            highestYPosValueInSection[row] = Math.max(
-              highestYPosValueInSection[row],
-              pos.y
-            );
-          } else {
-            pos.y = prevNodePos[prevID].y;
-          }
-          /**
-           *
-           */
-
-          prevNodePos[vID] = pos;
-
-          /**
-           * Move and animate
-           */
-          let vMoveAni;
-          let vMoveAniProm = new Promise((resolve, reject) => {
-            vMoveAni = v.animation(
-              {
-                position: pos,
-                style: { backgroundColor: "purple" },
-              },
-              {
-                duration: dur,
-                complete: () => {
-                  resolve(
-                    "animating " + vID + "'s position to " + JSON.stringify(pos)
-                  );
-                },
-              }
-            );
-          });
-          vMoveAni.play();
-          // v.position(pos);
-
-          // add v's movement animation to current animations object
-          currStepAnimations.vMovePos = pos;
-          currStepAnimations.vMoveAniProm = vMoveAniProm;
-          currStepAnimations.vMoveAni = vMoveAni;
-          // currStepAnimations.rootID = ele.id();
-          // curr animations object to collective animations holder
-          animations.push(currStepAnimations);
-          // v.position(pos);
-          /**
-           *
-           */
-          /**
-           *
-           *
-           *
-           *
-           *
-           */
-
-          // if (vID === testNode3ID) {
-          // console.log();
-          // console.log();
-          // console.log(
-          //   "currNodePos:",
-          //   vID,
-          //   v.data("nodeType"),
-          //   v.data("name"),
-          //   v.position()
-          // );
-          // console.log(v.json());
-
-          // console.log(
-          //   "prevNodeOgPos:",
-          //   prevNodeOg.id(),
-          //   prevNodeOg.data("nodeType"),
-          //   prevNodeOg.position()
-          // );
-          // console.log();
-          // }
-        } else {
-          // We should have a previous node because we didn't find the
-          // current node in roots
-          throw new Error(
-            vID + " doesn't have a previous node and isn't a root node."
-          );
-        }
-      },
-      directed: true,
-    });
-
-    /**
-     * Play animations
-     *
-     * either one by one
-     *  current setup with an await for each animation promise
-     *
-     * or
-     *
-     * altogether
-     *  remove await's
-     */
-    // console.log("animating bfs");
-    // emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
-    // for (let i = 0; i < animations.length; i++) {
-    //   const ani = animations[i];
-    //   const {
-    //     preID,
-    //     preAniProm,
-    //     preAni,
-    //     currID,
-    //     currAni,
-    //     currAniProm,
-    //     rootID,
-    //     rootAni,
-    //     rootAniProm,
-    //     vMovePos,
-    //     vMoveAni,
-    //     vMoveAniProm,
-    //   } = ani;
-    //   let msg;
-
-    //   // need to figure out how to calculate for rows with multiple levels
-    //   if (rootID) {
-    //     const nextRowOfNodes = getRowOfNodesFromRoot(cy.$("#" + rootID));
-    //     // cy.fit(nextRowOfNodes, 150);
-    //     // cy.panBy({x: 0, y: 300})
-    //   }
-
-    //   if (preAniProm && preAni) {
-    //     msg = "animating " + preID;
-    //     const resolvedMsg = await emitAndWaitForAni(
-    //       msg,
-    //       preID,
-    //       cy,
-    //       preAni,
-    //       preAniProm
-    //     );
-    //   }
-
-    //   msg = "animating " + currID;
-    //   const currAniResolvedMsg = await emitAndWaitForAni(
-    //     msg,
-    //     currID,
-    //     cy,
-    //     currAni,
-    //     currAniProm
-    //   );
-
-    //   if (vMovePos) {
-    //     msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
-    //     const resolvedMsg = await emitAndWaitForAni(
-    //       msg,
-    //       currID,
-    //       cy,
-    //       vMoveAni,
-    //       vMoveAniProm
-    //     );
-    //   }
-
-    //   if (rootAni) {
-    //     msg = "animating root " + rootID;
-    //     const resolvedMsg = await emitAndWaitForAni(
-    //       msg,
-    //       rootID,
-    //       cy,
-    //       rootAni,
-    //       rootAniProm
-    //     );
-    //   }
-
-    //   // change prev node to green as its processing is complete
-    //   if (preID) {
-    //     msg = "prev node " + preID + " processing is complete animation";
-    //     const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
-    //       cy.$("#" + preID),
-    //       dur,
-    //       "green"
-    //     );
-    //     const resolvedMsg = await emitAndWaitForAni(
-    //       msg,
-    //       preID,
-    //       cy,
-    //       doneWithPrevNodeAni,
-    //       prom
-    //     );
-    //   }
-
-    //   if (
-    //     !cy
-    //       .$("#" + currID)
-    //       .outgoers()
-    //       .size()
-    //   ) {
-    //     msg = "prev node " + preID + " processing is finished animation";
-    //     const { ani: doneWithCurrLeafNodeAni, prom } =
-    //       getAnimationPromiseForEle(cy.$("#" + currID), dur, "green");
-    //     const resolvedMsg = await emitAndWaitForAni(
-    //       msg,
-    //       preID,
-    //       cy,
-    //       doneWithCurrLeafNodeAni,
-    //       prom
-    //     );
-    //   }
-    // }
-    // emitStyleEventForExplainerText(cy, "Beautiflowifying", "", false, true);
-    // // console.log("animating bfs completed");
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     */
-  }
-
-  /**
-   * Debugging
-   */
-  // console.log();
-  // console.log("old positions");
-  // console.log(testNode1ID);
-  // console.log(cyBeforeRepositioning.getElementById(testNode1ID).position());
-  // console.log(testNode2ID);
-  // console.log(cyBeforeRepositioning.getElementById(testNode2ID).position());
-  // console.log();
-  // console.log();
-  // console.log("new positions");
-  // console.log(testNode1ID);
-  // console.log(cy.getElementById(testNode1ID).position());
-  // console.log(testNode2ID);
-  // console.log(cy.getElementById(testNode2ID).position());
-  // console.log();
-
-  // console.log();
-  // console.log("old positions");
-  // console.log(testNode3ID);
-  // console.log(cyBeforeRepositioning.getElementById(testNode3ID).position());
-  // console.log(testNode4ID);
-  // console.log(cyBeforeRepositioning.getElementById(testNode4ID).position());
-  // console.log();
-  // console.log();
-  // console.log("new positions");
-  // console.log(testNode3ID);
-  // console.log(cy.getElementById(testNode3ID).position());
-  // console.log(testNode4ID);
-  // console.log(cy.getElementById(testNode4ID).position());
-  // console.log();
-
-  /**
-   * Return cy graph
-   */
-  // return await createCytoscapeGraphFromEles(
-  //   cy.json(normalizedNodesWOAnnotations.jsons())
-  // );
-  return cy;
-};
-
-export const beautiflowifyWithAnimation = async (
-  cy,
-  spacing,
-  verticalTolerance,
-  dur
-) => {
-  // const testNode1ID = "bb45iggzc5";
-  // const testNode2ID = "ze3omkafya";
-  // const testNode3ID = "bviv3cclyg";
-  // const testNode4ID = "w7jmfry8oc";
-  // const testNode1ID = "cnebm2o1f8";
-  // const testNode2ID = "yph1ptw3e7";
-  // const testNode3ID = "cdev73rs44";
-  // const testNode4ID = "nppc861ktr";
-  // const cy = createCytoscapeGraph(flowJSON);
-
-  // console.log(cy.getElementById(testNode3ID).json());
-
-  const cyBeforeRepositioning = await createCytoscapeGraphFromEles(
-    cy.$("*").clone().jsons()
-  );
-
-  // console.log('cyBeforeRepositioning.$(" *").jsons().length');
-
-  const nodes = cy.nodes();
-  const nodesOG = nodes.clone();
-  const nodesSorted = sortNodes(nodes, verticalTolerance);
-  const normalizedNodes = normalizeCyNodePos(nodesSorted);
-  const normalizedNodesUntouched = normalizedNodes.clone();
-  const normalizedNodesWOAnnotations = normalizedNodes.filter(
-    '[nodeType != "ANNOTATION"]'
-  );
-  const collWithNormalizedNodePos = cy.edges().union(normalizedNodes);
-  // (normalizedNodes.jsons());
-  cy.json(collWithNormalizedNodePos.jsons());
-
-  const roots = normalizedNodesWOAnnotations.roots();
-  cy.fit(getRowOfNodesFromRoot(roots.first()), 150);
-  // const startNode = getStartNode(nodesWOAnnotations, verticalTolerance);
-
-  // just in case, lock annotations' pos
-  lockAnnotationPositions(cy);
-
-  // console.log();
-  // console.log(normalizedNodesWOAnnotations.jsons().slice(0, 2));
-  // console.log();
-
-  // console.log();
-  // console.log("cy");
-  // console.log(cy);
-  // console.log();
-  // console.log();
-  // console.log("cyWOAnnotations");
-  // console.log(cyWOAnnotations);
-  // console.log();
-
-  const rootsArr = roots.toArray();
-  const rootsArr1 = rootsArr.slice(0, 1);
-
-  // console.log("roots");
-  // console.log(roots.jsons());
-
-  // let dur = 1000;
-  // let dur = 500;
-  // "animating roots"
-  // emitStyleEventForExplainerText(cy, "Animating roots", "", true, false);
-  // await Promise.all(
-  //   roots.map((ele, i, eles) => {
-  //     const msg = "animated " + ele.id();
-  //     return new Promise((resolve, reject) => {
-  //       const ani = ele.animation(
-  //         {
-  //           style: { backgroundColor: "red" },
-  //         },
-  //         {
-  //           duration: dur,
-  //           complete: () => {
-  //             emitStyleEventForExplainerText(cy, "", msg, false, true);
-  //             resolve(msg);
-  //           },
-  //         }
-  //       );
-  //       emitStyleEventForExplainerText(cy, "", msg, true, false);
-  //       ani.play();
-  //       // await eles.pon("style");
-  //     });
-  //   })
-  // );
-  // emitStyleEventForExplainerText(cy, "Animating roots", "", false, true);
-
-  // "Animating roots successors"
-  // emitStyleEventForExplainerText(
-  //   cy,
-  //   "Animating roots successors",
-  //   "",
-  //   true,
-  //   false
-  // );
-  // let color = "blue";
-  // for (const r of roots) {
-  //   const animatedRootSuccessors = await animateNodesAndWait(
-  //     cy,
-  //     r.successors(),
-  //     dur,
-  //     color
-  //   );
-  //   // console.log(animatedRootSuccessors);
-  // }
-
-  // emitStyleEventForExplainerText(
-  //   cy,
-  //   "Animating roots successors",
-  //   "",
-  //   false,
-  //   true
-  // );
-
-  const rows = [];
-  const rowNum = 0;
-
-  // Animating row of nodes
-  // emitStyleEventForExplainerText(cy, "Animating row of nodes", "", true, false);
-  // for (const r of roots) {
-  //   const rowNodes = getRowOfNodesFromRoot(r);
-  //   const animatedNodes = await animateNodesAndWait(
-  //     cy,
-  //     rowNodes,
-  //     1000,
-  //     "green"
-  //   );
-  //   // console.log(animatedNodes);
-  // }
-  // emitStyleEventForExplainerText(cy, "Animating row of nodes", "", false, true);
-
-  // Animating row of nodes and edges
-  // emitStyleEventForExplainerText(
-  //   cy,
-  //   "Animating row of nodes and edges",
-  //   "",
-  //   true,
-  //   false
-  // );
-  // for (const r of roots) {
-  //   const rowNodes = getRowOfNodesFromRoot(r);
-  //   const row = rowNodes.union(rowNodes.connectedEdges());
-  //   const animatedEles = await animateElesAndWait(cy, row, 1000, "red");
-  //   console.log(animatedEles);
-  // }
-  // emitStyleEventForExplainerText(
-  //   cy,
-  //   "Animating row of nodes and edges",
-  //   "",
-  //   false,
-  //   true
-  // );
 
   let visitedNodes = cy.collection();
   const updatedPos = {};
   const rowStartPosX = 0;
   const firstRowStartPosY = 180;
+  const sameRowDiffHeightSpacingY = 240;
   let sectionBaselinePosY = [];
-  let nextRowPosY = 400;
   const rowSpacingY = 300;
   let highestYPosValueInSection = [];
   // for (const ele of roots) {
-  for (let row = 0; row < roots.length; row++) {
-    const ele = roots[row];
+  for (let row = 0; row < rootsSorted.length; row++) {
+    const ele = rootsSorted[row];
     const prevNodePos = {};
-    const currNodeAnimations = [];
-    const prevNodeAnimations = [];
     const animations = [];
     const nodesInCurrRow = getRowOfNodesFromRoot(ele);
     const nodesInCurrRowClone = nodesInCurrRow.clone();
@@ -1863,17 +974,11 @@ export const beautiflowifyWithAnimation = async (
         let prevNodeAni;
         let currNodeAniProm;
         let currNodeAni;
-        let posY;
+        const pos = {};
 
-        // skip if we've already visited and modified this node
+        // skip if we've already visited this node
         if (!visitedNodes.anySame(v)) {
-          /**
-           * Remember that we've visited this node
-           */
-          visitedNodes = visitedNodes.union(v);
-          /**
-           *
-           */
+          const vSuccessors = v.successors();
 
           /**
            * Current node color animation
@@ -1890,34 +995,17 @@ export const beautiflowifyWithAnimation = async (
             );
           });
 
-          currStepAnimations.currID = vID;
-          currStepAnimations.currAni = currNodeAni;
-          currStepAnimations.currAniProm = currNodeAniProm;
+          if (watchAnimation) {
+            currStepAnimations.currID = vID;
+            currStepAnimations.currAni = currNodeAni;
+            currStepAnimations.currAniProm = currNodeAniProm;
+          } else {
+            currNodeAni.play();
+          }
           /**
            *
            */
 
-          const vSuccessors = v.successors();
-          if (vSuccessors.anySame(visitedNodes)) {
-            // this root contains a path that leads into nodes we've already
-            // visited
-            // Get the edges and sources coming into vSuccessors
-            const vSuccessorsIncomers = vSuccessors.incomers();
-            // get the already visited elements up to the point where v's path
-            // hits an already visited node
-            // this should give the eles which should be above the current node
-            const visitedElesBeforePathMerge = vSuccessorsIncomers.not(
-              vSuccessors.union(v)
-            );
-
-            const { value, ele } = visitedElesBeforePathMerge.max(
-              (ele, i, eles) => {
-                return ele.position("y");
-              }
-            );
-
-            posY = value + spacing;
-          }
           /**
            * Decide new position based on whether if it's a root node or not
            *
@@ -1929,16 +1017,39 @@ export const beautiflowifyWithAnimation = async (
            *  y pos depends on whether it's in a column with other nodes connected
            *    to the same source node
            */
-          if (roots.getElementById(vID).length) {
+          if (rootsSorted.getElementById(vID).length) {
             // at a root node
-            posY = sectionBaselinePosY[row];
+
+            if (vSuccessors.anySame(visitedNodes)) {
+              // this root contains a path that leads into nodes we've already
+              // visited
+              // Get the edges and sources coming into vSuccessors
+              pos.y = doesNodePathMergeWithAlreadyVisitedNodes(
+                vSuccessors,
+                v,
+                sameRowDiffHeightSpacingY,
+                visitedNodes
+              );
+
+              const maxOfRow = vSuccessors.max((ele, i, eles) =>
+                ele.position("y")
+              );
+              highestYPosValueInSection[row] = Math.max(pos.y, maxOfRow.value);
+            } else {
+              pos.y = sectionBaselinePosY[row];
+            }
+
+            highestYPosValueInSection[row] = Math.max(
+              highestYPosValueInSection[row],
+              pos.y
+            );
 
             /**
              * Root node animation
              * color and position
              */
             let rootAni;
-            let pos = { x: rowStartPosX, y: posY };
+            pos.x = rowStartPosX;
             const rootAniProm = new Promise((resolve, reject) => {
               rootAni = v.animation(
                 {
@@ -1961,11 +1072,15 @@ export const beautiflowifyWithAnimation = async (
             prevNodePos[vID] = pos;
             updatedPos[vID] = pos;
 
-            currStepAnimations.rootID = vID;
-            currStepAnimations.rootAniProm = rootAniProm;
-            currStepAnimations.rootAni = rootAni;
-            currStepAnimations.newRootPos = pos;
-            animations.push(currStepAnimations);
+            if (watchAnimation) {
+              currStepAnimations.rootID = vID;
+              currStepAnimations.rootAniProm = rootAniProm;
+              currStepAnimations.rootAni = rootAni;
+              currStepAnimations.newRootPos = pos;
+              animations.push(currStepAnimations);
+            } else {
+              rootAni.play();
+            }
             /**
              *
              */
@@ -1977,29 +1092,10 @@ export const beautiflowifyWithAnimation = async (
             const prevOGPos = prevOG.position();
             const prevOGPosX = prevOGPos.x;
             const prevOGPosY = prevOGPos.y;
-            const prevOutgoerNodes = prev.outgoers("nodes");
-            const vPosY = vPos.y;
-            const sameRowDiffHeightSpacingY = 240;
+            const prevOutgoerNodes = prev.outgoers("node");
             // new x pos
             const posX = spacing * depth + rowStartPosX;
             // object to store new position value
-            let pos = {};
-            let y;
-
-            /**
-             * Animate prev node color
-             */
-            const prevPos = prev.position();
-            // prev.animate(
-            //   {
-            //     // position: prevPos,
-            //     style: { backgroundColor: "green" },
-            //   },
-            //   {
-            //     duration: dur,
-            //   }
-            // );
-            // .delay(dur * (i + 1));
 
             prevNodeAniProm = new Promise((resolve, reject) => {
               prevNodeAni = prev.animation(
@@ -2012,11 +1108,14 @@ export const beautiflowifyWithAnimation = async (
                 }
               );
             });
-            prevNodeAni.play();
 
-            currStepAnimations.preID = prev?.id();
-            currStepAnimations.preAniProm = prevNodeAniProm;
-            currStepAnimations.preAni = prevNodeAni;
+            if (watchAnimation) {
+              currStepAnimations.preID = prev?.id();
+              currStepAnimations.preAniProm = prevNodeAniProm;
+              currStepAnimations.preAni = prevNodeAni;
+            } else {
+              prevNodeAni.play();
+            }
             /**
              *
              */
@@ -2081,11 +1180,6 @@ export const beautiflowifyWithAnimation = async (
                   pos.y = prevNewPosY + j * sameRowDiffHeightSpacingY;
                 }
               }
-
-              highestYPosValueInSection[row] = Math.max(
-                highestYPosValueInSection[row],
-                pos.y
-              );
             } else {
               pos.y = prevNodePos[prevID].y;
             }
@@ -2093,10 +1187,15 @@ export const beautiflowifyWithAnimation = async (
              *
              */
 
+            highestYPosValueInSection[row] = Math.max(
+              highestYPosValueInSection[row],
+              pos.y
+            );
+
             prevNodePos[vID] = pos;
 
             /**
-             * Move and animate
+             * Move animation
              */
             let vMoveAni;
             let vMoveAniProm = new Promise((resolve, reject) => {
@@ -2118,17 +1217,17 @@ export const beautiflowifyWithAnimation = async (
                 }
               );
             });
-            // vMoveAni.play();
-            // v.position(pos);
 
-            // add v's movement animation to current animations object
-            currStepAnimations.vMovePos = pos;
-            currStepAnimations.vMoveAniProm = vMoveAniProm;
-            currStepAnimations.vMoveAni = vMoveAni;
-            // currStepAnimations.rootID = ele.id();
-            // curr animations object to collective animations holder
-            animations.push(currStepAnimations);
-            // v.position(pos);
+            if (watchAnimation) {
+              // add v's movement animation to current animations object
+              currStepAnimations.vMovePos = pos;
+              currStepAnimations.vMoveAniProm = vMoveAniProm;
+              currStepAnimations.vMoveAni = vMoveAni;
+              // curr animations object to collective animations holder
+              animations.push(currStepAnimations);
+            } else {
+              vMoveAni.play();
+            }
             /**
              *
              */
@@ -2139,27 +1238,6 @@ export const beautiflowifyWithAnimation = async (
              *
              *
              */
-
-            // if (vID === testNode3ID) {
-            // console.log();
-            // console.log();
-            // console.log(
-            //   "currNodePos:",
-            //   vID,
-            //   v.data("nodeType"),
-            //   v.data("name"),
-            //   v.position()
-            // );
-            // console.log(v.json());
-
-            // console.log(
-            //   "prevNodeOgPos:",
-            //   prevNodeOg.id(),
-            //   prevNodeOg.data("nodeType"),
-            //   prevNodeOg.position()
-            // );
-            // console.log();
-            // }
           } else {
             // We should have a previous node because we didn't find the
             // current node in roots
@@ -2167,6 +1245,14 @@ export const beautiflowifyWithAnimation = async (
               vID + " doesn't have a previous node and isn't a root node."
             );
           }
+
+          /**
+           * Remember that we've visited this node
+           */
+          visitedNodes.merge(v);
+          /**
+           *
+           */
         }
       },
       directed: true,
@@ -2177,164 +1263,133 @@ export const beautiflowifyWithAnimation = async (
      *
      * either one by one
      *  current setup with an await for each animation promise
-     *
-     * or
-     *
-     * altogether
-     *  remove await's
      */
     // console.log("animating bfs");
-    emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
-    // let viewportAni;
-    // let viewportAniProm = new Promise((resolve, reject) => {
-    //   viewportAni = cy.animation({
-    //     // zoom: { level: 1, position: ele.position() },
-    //     panBy: rootNodePosAdj,
-    //     duration: dur / 2,
-    //     complete: () =>
-    //       resolve("Adjusted viewport (pan) to animating elements"),
-    //   });
-    // });
-    // cy.fit(nodesInCurrRow, 150);
-    // viewportAni.play();
-    // await viewportAniProm;
+    if (watchAnimation) {
+      emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
 
-    for (let i = 0; i < animations.length; i++) {
-      const ani = animations[i];
-      const {
-        preID,
-        preAniProm,
-        preAni,
-        currID,
-        currAni,
-        currAniProm,
-        rootID,
-        rootAni,
-        rootAniProm,
-        newRootPos,
-        vMovePos,
-        vMoveAni,
-        vMoveAniProm,
-      } = ani;
-      let msg;
-
-      // need to figure out how to calculate for rows with multiple levels
-      if (rootID) {
-        let viewportAni;
-        // cy.fit(cy.$("#" + rootID).successors);
-        cy.fit(newRootPos, 50);
-        // cy.panBy({ x: -300, y: 0 });
-        // let viewportAniProm = new Promise((resolve, reject) => {
-        //   viewportAni = cy.animation({
-        //     panBy: {
-        //       x: -100,
-        //       y: 0,
-        //     },
-        //     duration: dur / 2,
-        //     complete: () =>
-        //       resolve("Adjusted viewport (panBy) to animating elements"),
-        //   });
-        // });
-        // viewportAni.play();
-        // await viewportAniProm;
-
-        const viewportAniProm = new Promise((resolve, reject) => {
-          viewportAni = cy.animation({
-            // panBy: {
-            //   x: 150,
-            //   y: -150,
-            // },
-            zoom: {
-              level: 0.3,
-              position: newRootPos,
-            },
-            duration: dur / 2,
-            complete: () =>
-              resolve("Adjusted viewport (panBy) to animating elements"),
-          });
-        });
-        viewportAni.play();
-        await viewportAniProm;
-        // cy.fit(nextRowOfNodes, 150);
-        // cy.panBy({x: 0, y: 300})
-      }
-
-      if (preAniProm && preAni) {
-        msg = "animating " + preID;
-        const resolvedMsg = await emitAndWaitForAni(
-          msg,
+      for (let i = 0; i < animations.length; i++) {
+        const ani = animations[i];
+        const {
           preID,
-          cy,
+          preAniProm,
           preAni,
-          preAniProm
-        );
-      }
+          currID,
+          currAni,
+          currAniProm,
+          rootID,
+          rootAni,
+          rootAniProm,
+          newRootPos,
+          vMovePos,
+          vMoveAni,
+          vMoveAniProm,
+        } = ani;
+        let msg;
 
-      msg = "animating " + currID;
-      const currAniResolvedMsg = await emitAndWaitForAni(
-        msg,
-        currID,
-        cy,
-        currAni,
-        currAniProm
-      );
+        // need to figure out how to calculate for rows with multiple levels
+        if (rootID) {
+          let viewportAni;
+          cy.fit(newRootPos, 50);
 
-      if (vMovePos) {
-        msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
-        const resolvedMsg = await emitAndWaitForAni(
+          const viewportAniProm = new Promise((resolve, reject) => {
+            viewportAni = cy.animation({
+              zoom: {
+                level: 0.3,
+                position: newRootPos,
+              },
+              duration: dur / 2,
+              complete: () =>
+                resolve("Adjusted viewport (panBy) to animating elements"),
+            });
+          });
+          viewportAni.play();
+          await viewportAniProm;
+        }
+
+        if (preAniProm && preAni) {
+          msg = "animating " + preID;
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
+            preID,
+            cy,
+            preAni,
+            preAniProm
+          );
+        }
+
+        msg = "animating " + currID;
+        const currAniResolvedMsg = await emitAndWaitForAni(
           msg,
           currID,
           cy,
-          vMoveAni,
-          vMoveAniProm
+          currAni,
+          currAniProm
         );
-      }
 
-      if (rootAni) {
-        msg = "animating root " + rootID;
-        const resolvedMsg = await emitAndWaitForAni(
-          msg,
-          rootID,
-          cy,
-          rootAni,
-          rootAniProm
-        );
-      }
+        if (vMovePos) {
+          msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
+            currID,
+            cy,
+            vMoveAni,
+            vMoveAniProm
+          );
+        }
 
-      // change prev node to green as its processing is complete
-      if (preID) {
-        msg = "prev node " + preID + " processing is complete animation";
-        const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
-          cy.$("#" + preID),
-          dur,
-          "green"
-        );
-        const resolvedMsg = await emitAndWaitForAni(
-          msg,
-          preID,
-          cy,
-          doneWithPrevNodeAni,
-          prom
-        );
-      }
+        if (rootAni) {
+          msg = "animating root " + rootID;
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
+            rootID,
+            cy,
+            rootAni,
+            rootAniProm
+          );
+        }
 
-      if (
-        !cy
-          .$("#" + currID)
-          .outgoers()
-          .size()
-      ) {
-        msg = "prev node " + preID + " processing is finished animation";
-        const { ani: doneWithCurrLeafNodeAni, prom } =
-          getAnimationPromiseForEle(cy.$("#" + currID), dur, "green");
-        const resolvedMsg = await emitAndWaitForAni(
-          msg,
-          preID,
-          cy,
-          doneWithCurrLeafNodeAni,
-          prom
-        );
+        // change prev node to green as its processing is complete
+        if (preID) {
+          msg = "prev node " + preID + " processing is complete animation";
+          const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
+            cy.$("#" + preID),
+            dur,
+            "green"
+          );
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
+            preID,
+            cy,
+            doneWithPrevNodeAni,
+            prom
+          );
+        }
+
+        if (
+          !cy
+            .$("#" + currID)
+            .outgoers()
+            .size()
+        ) {
+          msg = "prev node " + preID + " processing is finished animation";
+          const { ani: doneWithCurrLeafNodeAni, prom } =
+            getAnimationPromiseForEle(cy.$("#" + currID), dur, "green");
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
+            preID,
+            cy,
+            doneWithCurrLeafNodeAni,
+            prom
+          );
+        }
       }
+    } else {
+      cy.stop(false, true);
+      cy.style()
+        .selector('node[nodeType != "ANNOTATION"]')
+        .style({ "background-color": "green" })
+        .update();
     }
     emitStyleEventForExplainerText(cy, "Beautiflowifying", "", false, true);
     // console.log("animating bfs completed");
@@ -2350,46 +1405,6 @@ export const beautiflowifyWithAnimation = async (
      *
      */
   }
-
-  /**
-   * Debugging
-   */
-  // console.log();
-  // console.log("old positions");
-  // console.log(testNode1ID);
-  // console.log(cyBeforeRepositioning.getElementById(testNode1ID).position());
-  // console.log(testNode2ID);
-  // console.log(cyBeforeRepositioning.getElementById(testNode2ID).position());
-  // console.log();
-  // console.log();
-  // console.log("new positions");
-  // console.log(testNode1ID);
-  // console.log(cy.getElementById(testNode1ID).position());
-  // console.log(testNode2ID);
-  // console.log(cy.getElementById(testNode2ID).position());
-  // console.log();
-
-  // console.log();
-  // console.log("old positions");
-  // console.log(testNode3ID);
-  // console.log(cyBeforeRepositioning.getElementById(testNode3ID).position());
-  // console.log(testNode4ID);
-  // console.log(cyBeforeRepositioning.getElementById(testNode4ID).position());
-  // console.log();
-  // console.log();
-  // console.log("new positions");
-  // console.log(testNode3ID);
-  // console.log(cy.getElementById(testNode3ID).position());
-  // console.log(testNode4ID);
-  // console.log(cy.getElementById(testNode4ID).position());
-  // console.log();
-
-  /**
-   * Return cy graph
-   */
-  // return await createCytoscapeGraphFromEles(
-  //   cy.json(normalizedNodesWOAnnotations.jsons())
-  // );
 
   const paddingPX = 25;
   cy.fit(cy.nodes('[nodeType != "ANNOTATION"]'), paddingPX);
