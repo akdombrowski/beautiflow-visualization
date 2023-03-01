@@ -209,7 +209,6 @@ function App() {
     if (!annosShifted && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
       cloneElesRef.current = createClonedNodes(cyRef.current);
-      cyRef.current.fit();
     } else if (!flowJSONRef.current && cyRef.current) {
       cyRef.current.unmount();
       cyRef.current.destroy();

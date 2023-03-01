@@ -2217,15 +2217,18 @@ export const beautiflowifyWithAnimation = async (
         vMoveAniProm,
       } = ani;
       let msg;
-      cy.fit();
 
       // need to figure out how to calculate for rows with multiple levels
-      if (vMovePos) {
-        // viewportAniProm = new Promise((resolve, reject) => {
+      if (rootID) {
+        let viewportAni;
+        // cy.fit(cy.$("#" + rootID).successors);
+        cy.fit(newRootPos, 50);
+        // cy.panBy({ x: -300, y: 0 });
+        // let viewportAniProm = new Promise((resolve, reject) => {
         //   viewportAni = cy.animation({
         //     panBy: {
-        //       x: 150,
-        //       y: -150,
+        //       x: -100,
+        //       y: 0,
         //     },
         //     duration: dur / 2,
         //     complete: () =>
@@ -2234,6 +2237,24 @@ export const beautiflowifyWithAnimation = async (
         // });
         // viewportAni.play();
         // await viewportAniProm;
+
+        const viewportAniProm = new Promise((resolve, reject) => {
+          viewportAni = cy.animation({
+            // panBy: {
+            //   x: 150,
+            //   y: -150,
+            // },
+            zoom: {
+              level: 0.3,
+              position: newRootPos,
+            },
+            duration: dur / 2,
+            complete: () =>
+              resolve("Adjusted viewport (panBy) to animating elements"),
+          });
+        });
+        viewportAni.play();
+        await viewportAniProm;
         // cy.fit(nextRowOfNodes, 150);
         // cy.panBy({x: 0, y: 300})
       }
@@ -2370,7 +2391,8 @@ export const beautiflowifyWithAnimation = async (
   //   cy.json(normalizedNodesWOAnnotations.jsons())
   // );
 
-  cy.fit();
+  const paddingPX = 25;
+  cy.fit(cy.nodes('[nodeType != "ANNOTATION"]'), paddingPX);
 
   return cy;
 };
