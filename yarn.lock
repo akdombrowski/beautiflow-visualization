@@ -3931,6 +3931,9 @@ __metadata:
     source-map-explorer: ^2.5.3
     web-vitals: ^3.1.1
     xo: ^0.53.1
+  dependenciesMeta:
+    xo@0.53.1:
+      unplugged: true
   languageName: unknown
   linkType: soft
 

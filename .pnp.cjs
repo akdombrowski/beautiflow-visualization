@@ -19054,14 +19054,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ]],\
       ["xo", [\
         ["npm:0.53.1", {\
-          "packageLocation": "./.yarn/cache/xo-npm-0.53.1-5feab92395-48aa8cdcbb.zip/node_modules/xo/",\
+          "packageLocation": "./.yarn/unplugged/xo-virtual-32e9fc0ddc/node_modules/xo/",\
           "packageDependencies": [\
             ["xo", "npm:0.53.1"]\
           ],\
           "linkType": "SOFT"\
         }],\
         ["virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:0.53.1", {\
-          "packageLocation": "./.yarn/__virtual__/xo-virtual-32e9fc0ddc/0/cache/xo-npm-0.53.1-5feab92395-48aa8cdcbb.zip/node_modules/xo/",\
+          "packageLocation": "./.yarn/unplugged/xo-virtual-32e9fc0ddc/node_modules/xo/",\
           "packageDependencies": [\
             ["xo", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:0.53.1"],\
             ["@eslint/eslintrc", "npm:1.4.1"],\

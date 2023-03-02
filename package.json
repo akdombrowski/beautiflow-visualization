@@ -21,8 +21,14 @@
     "test": "xo",
     "eject": "react-scripts eject",
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "yarn predeploy && gh-pages -d build",
     "analyze": "source-map-explorer 'build/static/js/*.js' --html analyze/result.html"
+  },
+  "eslintConfig": {
+    "extends": [
+      "xo",
+      "xo-react"
+    ]
   },
   "xo": {
     "space": 2,
@@ -53,5 +59,10 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "source-map-explorer": "^2.5.3",
     "xo": "^0.53.1"
+  },
+  "dependenciesMeta": {
+    "xo@0.53.1": {
+      "unplugged": true
+    }
   }
 }
