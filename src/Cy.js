@@ -1,35 +1,35 @@
 import cytoscape from "cytoscape";
-// Import { readFileSync, writeFileSync } from "fs";
+// import { readFileSync, writeFileSync } from "fs";
 
-export const convertStrToJSON = (string_) => {
+export const convertStrToJSON = (str) => {
   try {
-    return JSON.parse(string_);
-  } catch (error) {
-    throw new SyntaxError("Content needs to be of JSON", { cause: error });
+    return JSON.parse(str);
+  } catch (e) {
+    throw new SyntaxError("Content needs to be of JSON", { cause: e });
   }
 };
 
-// Export const readFlowJSONFile = async (filename) => {
-//   console.log("Reading flow json from file... ", filename);
-//   if (!filename.endsWith(".json")) {
-//     const errMsg = "Must use a JSON file (filename ends with .json).";
-//     console.error(errMsg);
-//     throw new Error(errMsg);
-//   }
+export const readFlowJSONFile = async (filename) => {
+  console.log("Reading flow json from file... ", filename);
+  if (!filename.endsWith(".json")) {
+    const errMsg = "Must use a JSON file (filename ends with .json).";
+    console.error(errMsg);
+    throw new Error(errMsg);
+  }
 
-//   let data = await readFileSync(filename, "utf8", (err, data) => {
-//     if (err) {
-//       console.error(err);
-//       throw new Error("Couldn't read file contents", { cause: err });
-//     }
+  let data = await readFileSync(filename, "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+      throw new Error("Couldn't read file contents", { cause: err });
+    }
 
-//     return data;
-//   });
+    return data;
+  });
 
-//   const flowJSON = convertStrToJSON(data);
+  const flowJSON = convertStrToJSON(data);
 
-//   return flowJSON;
-// };
+  return flowJSON;
+};
 
 export const readFlowJSONFileWithFileReader = async (filename) => {
   console.log("Reading flow json from file...", filename);
@@ -68,24 +68,24 @@ export const createElementsObjFromArrays = (nodesArray, edgesArray) => ({
 export const getElements = (flowJSON) => {
   try {
     return getGraphData(flowJSON).elements;
-  } catch (error) {
-    throw new Error("Could not extract elements.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not extract elements.", { cause: e });
   }
 };
 
 export const getNodes = (flowJSON) => {
   try {
     return getElements(flowJSON).nodes;
-  } catch (error) {
-    throw new Error("Could not extract nodes.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not extract nodes.", { cause: e });
   }
 };
 
 export const getEdges = (flowJSON) => {
   try {
     return getElements(flowJSON).edges;
-  } catch (error) {
-    throw new Error("Could not extract edges.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not extract edges.", { cause: e });
   }
 };
 
@@ -93,49 +93,47 @@ export const getCopyOfElementsObj = (flowJSON) => {
   try {
     const elementsCopy = JSON.parse(JSON.stringify(getElements(flowJSON)));
     return elementsCopy;
-  } catch (error) {
-    throw new Error("Could not get a copy of elements.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not get a copy of elements.", { cause: e });
   }
 };
 
 export const getCopyOfNodesArr = (flowJSON) => {
   try {
     return getNodes(flowJSON).slice(0);
-  } catch (error) {
-    throw new Error("Could not get nodes to make a copy.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not get nodes to make a copy.", { cause: e });
   }
 };
 
 export const getCopyOfEdgesArr = (flowJSON) => {
   try {
     return getEdges(flowJSON).slice(0);
-  } catch (error) {
-    throw new Error("Could not get edges to make a copy.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not get edges to make a copy.", { cause: e });
   }
 };
 
 export const getCopyOfAnnotationsArr = (flowJSON) => {
   try {
     const nodes = getNodes(flowJSON);
-    return Array.filter(
-      nodes,
-      (n, i, nodes) => n.data.nodeType === "ANNOTATION"
-    );
-  } catch (error) {
-    throw new Error("Could not extract annotations.", { cause: error });
+    return Array.filter(nodes, (n, i, nodes) => {
+      return n.data.nodeType === "ANNOTATION";
+    });
+  } catch (e) {
+    throw new Error("Could not extract annotations.", { cause: e });
   }
 };
 
 export const getCopyOfNodesArrWOAnnotations = (flowJSON) => {
   try {
     const nodes = getNodes(flowJSON);
-    return Array.filter(
-      nodes,
-      (n, i, nodes) => n.data.nodeType !== "ANNOTATION"
-    );
-  } catch (error) {
+    return Array.filter(nodes, (n, i, nodes) => {
+      return n.data.nodeType !== "ANNOTATION";
+    });
+  } catch (e) {
     throw new Error("Could not get a copy of nodes without annotations.", {
-      cause: error,
+      cause: e,
     });
   }
 };
@@ -147,9 +145,9 @@ export const getCopyOfNodesArrWOAnnotationsFromNodes = (nodes) => {
       '[nodeType != "ANNOTATION"]'
     );
     return nodesCopyWOAnnotations;
-  } catch (error) {
+  } catch (e) {
     throw new Error("Could not get a copy of nodes without annotations.", {
-      cause: error,
+      cause: e,
     });
   }
 };
@@ -159,9 +157,9 @@ export const getCopyOfElementsObjWOAnnotations = (flowJSON) => {
     const nodesWOAnnotationsCopy = getCopyOfNodesArrWOAnnotations(flowJSON);
     const edgesCopy = getCopyOfEdgesArr(flowJSON);
     return createElementsObjFromArrays(nodesWOAnnotationsCopy, edgesCopy);
-  } catch (error) {
+  } catch (e) {
     throw new Error("Could not get a copy of elements without annotations.", {
-      cause: error,
+      cause: e,
     });
   }
 };
@@ -241,10 +239,9 @@ export const createCytoscapeGraph = (flowJSON) => {
     let parsedJSONFlow;
     try {
       parsedJSONFlow = convertStrToJSON(flowJSON);
-    } catch {
+    } catch (e) {
       parsedJSONFlow = flowJSON;
     }
-
     const elementsCopy = getCopyOfElementsObj(parsedJSONFlow);
 
     const cy = cytoscape({
@@ -255,8 +252,8 @@ export const createCytoscapeGraph = (flowJSON) => {
     });
 
     return cy;
-  } catch (error) {
-    throw new Error("Could not create cytoscape graph.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not create cytoscape graph.", { cause: e });
   }
 };
 
@@ -265,23 +262,23 @@ export const createCytoscapeGraphForViz = (flowJSON, containerID) => {
     let parsedJSONFlow;
     try {
       parsedJSONFlow = convertStrToJSON(flowJSON);
-    } catch {
+    } catch (e) {
       parsedJSONFlow = flowJSON;
     }
 
     const elementsCopy = getCopyOfElementsObj(parsedJSONFlow);
-    const containerElement = document.getElementById(containerID);
+    const containerEl = document.getElementById(containerID);
 
-    // Console.log(elementsCopy.jsons());
+    // console.log(elementsCopy.jsons());
 
     const cy = cytoscape({
-      container: containerElement,
+      container: containerEl,
       elements: elementsCopy,
       layout: { name: "preset" },
       headless: false,
       styleEnabled: true,
       style: [
-        // The stylesheet for the graph
+        // the stylesheet for the graph
         {
           selector: "node",
           style: {
@@ -304,16 +301,16 @@ export const createCytoscapeGraphForViz = (flowJSON, containerID) => {
     });
 
     return cy;
-  } catch (error) {
-    throw new Error("Could not create cytoscape graph.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not create cytoscape graph.", { cause: e });
   }
 };
 
 export const createCytoscapeGraphFromEles = async (elements) => {
   try {
     const cy = cytoscape({
-      elements,
-      // Positions: posMapping,
+      elements: elements,
+      // positions: posMapping,
       // elements: () =>
       //   new Promise((resolve, reject) => {
       //     const elementsCopy = getCopyOfElementsObj(flowJSON);
@@ -331,8 +328,8 @@ export const createCytoscapeGraphFromEles = async (elements) => {
     });
 
     return cy;
-  } catch (error) {
-    throw new Error("Could not create cytoscape graph.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not create cytoscape graph.", { cause: e });
   }
 };
 
@@ -349,7 +346,7 @@ export const createCytoscapeGraphWOAnnotationsFromNodesEdgesArrays = (
     return cytoscape({
       elements: () =>
         new Promise((resolve, reject) => {
-          const elements = createElementsObjFromArrays(nodesArray, edgesArray);
+          const elements = createElementsObjFromArrays(nodesArr, edgesArr);
           if (!elements || Object.values(elements).length === 0) {
             reject("No elements were found.");
           } else {
@@ -360,8 +357,8 @@ export const createCytoscapeGraphWOAnnotationsFromNodesEdgesArrays = (
       headless: true,
       styleEnabled: false,
     });
-  } catch (error) {
-    throw new Error("Could not create cytoscape graph.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not create cytoscape graph.", { cause: e });
   }
 };
 
@@ -381,8 +378,8 @@ export const createCytoscapeGraphWOAnnotations = (flowJSON) => {
       headless: true,
       styleEnabled: false,
     });
-  } catch (error) {
-    throw new Error("Could not create cytoscape graph.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not create cytoscape graph.", { cause: e });
   }
 };
 
@@ -428,11 +425,12 @@ export const getMinYCyNode = (cyNodes) => {
   return minYCyNode;
 };
 
-export const isEleYPosWithinToleranceOfY = (ele, y, tolerance) =>
-  ele.position.y < y + tolerance && ele.position.y > y - tolerance;
+export const isEleYPosWithinToleranceOfY = (ele, y, tolerance) => {
+  return ele.position.y < y + tolerance && ele.position.y > y - tolerance;
+};
 
-export const getNodesWithinYTolerance = (cy, y, tolerance) =>
-  cy.filter((ele, i, eles) => {
+export const getNodesWithinYTolerance = (cy, y, tolerance) => {
+  return cy.filter((ele, i, eles) => {
     if (!ele.isNode()) {
       return false;
     }
@@ -450,6 +448,7 @@ export const getNodesWithinYTolerance = (cy, y, tolerance) =>
 
     return true;
   });
+};
 
 export const shiftAnnosRenderedPosFromNodes = (nodes) => {
   const annies = nodes.filter('[nodeType = "ANNOTATION"]');
@@ -490,14 +489,15 @@ export const resetAnnosPosFromNodes = (nodes) => {
   return nodes;
 };
 
-export const getCyNodesInRowAtYPos = (cyNodes, y, tolerance) =>
-  cyNodes.filter((ele, i, eles) => {
+export const getCyNodesInRowAtYPos = (cyNodes, y, tolerance) => {
+  return cyNodes.filter((ele, i, eles) => {
     if (isEleYPosWithinToleranceOfY(ele.json(), y, tolerance)) {
       return true;
     }
 
     return false;
   });
+};
 
 export const getStartNode = (cyNodes, tolerance) => {
   const minY = cyNodes.min((ele, i, eles) => ele.position("y"));
@@ -644,7 +644,7 @@ export const getSourceNode = (cy, targetNodeID) => {
   return sourceNode;
 };
 
-// Export const calcNodeRows = (nodes) => {
+// export const calcNodeRows = (nodes) => {
 //   const rows = [];
 //   let rowNum = 0;
 
@@ -694,8 +694,8 @@ export const animateSuccessorsOfEle = (ele, dur, color) => {
   const anis = ele
     .successors()
     .filter("node")
-    .map((element, i, els) => {
-      const ani = element.animation(
+    .map((el, i, els) => {
+      const ani = el.animation(
         {
           style: { backgroundColor: color },
         },
@@ -728,10 +728,10 @@ export const emitStyleEventForExplainerText = (
   cy.emit("style", [ani, aniDes, start, end]);
 };
 
-export const animateNodesAndWait = async (cy, nodes, dur, color) =>
-  Promise.all(
+export const animateNodesAndWait = async (cy, nodes, dur, color) => {
+  return Promise.all(
     nodes.map((ele, i, eles) => {
-      const message = "animated " + ele.id();
+      const msg = "animated " + ele.id();
       return new Promise((resolve, reject) => {
         const ani = ele.animation(
           {
@@ -739,49 +739,52 @@ export const animateNodesAndWait = async (cy, nodes, dur, color) =>
           },
           {
             duration: dur,
-            complete() {
-              // Console.log("animated " + ele.id());
-              emitStyleEventForExplainerText(cy, "", message, false, true);
-              resolve(message);
+            complete: () => {
+              // console.log("animated " + ele.id());
+              emitStyleEventForExplainerText(cy, "", msg, false, true);
+              resolve(msg);
             },
           }
         );
-        emitStyleEventForExplainerText(cy, "", message, true, false);
+        emitStyleEventForExplainerText(cy, "", msg, true, false);
         ani.play();
-        // Await eles.pon("style");
+        // await eles.pon("style");
       });
     })
   );
+};
 
-export const animateElesAndWait = async (cy, els, dur, color) =>
-  Promise.all(
+export const animateElesAndWait = async (cy, els, dur, color) => {
+  return Promise.all(
     els.map((ele, i, eles) => {
-      const message = "animated " + ele.id();
+      const msg = "animated " + ele.id();
       return new Promise((resolve, reject) => {
         let sty;
-        sty = ele.isNode()
-          ? { backgroundColor: color }
-          : { "line-color": color };
-
+        if (ele.isNode()) {
+          sty = { backgroundColor: color };
+        } else {
+          sty = { "line-color": color };
+        }
         const ani = ele.animation(
           {
             style: sty,
           },
           {
             duration: dur,
-            complete() {
-              // Console.log("animated " + ele.id());
-              emitStyleEventForExplainerText(cy, "", message, false, true);
-              resolve(message);
+            complete: () => {
+              // console.log("animated " + ele.id());
+              emitStyleEventForExplainerText(cy, "", msg, false, true);
+              resolve(msg);
             },
           }
         );
-        emitStyleEventForExplainerText(cy, "", message, true, false);
+        emitStyleEventForExplainerText(cy, "", msg, true, false);
         ani.play();
-        // Await eles.pon("style");
+        // await eles.pon("style");
       });
     })
   );
+};
 
 export const animateNodes = (nodes, dur, color) => {
   nodes.map((ele, i, eles) => {
@@ -791,13 +794,14 @@ export const animateNodes = (nodes, dur, color) => {
       },
       {
         duration: dur,
-        complete() {
-          // Console.log(ele.id() + " animated");
+        complete: () => {
+          // console.log(ele.id() + " animated");
+          return;
         },
       }
     );
     ani.play();
-    // Await eles.pon("style");
+    // await eles.pon("style");
   });
 };
 
@@ -810,8 +814,8 @@ export const getAnimationPromiseForEle = (ele, dur, color) => {
       },
       {
         duration: dur,
-        complete() {
-          // Console.log(ele.id() + " animated");
+        complete: () => {
+          // console.log(ele.id() + " animated");
           resolve("animated " + ele.id());
         },
       }
@@ -821,32 +825,32 @@ export const getAnimationPromiseForEle = (ele, dur, color) => {
 };
 
 export const animateElePosAndPlay = (cy, ele, dur, color, pos) => {
-  const message = "animated " + ele.id();
+  const msg = "animated " + ele.id();
   return new Promise((resolve, reject) => {
     const ani = ele.animation(
       {
         position: pos,
-        // Style: { backgroundColor: color },
+        // style: { backgroundColor: color },
       },
       {
         duration: dur,
-        complete() {
-          // Console.log(ele.id() + " animated");
-          emitStyleEventForExplainerText(cy, "", message, false, true);
-          resolve(message);
+        complete: () => {
+          // console.log(ele.id() + " animated");
+          emitStyleEventForExplainerText(cy, "", msg, false, true);
+          resolve(msg);
         },
       }
     );
-    emitStyleEventForExplainerText(cy, "", message, true, false);
+    emitStyleEventForExplainerText(cy, "", msg, true, false);
     ani.play();
   });
 };
 
-export const emitAndWaitForAni = async (message, id, cy, ani, aniProm) => {
-  emitStyleEventForExplainerText(cy, "", message, true, false);
+export const emitAndWaitForAni = async (msg, id, cy, ani, aniProm) => {
+  emitStyleEventForExplainerText(cy, "", msg, true, false);
   ani.play();
   const animated = await aniProm;
-  emitStyleEventForExplainerText(cy, "", message, false, true);
+  emitStyleEventForExplainerText(cy, "", msg, false, true);
   return animated;
 };
 
@@ -874,9 +878,9 @@ export const doesNodePathMergeWithAlreadyVisitedNodes = (
 
   console.log("removeUnvisitedNodes");
   console.log(removeUnvisitedNodes.jsons());
-  const { value, ele } = removeUnvisitedNodes.max((ele, i, eles) =>
-    ele.position("y")
-  );
+  const { value, ele } = removeUnvisitedNodes.max((ele, i, eles) => {
+    return ele.position("y");
+  });
 
   console.log("max y value");
   console.log(value);
@@ -926,13 +930,12 @@ export const beautiflowify = async (
   // For (const ele of roots) {
   for (let row = 0; row < rootsSorted.length; row++) {
     const ele = rootsSorted[row];
-    const previousNodePos = {};
+    const prevNodePos = {};
     const animations = [];
     const nodesInCurrRow = getRowOfNodesFromRoot(ele);
     const nodesInCurrRowClone = nodesInCurrRow.clone();
-    const rootNodePosAdj = { x: 0, y: 0 };
     /**
-     * SectionBasePosY is the y-value for the starting nodes and any following
+     * sectionBasePosY is the y-value for the starting nodes and any following
      * nodes along that same horizontal line
      *
      * if row > 0,
@@ -957,12 +960,12 @@ export const beautiflowify = async (
      */
     nodesInCurrRow.breadthFirstSearch({
       root: ele,
-      async visit(v, edge, previous, j, depth) {
+      visit: async (v, edge, prev, j, depth) => {
         const currStepAnimations = {};
         const vPos = v.position();
         const vID = v.id();
-        let previousNodeAniProm;
-        let previousNodeAni;
+        let prevNodeAniProm;
+        let prevNodeAni;
         let currNodeAniProm;
         let currNodeAni;
         const pos = {};
@@ -1049,18 +1052,15 @@ export const beautiflowify = async (
                 },
                 {
                   duration: dur,
-                  complete() {
-                    // Console.log("animated " + vID)
+                  complete: () => {
+                    // console.log("animated " + vID)
                     resolve("animating root " + vID);
                   },
                 }
               );
             });
 
-            rootNodePosAdj.x = ele.position("x") - pos.x;
-            rootNodePosAdj.y = ele.position("y") - pos.y;
-
-            previousNodePos[vID] = pos;
+            prevNodePos[vID] = pos;
             updatedPos[vID] = pos;
 
             if (watchAnimation) {
@@ -1075,37 +1075,37 @@ export const beautiflowify = async (
             /**
              *
              */
-          } else if (previous) {
-            const previousID = previous.id();
-            const previousPosX = previous.position("x");
-            const previousPosY = previous.position("y");
-            const previousOG = cyBeforeRepositioning.getElementById(previousID);
-            const previousOGPos = previousOG.position();
-            const previousOGPosX = previousOGPos.x;
-            const previousOGPosY = previousOGPos.y;
-            const previousOutgoerNodes = previous.outgoers("node");
+          } else if (prev) {
+            const prevID = prev.id();
+            const prevPosX = prev.position("x");
+            const prevPosY = prev.position("y");
+            const prevOG = cyBeforeRepositioning.getElementById(prevID);
+            const prevOGPos = prevOG.position();
+            const prevOGPosX = prevOGPos.x;
+            const prevOGPosY = prevOGPos.y;
+            const prevOutgoerNodes = prev.outgoers("node");
             // New x pos
             const posX = spacing * depth + rowStartPosX;
             // Object to store new position value
 
-            previousNodeAniProm = new Promise((resolve, reject) => {
-              previousNodeAni = previous.animation(
+            prevNodeAniProm = new Promise((resolve, reject) => {
+              prevNodeAni = prev.animation(
                 {
                   style: { backgroundColor: "blue" },
                 },
                 {
                   duration: dur,
-                  complete: () => resolve("animated " + previousID),
+                  complete: () => resolve("animated " + prevID),
                 }
               );
             });
 
             if (watchAnimation) {
-              currStepAnimations.preID = previous?.id();
-              currStepAnimations.preAniProm = previousNodeAniProm;
-              currStepAnimations.preAni = previousNodeAni;
+              currStepAnimations.preID = prev?.id();
+              currStepAnimations.preAniProm = prevNodeAniProm;
+              currStepAnimations.preAni = prevNodeAni;
             } else {
-              previousNodeAni.play();
+              prevNodeAni.play();
             }
             /**
              *
@@ -1142,40 +1142,37 @@ export const beautiflowify = async (
              * if it doesn't, set new y pos value to be at the same y pos value
              * as its prev (source) node
              */
-            if (previousOutgoerNodes.size() > 1) {
-              const previousOutgoerNodesSorted = previousOutgoerNodes.sort(
+            if (prevOutgoerNodes.size() > 1) {
+              const prevOutgoerNodesSorted = prevOutgoerNodes.sort(
                 (ele1, ele2) => ele1.position("y") - ele2.position("y")
               );
-              const previousOutgoerNodesSortedArray =
-                previousOutgoerNodesSorted.toArray();
-              for (const [
-                j,
-                element,
-              ] of previousOutgoerNodesSortedArray.entries()) {
-                const outgoerFromPreviousID = element.id();
-                if (outgoerFromPreviousID === vID) {
-                  // Get the updated position of the previous (source) node
-                  const previousNewPos = previousNodePos[previousID];
-                  const previousNewPosY = previousNewPos?.y;
-                  // It should have a position object with a y value
-                  if (!previousNewPosY && previousNewPosY !== 0) {
+              const prevOutgoerNodesSortedArr =
+                prevOutgoerNodesSorted.toArray();
+              for (let j = 0; j < prevOutgoerNodesSortedArr.length; j++) {
+                const outgoerFromPrevID = prevOutgoerNodesSortedArr[j].id();
+                if (outgoerFromPrevID === vID) {
+                  // get the updated position of the previous (source) node
+                  const prevNewPos = prevNodePos[prevID];
+                  const prevNewPosY = prevNewPos?.y;
+                  // it should have a position object with a y value
+                  if (!prevNewPosY && prevNewPosY !== 0) {
                     throw new Error(
                       "Missing y position value on the previous (source) node " +
-                        previousID +
+                        prevID +
                         " in array:\n" +
-                        JSON.stringify(previousNodePos)
+                        JSON.stringify(prevNodePos)
                     );
                   }
 
-                  // New y pos will be the previous node's y pos + what
+                  // new y pos will be the previous node's y pos + what
                   // vertical level in the column stack this node is
                   // calculated by multiplying the current array index
                   // value with the row spacing for nodes in the same section
-                  pos.y = previousNewPosY + j * sameRowDiffHeightSpacingY;
+                  pos.y = prevNewPosY + j * sameRowDiffHeightSpacingY;
                 }
               }
             } else {
-              pos.y = previousNodePos[previousID].y;
+              pos.y = prevNodePos[prevID].y;
             }
             /**
              *
@@ -1186,7 +1183,7 @@ export const beautiflowify = async (
               pos.y
             );
 
-            previousNodePos[vID] = pos;
+            prevNodePos[vID] = pos;
 
             /**
              * Move animation
@@ -1200,7 +1197,7 @@ export const beautiflowify = async (
                 },
                 {
                   duration: dur,
-                  complete() {
+                  complete: () => {
                     resolve(
                       "animating " +
                         vID +
@@ -1278,7 +1275,7 @@ export const beautiflowify = async (
           vMoveAni,
           vMoveAniProm,
         } = ani;
-        let message;
+        let msg;
 
         // Need to figure out how to calculate for rows with multiple levels
         if (rootID) {
@@ -1301,9 +1298,9 @@ export const beautiflowify = async (
         }
 
         if (preAniProm && preAni) {
-          message = "animating " + preID;
-          const resolvedMessage = await emitAndWaitForAni(
-            message,
+          msg = "animating " + preID;
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
             preID,
             cy,
             preAni,
@@ -1311,9 +1308,9 @@ export const beautiflowify = async (
           );
         }
 
-        message = "animating " + currID;
-        const currAniResolvedMessage = await emitAndWaitForAni(
-          message,
+        msg = "animating " + currID;
+        const currAniResolvedMsg = await emitAndWaitForAni(
+          msg,
           currID,
           cy,
           currAni,
@@ -1321,10 +1318,9 @@ export const beautiflowify = async (
         );
 
         if (vMovePos) {
-          message =
-            "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
-          const resolvedMessage = await emitAndWaitForAni(
-            message,
+          msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
             currID,
             cy,
             vMoveAni,
@@ -1333,9 +1329,9 @@ export const beautiflowify = async (
         }
 
         if (rootAni) {
-          message = "animating root " + rootID;
-          const resolvedMessage = await emitAndWaitForAni(
-            message,
+          msg = "animating root " + rootID;
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
             rootID,
             cy,
             rootAni,
@@ -1343,16 +1339,19 @@ export const beautiflowify = async (
           );
         }
 
-        // Change prev node to green as its processing is complete
+        // change prev node to green as its processing is complete
         if (preID) {
-          message = "prev node " + preID + " processing is complete animation";
-          const { ani: doneWithPreviousNodeAni, prom } =
-            getAnimationPromiseForEle(cy.$("#" + preID), dur, "green");
-          const resolvedMessage = await emitAndWaitForAni(
-            message,
+          msg = "prev node " + preID + " processing is complete animation";
+          const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
+            cy.$("#" + preID),
+            dur,
+            "green"
+          );
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
             preID,
             cy,
-            doneWithPreviousNodeAni,
+            doneWithPrevNodeAni,
             prom
           );
         }
@@ -1363,11 +1362,11 @@ export const beautiflowify = async (
             .outgoers()
             .size()
         ) {
-          message = "prev node " + preID + " processing is finished animation";
+          msg = "prev node " + preID + " processing is finished animation";
           const { ani: doneWithCurrLeafNodeAni, prom } =
             getAnimationPromiseForEle(cy.$("#" + currID), dur, "green");
-          const resolvedMessage = await emitAndWaitForAni(
-            message,
+          const resolvedMsg = await emitAndWaitForAni(
+            msg,
             preID,
             cy,
             doneWithCurrLeafNodeAni,
@@ -1382,9 +1381,8 @@ export const beautiflowify = async (
         .style({ "background-color": "green" })
         .update();
     }
-
     emitStyleEventForExplainerText(cy, "Beautiflowifying", "", false, true);
-    // Console.log("animating bfs completed");
+    // console.log("animating bfs completed");
     /**
      *
      *
@@ -1422,8 +1420,8 @@ export const exportPNG = (outputFilePath, cy) => {
 export const getCyJSON = (cy) => {
   try {
     return cy.json(false);
-  } catch (error) {
-    throw new Error("Could not convert graph to json.", { cause: error });
+  } catch (e) {
+    throw new Error("Could not convert graph to json.", { cause: e });
   }
 };
 
@@ -1468,6 +1466,6 @@ export const getFlowJSON = (ogFlowJSON, cy) => {
   return copyOfFlowJSON;
 };
 
-// Export const writeFlowJSON = (outputFilePath, ogFlowJSON, cy) => {
+// export const writeFlowJSON = (outputFilePath, ogFlowJSON, cy) => {
 //   writeFileSync(outputFilePath, getFlowJSON(ogFlowJSON, cy));
 // };

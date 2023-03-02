@@ -29,7 +29,6 @@ function App() {
   const flowJSONRef = useRef(null);
   const cloneElesRef = useRef(null);
   const [elesForCyInit, setElesForCyInit] = useState(null);
-  // Const [flowJSON, setFlowJSON] = useState("");
   const [ogElesClone, setOGElesClone] = useState(null);
   const [aniText, setAniText] = useState("Ready!");
   const [aniDescriptionText, setAniDescriptionText] = useState("");
@@ -366,49 +365,49 @@ function App() {
             />
           </Col>
           <Col xs={12}>
-            <Form className="h-100">
-              <Row height="20vh">
-                <Col xs={8}>
-                  <Accordion
-                    flush
-                    className="h-100 text-light bs-headings-color-light"
-                    defaultActiveKey="0"
-                    onSelect={(eKey) => toggleAccordion(eKey)}
+            <Row height="20vh">
+              <Col xs={8}>
+                <Accordion
+                  flush
+                  className="h-100 text-light bs-headings-color-light"
+                  defaultActiveKey="0"
+                  onSelect={(eKey) => toggleAccordion(eKey)}
+                >
+                  <Accordion.Item
+                    eventKey="0"
+                    className="h-100 bs-text-light bs-headings-color-light"
                   >
-                    <Accordion.Item
-                      eventKey="0"
-                      className="h-100 bs-text-light bs-headings-color-light"
-                    >
-                      {/* <Accordion.Header className="bg-dark bs-text-light bs-headings-color-light"> */}
-                      <Card className="h-100 bg-dark">
-                        <Card.Header>
-                          <CustomToggle
-                            eventKey="0"
-                            setAccordionCollapsedState={toggleAccordion}
+                    {/* <Accordion.Header className="bg-dark bs-text-light bs-headings-color-light"> */}
+                    <Card className="h-100 bg-dark">
+                      <Card.Header>
+                        <CustomToggle
+                          eventKey="0"
+                          setAccordionCollapsedState={toggleAccordion}
+                        >
+                          Description of Animation - Expand/Collapse
+                        </CustomToggle>
+                      </Card.Header>
+                      <Accordion.Collapse eventKey="0">
+                        <Card.Body>
+                          <Stack
+                            className=""
+                            style={{ minHeight: "8vh", height: "100%" }}
                           >
-                            Description of Animation - Expand/Collapse
-                          </CustomToggle>
-                        </Card.Header>
-                        <Accordion.Collapse eventKey="0">
-                          <Card.Body>
-                            <Stack
-                              className=""
-                              style={{ minHeight: "8vh", height: "100%" }}
-                            >
-                              <h1 className="display-6 fs-4 text-light text-center">
-                                {aniText}
-                              </h1>
-                              <p className="lead text-light">
-                                <small>{aniDescriptionText}</small>
-                              </p>
-                            </Stack>
-                          </Card.Body>
-                        </Accordion.Collapse>
-                      </Card>
-                    </Accordion.Item>
-                  </Accordion>
-                </Col>
-                <Col xs={4}>
+                            <h1 className="display-6 fs-4 text-light text-center">
+                              {aniText}
+                            </h1>
+                            <p className="lead text-light">
+                              <small>{aniDescriptionText}</small>
+                            </p>
+                          </Stack>
+                        </Card.Body>
+                      </Accordion.Collapse>
+                    </Card>
+                  </Accordion.Item>
+                </Accordion>
+              </Col>
+              <Col xs={4}>
+                <Form className="pb-5 m-5">
                   <Row className="gap-1 justify-content-center">
                     <Col xs={12} className="pb-4">
                       <Form.Floating className="mt-2">
@@ -451,34 +450,15 @@ function App() {
                         </Button>
                       </div>
                     </Col>
-                    <Col xs={5} className="pb-4 pt-4">
-                      <div className="d-grid gap-5">
-                        <Button
-                          id="clickableLableForFileInput"
-                          name="clickableLableForFileInput"
-                          className=""
-                          variant="light"
-                          size="sm"
-                          onClick={(e) => handleFileInputLabelClick(e)}
-                        >
-                          {/* <Form.Label
-                            className="text-dark text-center"
-                            htmlFor="fileInput"
-                          > */}
-                          <p className="text-dark text-center pt-3">
-                            Choose JSON file
-                          </p>
-                          {/* </Form.Label> */}
-                        </Button>
-                        <input
+                    <Col xs={5} className="">
+                      <Form.Group controlId="formFileLg" className="mb-3">
+                        <Form.Label>Large file input example</Form.Label>
+                        <Form.Control
                           type="file"
-                          id="fileInput"
-                          name="fileInput"
-                          accept=".json"
-                          style={{ display: "none" }}
+                          size="sm"
                           onChange={(e) => loadFlowJSONFromFile(e)}
                         />
-                      </div>
+                      </Form.Group>
                     </Col>
                     <Col xs={5}>
                       <div className="d-grid gap-5">
@@ -521,72 +501,45 @@ function App() {
                       </p>
                     </Col>
                   </Row>
-                </Col>
-              </Row>
-            </Form>
+                </Form>
+              </Col>
+            </Row>
           </Col>
         </Row>
       ) : (
-        <Form className="h-100 p-5">
-          <Row className="justify-content-center align-content-center">
-            <Col xs={12} className="pt-5">
-              <h1 className="display-1 text-light text-center">
-                Import a DV flow JSON export file to get started!
-              </h1>
-            </Col>
-            <Col xs={12} className="pb-5 m-5">
-              <div className="d-grid">
-                <Button
-                  id="clickableLableForFileInput"
-                  name="clickableLableForFileInput"
-                  className=""
-                  variant="light"
-                  size="lg"
-                  onClick={(e) => handleFileInputLabelClick(e)}
-                >
-                  <Row>
-                    <Col xs={12} className="pb-3">
-                      <h3 className="text-dark text-center pt-3">
-                        Import a JSON file
-                      </h3>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col xs={12}>
-                      <p>
-                        <small>*(imports client-side only)</small>
-                      </p>
-                    </Col>
-                  </Row>
-                </Button>
-                <input
+        <Row className="pt-5 justify-content-center align-content-center">
+          <Col xs={12} className="pt-5">
+            <h1 className="display-1 text-light text-center">
+              Import a DV flow JSON export file to get started!
+            </h1>
+          </Col>
+          <Col xs={8} className="py-5 m-5">
+            <Form className="pb-5 m-5">
+              <Form.Group controlId="formFileLg" className="mb-3">
+                <Form.Label>Large file input example</Form.Label>
+                <Form.Control
                   type="file"
-                  id="fileInput"
-                  name="fileInput"
-                  accept=".json"
-                  style={{ display: "none" }}
+                  size="lg"
                   onChange={(e) => loadFlowJSONFromFile(e)}
                 />
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={12}>
-              <p className="text-light text-center">
-                <small>
-                  Okay, so beauty is in the eye of the beholder. It spaces nodes
-                  out nicely (skipping annotations) and only works for simple
-                  flows... for now.
-                </small>
-              </p>
-            </Col>
-            <Col xs={12}>
-              <p className="text-light text-center">
-                <small>*work in progress</small>
-              </p>
-            </Col>
-          </Row>
-        </Form>
+              </Form.Group>
+            </Form>
+          </Col>
+          <Col xs={12}>
+            <p className="text-light text-center">
+              <small>
+                Okay, so beauty is in the eye of the beholder. It spaces nodes
+                out nicely (skipping annotations) and only works for simple
+                flows... for now.
+              </small>
+            </p>
+          </Col>
+          <Col xs={12}>
+            <p className="text-light text-center">
+              <small>*work in progress</small>
+            </p>
+          </Col>
+        </Row>
       )}
     </Container>
   );
