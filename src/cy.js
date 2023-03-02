@@ -1257,27 +1257,25 @@ export const beautiflowify = async (
               const prevOutgoerNodesSortedArr =
                 prevOutgoerNodesSorted.toArray();
               const prevNewPosy = updatedPos[prevID].y;
-              let numOfVisitedNodesInPrevOutgoers = 0;
 
-              for (let j = 0; j < prevOutgoerNodesSortedArr.length; j++) {
-                const outgoerFromPrevID = prevOutgoerNodesSortedArr[j].id();
-                // check if we've already visited this node by seeing if it has
-                // an updated pos
-                if (updatedPos[outgoerFromPrevID]) {
-                  numOfVisitedNodesInPrevOutgoers++;
-                }
-              }
+              // of the previous node's outgoers
+              // which have already been visited,
+              // find the max y value,
+              // then add same row vertical spacing
+              const visitedPrevOutgoers =
+                prevOutgoerNodes.intersection(visitedNodes);
 
-              if (
-                numOfVisitedNodesInPrevOutgoers <
-                  prevOutgoerNodesSortedArr.length &&
-                numOfVisitedNodesInPrevOutgoers > 0
-              ) {
-                // new y pos will be the previous node's y pos + what
-                // vertical level in the column stack this node is
-                // calculated by adding the row spacing for nodes in the same
-                // section
-                pos.y = prevNewPosy + sameRowDiffHeightSpacingY;
+              if (visitedPrevOutgoers.size() > 0) {
+                const maxPosY = visitedPrevOutgoers.max((ele, i, eles) => {
+                  return updatedPos[ele.id()].y;
+                });
+                const maxPosYValue = maxPosY.value;
+                const maxPosYValPlusSameRowVertSpacing =
+                  maxPosYValue + sameRowDiffHeightSpacingY;
+                pos.y = Math.max(
+                  maxPosYValPlusSameRowVertSpacing,
+                  updatedPos[prevID].y
+                );
               } else {
                 pos.y = prevNewPosy;
               }
