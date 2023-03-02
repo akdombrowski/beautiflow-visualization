@@ -989,7 +989,6 @@ export const beautiflowify = async (
   // For (const ele of roots) {
   for (let row = 0; row < rootsSorted.length; row++) {
     const ele = rootsSorted[row];
-    const visitedNodesUpdatedPos = {};
     const animations = [];
     const nodesInCurrRow = getRowOfNodesFromRoot(ele);
     const nodesInCurrRowClone = nodesInCurrRow.clone();
@@ -1134,7 +1133,6 @@ export const beautiflowify = async (
               );
             });
 
-            visitedNodesUpdatedPos[vID] = pos;
             updatedPos[vID] = pos;
 
             if (watchAnimation) {
@@ -1272,7 +1270,8 @@ export const beautiflowify = async (
 
               if (
                 numOfVisitedNodesInPrevOutgoers <
-                prevOutgoerNodesSortedArr.length
+                  prevOutgoerNodesSortedArr.length &&
+                numOfVisitedNodesInPrevOutgoers > 0
               ) {
                 // new y pos will be the previous node's y pos + what
                 // vertical level in the column stack this node is
@@ -1294,7 +1293,6 @@ export const beautiflowify = async (
               pos.y
             );
 
-            visitedNodesUpdatedPos[vID] = pos;
             updatedPos[vID] = pos;
 
             /**
