@@ -24,14 +24,8 @@
     "deploy": "gh-pages -d build",
     "analyze": "source-map-explorer 'build/static/js/*.js' --html analyze/result.html"
   },
-  "eslintConfig": {
-    "extends": [
-      "xo",
-      "xo-react/space"
-    ]
-  },
   "xo": {
-    "extends": "xo-react"
+    "extends": "xo-react/space"
   },
   "browserslist": {
     "production": [
