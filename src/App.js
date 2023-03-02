@@ -16,7 +16,7 @@ import {
   resetAnnosPosFromNodes,
   getFlowJSON,
   getDateTime,
-} from "./Cy.js";
+} from "./cy.js";
 import CustomToggle from "./CustomToggle.jsx";
 import HomeFileImportForm from "./HomeFileImportForm.jsx";
 
