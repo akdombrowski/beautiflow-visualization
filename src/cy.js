@@ -1540,7 +1540,6 @@ export const getFlowJSON = (ogFlowJSON, cy) => {
   return copyOfFlowJSON;
 };
 
-
-// export const writeFlowJSON = (outputFilePath, ogFlowJSON, cy) => {
-//   writeFileSync(outputFilePath, getFlowJSON(ogFlowJSON, cy));
-// };
+export const writeFlowJSON = (outputFilePath, ogFlowJSON, cy) => {
+  writeFileSync(outputFilePath, getFlowJSON(ogFlowJSON, cy));
+};
