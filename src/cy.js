@@ -929,7 +929,7 @@ export const doesNodePathMergeWithAlreadyVisitedNodes = (
   spacing,
   visitedNodes
 ) => {
-  const vSuccessorsPredecessors = vSuccessors.predecessors();
+  const vSuccessorsPredecessors = vSuccessors.predecessors("node");
   // Get the already visited elements up to the point where v's path
   // hits an already visited node
   // this should give the eles which should be above the current node
@@ -943,9 +943,6 @@ export const doesNodePathMergeWithAlreadyVisitedNodes = (
   const { value, ele } = removeUnvisitedNodes.max((ele, i, eles) => {
     return ele.position("y");
   });
-
-  console.log("max y value");
-  console.log(value);
 
   const posY = value + spacing;
 
@@ -992,7 +989,7 @@ export const beautiflowify = async (
   // For (const ele of roots) {
   for (let row = 0; row < rootsSorted.length; row++) {
     const ele = rootsSorted[row];
-    const prevNodePos = {};
+    const visitedNodesUpdatedPos = {};
     const animations = [];
     const nodesInCurrRow = getRowOfNodesFromRoot(ele);
     const nodesInCurrRowClone = nodesInCurrRow.clone();
@@ -1087,18 +1084,34 @@ export const beautiflowify = async (
                 visitedNodes
               );
 
-              const maxOfRow = vSuccessors.max((ele, i, eles) =>
+              // Get the eles already visited and is a successor of the current
+              // node and the current node itself and find the max y position
+              // value out of them
+              //
+              // e.g.,
+              // suppose our graph looks like below
+              // A - B - C - D - E - F
+              //       /
+              // G - H - I - J
+              // ^
+              // and suppose that we've already visited the first row (A
+              // through F)
+              // and the current node is G (a root)
+              //
+              // G's successors will be:
+              // H, I, J, C, D, E, F
+              const maxOfRow = visitedNodes.max((ele, i, eles) =>
                 ele.position("y")
               );
               highestYPosValueInSection[row] = Math.max(pos.y, maxOfRow.value);
             } else {
               pos.y = sectionBaselinePosY[row];
-            }
 
-            highestYPosValueInSection[row] = Math.max(
-              highestYPosValueInSection[row],
-              pos.y
-            );
+              highestYPosValueInSection[row] = Math.max(
+                highestYPosValueInSection[row],
+                pos.y
+              );
+            }
 
             /**
              * Root node animation
@@ -1121,7 +1134,7 @@ export const beautiflowify = async (
               );
             });
 
-            prevNodePos[vID] = pos;
+            visitedNodesUpdatedPos[vID] = pos;
             updatedPos[vID] = pos;
 
             if (watchAnimation) {
@@ -1135,6 +1148,8 @@ export const beautiflowify = async (
             }
             /**
              *
+             *
+             *
              */
           } else if (prev) {
             const prevID = prev.id();
@@ -1145,7 +1160,7 @@ export const beautiflowify = async (
             const prevOGPosX = prevOGPos.x;
             const prevOGPosY = prevOGPos.y;
             const prevOutgoerNodes = prev.outgoers("node");
-            // New x pos
+            // New x pos variable
             const posX = spacing * depth + rowStartPosX;
 
             /**
@@ -1185,7 +1200,11 @@ export const beautiflowify = async (
              */
 
             /**
-             * New x position
+             *
+             * ================
+             *  New x position
+             * ================
+             *
              */
             pos.x = posX;
             /**
@@ -1193,10 +1212,14 @@ export const beautiflowify = async (
              */
 
             /**
-             * New y position
+             *
+             * ================
+             *  New y position
+             * ================
              *
              */
-            /** Check if this node is in a stack by seeing if the previous
+            /**
+             * Check if this node is in a stack by seeing if the previous
              * (source) node has more than 1 outgoer
              *
              * if it does, sort the previous node's outgoers by y value (from
@@ -1209,37 +1232,58 @@ export const beautiflowify = async (
              * if it doesn't, set new y pos value to be at the same y pos value
              * as its prev (source) node
              */
+
+            /**
+             * Accounting for a row with multiple roots
+             */
+            // Get the eles already visited and is a successor of the current
+            // node and the current node itself and find the max y position
+            // value out of them
+            //
+            // e.g.,
+            // suppose our graph looks like below
+            // A - B - C - D - E - F
+            //       /
+            // G - H - I - J
+            //         ^
+            // and suppose that we've already visited the first row (A
+            // through F)
+            // and we've already visited G
+            // and the current node is I
+            //
+            //
             if (prevOutgoerNodes.size() > 1) {
               const prevOutgoerNodesSorted = prevOutgoerNodes.sort(
                 (ele1, ele2) => ele1.position("y") - ele2.position("y")
               );
               const prevOutgoerNodesSortedArr =
                 prevOutgoerNodesSorted.toArray();
+              const prevNewPosy = updatedPos[prevID].y;
+              let numOfVisitedNodesInPrevOutgoers = 0;
+
               for (let j = 0; j < prevOutgoerNodesSortedArr.length; j++) {
                 const outgoerFromPrevID = prevOutgoerNodesSortedArr[j].id();
-                if (outgoerFromPrevID === vID) {
-                  // get the updated position of the previous (source) node
-                  const prevNewPos = prevNodePos[prevID];
-                  const prevNewPosY = prevNewPos?.y;
-                  // it should have a position object with a y value
-                  if (!prevNewPosY && prevNewPosY !== 0) {
-                    throw new Error(
-                      "Missing y position value on the previous (source) node " +
-                        prevID +
-                        " in array:\n" +
-                        JSON.stringify(prevNodePos)
-                    );
-                  }
-
-                  // new y pos will be the previous node's y pos + what
-                  // vertical level in the column stack this node is
-                  // calculated by multiplying the current array index
-                  // value with the row spacing for nodes in the same section
-                  pos.y = prevNewPosY + j * sameRowDiffHeightSpacingY;
+                // check if we've already visited this node by seeing if it has
+                // an updated pos
+                if (updatedPos[outgoerFromPrevID]) {
+                  numOfVisitedNodesInPrevOutgoers++;
                 }
               }
+
+              if (
+                numOfVisitedNodesInPrevOutgoers <
+                prevOutgoerNodesSortedArr.length
+              ) {
+                // new y pos will be the previous node's y pos + what
+                // vertical level in the column stack this node is
+                // calculated by adding the row spacing for nodes in the same
+                // section
+                pos.y = prevNewPosy + sameRowDiffHeightSpacingY;
+              } else {
+                pos.y = prevNewPosy;
+              }
             } else {
-              pos.y = prevNodePos[prevID].y;
+              pos.y = updatedPos[prevID].y;
             }
             /**
              *
@@ -1250,7 +1294,8 @@ export const beautiflowify = async (
               pos.y
             );
 
-            prevNodePos[vID] = pos;
+            visitedNodesUpdatedPos[vID] = pos;
+            updatedPos[vID] = pos;
 
             /**
              * Move animation
