@@ -254,18 +254,16 @@ function App() {
                 height: "70vh",
                 border: ".1rem solid black",
               }}
-              //  Cy={(cy) => setCyRef(cy)}
               cy={(cy) => {
                 cyRef.current = cy;
               }}
-              // WheelSensitivity={0.1}
+              WheelSensitivity={0.1}
               zoom={4}
               stylesheet={[
                 {
                   selector: "node",
                   style: {
                     "background-opacity": 0.75,
-                    // "background-blacken": -.1,
                     shape(ele) {
                       if (ele.data("nodeType") !== "EVAL") {
                         return "rectangle";
@@ -377,7 +375,6 @@ function App() {
                     eventKey="0"
                     className="h-100 bs-text-light bs-headings-color-light"
                   >
-                    {/* <Accordion.Header className="bg-dark bs-text-light bs-headings-color-light"> */}
                     <Card className="h-100 bg-dark">
                       <Card.Header>
                         <CustomToggle

@@ -1,5 +1,4 @@
 import cytoscape from "cytoscape";
-// import { readFileSync, writeFileSync } from "fs";
 
 export const convertStrToJSON = (str) => {
   try {
@@ -310,18 +309,6 @@ export const createCytoscapeGraphFromEles = async (elements) => {
   try {
     const cy = cytoscape({
       elements: elements,
-      // positions: posMapping,
-      // elements: () =>
-      //   new Promise((resolve, reject) => {
-      //     const elementsCopy = getCopyOfElementsObj(flowJSON);
-      //     console.log("elementsCopy.nodes.length");
-      //     console.log(elementsCopy.nodes.length);
-      //     if (!elementsCopy || Object.values(elementsCopy).length === 0) {
-      //       reject("No elements were found.");
-      //     } else {
-      //       resolve(elementsCopy);
-      //     }
-      //   }),
       layout: { name: "preset" },
       headless: true,
       styleEnabled: false,
@@ -452,7 +439,7 @@ export const getNodesWithinYTolerance = (cy, y, tolerance) => {
 
 export const shiftAnnosRenderedPosFromNodes = (nodes) => {
   const annies = nodes.filter('[nodeType = "ANNOTATION"]');
-  // Can i run shift on a single node?
+
   annies.forEach((ele, i, eles) => {
     const posX = ele.position("x");
     const width = ele.data("properties").width.value;
@@ -465,7 +452,7 @@ export const shiftAnnosRenderedPosFromNodes = (nodes) => {
 
 export const shiftAnnosPosFromNodes = (nodes) => {
   const annies = nodes.filter('[nodeType = "ANNOTATION"]');
-  // Can i run shift on a single node?
+
   annies.forEach((ele, i, eles) => {
     const posX = ele.position("x");
     const width = ele.data("properties").width.value;
@@ -478,7 +465,7 @@ export const shiftAnnosPosFromNodes = (nodes) => {
 
 export const resetAnnosPosFromNodes = (nodes) => {
   const annies = nodes.filter('[nodeType = "ANNOTATION"]');
-  // Can i run shift on a single node?
+
   annies.forEach((ele, i, eles) => {
     const posX = ele.position("x");
     const width = ele.data("properties").width.value;
@@ -511,7 +498,6 @@ export const getStartNode = (cyNodes, tolerance) => {
   return startCyNode;
 };
 
-// Try out nodes.shift()
 export const normalizeNodePositions = (nodes) => {
   const nodesCopy = nodes.slice(0);
   const minX = getMinXNode(nodesCopy).position.x;
@@ -644,52 +630,6 @@ export const getSourceNode = (cy, targetNodeID) => {
   return sourceNode;
 };
 
-// export const calcNodeRows = (nodes) => {
-//   const rows = [];
-//   let rowNum = 0;
-
-//   nodes.forEach((ele, i, eles) => {
-//     // rootsArr1.forEach((ele, i, eles) => {
-//     nodes.filter('[nodeType != "ANNOTATION"]').breadthFirstSearch({
-//       root: ele,
-//       visit: (v, edge, prev, j, depth) => {
-//         if (!prev) {
-//           currRowPosY += nextRowYAdd;
-//           v.position({ x: rowStartPosX, y: currRowPosY });
-//         } else {
-//           const prevNodePosX = prev.position("x");
-//           const prevNodePosY = prev.position("y");
-//           const currNodePosY = v.position("y");
-//           const nextPosX = prevNodePosX + spacing;
-
-//           if (v.id() === testNode3ID) {
-//             console.log();
-//             console.log("currNode");
-//             console.log(v.json());
-
-//             console.log("prevNode");
-//             console.log(prev.json());
-//             console.log();
-//           }
-//           v.position("x", nextPosX);
-
-//           // i think the diff calc is using the updated pos of the prev node, so it's not reliable
-//           // calc row y pos ahead of time
-//           if (currNodePosY - prevNodePosY > verticalTolerance) {
-//             // 240 is where the next node should start accounting for space for an annotation above it with 150 spacing to that annotation from the row above
-//             const nextPosY = prevNodePosY + 240;
-//             const numberOfRowsBelow = Math.floor(
-//               (currNodePosY - prevNodePosY) / verticalTolerance
-//             );
-//             v.position("y", nextPosY);
-//           }
-//         }
-//       },
-//       directed: true,
-//     });
-//   });
-// };
-
 export const animateSuccessorsOfEle = (ele, dur, color) => {
   const anis = ele
     .successors()
@@ -748,7 +688,6 @@ export const animateNodesAndWait = async (cy, nodes, dur, color) => {
         );
         emitStyleEventForExplainerText(cy, "", msg, true, false);
         ani.play();
-        // await eles.pon("style");
       });
     })
   );
@@ -780,7 +719,6 @@ export const animateElesAndWait = async (cy, els, dur, color) => {
         );
         emitStyleEventForExplainerText(cy, "", msg, true, false);
         ani.play();
-        // await eles.pon("style");
       });
     })
   );
@@ -801,7 +739,6 @@ export const animateNodes = (nodes, dur, color) => {
       }
     );
     ani.play();
-    // await eles.pon("style");
   });
 };
 
@@ -830,7 +767,6 @@ export const animateElePosAndPlay = (cy, ele, dur, color, pos) => {
     const ani = ele.animation(
       {
         position: pos,
-        // style: { backgroundColor: color },
       },
       {
         duration: dur,
@@ -876,8 +812,6 @@ export const doesNodePathMergeWithAlreadyVisitedNodes = (
   const removeUnvisitedNodes =
     visitedElesBeforePathMerge.intersection(visitedNodes);
 
-  console.log("removeUnvisitedNodes");
-  console.log(removeUnvisitedNodes.jsons());
   const { value, ele } = removeUnvisitedNodes.max((ele, i, eles) => {
     return ele.position("y");
   });
@@ -1053,7 +987,6 @@ export const beautiflowify = async (
                 {
                   duration: dur,
                   complete: () => {
-                    // console.log("animated " + vID)
                     resolve("animating root " + vID);
                   },
                 }
@@ -1086,8 +1019,12 @@ export const beautiflowify = async (
             const prevOutgoerNodes = prev.outgoers("node");
             // New x pos
             const posX = spacing * depth + rowStartPosX;
-            // Object to store new position value
 
+            /**
+             *
+             * Animate previous node's (source node) color
+             *
+             */
             prevNodeAniProm = new Promise((resolve, reject) => {
               prevNodeAni = prev.animation(
                 {
@@ -1118,6 +1055,7 @@ export const beautiflowify = async (
              *
              *
              */
+
             /**
              * New x position
              */
@@ -1129,7 +1067,8 @@ export const beautiflowify = async (
             /**
              * New y position
              *
-             * Check if this node is in a stack by seeing if the previous
+             */
+            /** Check if this node is in a stack by seeing if the previous
              * (source) node has more than 1 outgoer
              *
              * if it does, sort the previous node's outgoers by y value (from
@@ -1222,6 +1161,7 @@ export const beautiflowify = async (
             /**
              *
              */
+
             /**
              *
              *
@@ -1238,7 +1178,8 @@ export const beautiflowify = async (
           }
 
           /**
-           * Remember that we've visited this node
+           * Remember that we've visited this node by adding it to our visited
+           * nodes object
            */
           visitedNodes.merge(v);
           /**
@@ -1250,139 +1191,16 @@ export const beautiflowify = async (
     });
 
     /**
-     * Play animations
      *
-     * either one by one
-     *  current setup with an await for each animation promise
+     *  Play animations one-by-one
+     *
      */
-    // console.log("animating bfs");
     if (watchAnimation) {
-      emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
-
-      for (const ani of animations) {
-        const {
-          preID,
-          preAniProm,
-          preAni,
-          currID,
-          currAni,
-          currAniProm,
-          rootID,
-          rootAni,
-          rootAniProm,
-          newRootPos,
-          vMovePos,
-          vMoveAni,
-          vMoveAniProm,
-        } = ani;
-        let msg;
-
-        // Need to figure out how to calculate for rows with multiple levels
-        if (rootID) {
-          let viewportAni;
-          cy.fit(newRootPos, 50);
-
-          const viewportAniProm = new Promise((resolve, reject) => {
-            viewportAni = cy.animation({
-              zoom: {
-                level: 0.3,
-                position: newRootPos,
-              },
-              duration: dur / 2,
-              complete: () =>
-                resolve("Adjusted viewport (panBy) to animating elements"),
-            });
-          });
-          viewportAni.play();
-          await viewportAniProm;
-        }
-
-        if (preAniProm && preAni) {
-          msg = "animating " + preID;
-          const resolvedMsg = await emitAndWaitForAni(
-            msg,
-            preID,
-            cy,
-            preAni,
-            preAniProm
-          );
-        }
-
-        msg = "animating " + currID;
-        const currAniResolvedMsg = await emitAndWaitForAni(
-          msg,
-          currID,
-          cy,
-          currAni,
-          currAniProm
-        );
-
-        if (vMovePos) {
-          msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
-          const resolvedMsg = await emitAndWaitForAni(
-            msg,
-            currID,
-            cy,
-            vMoveAni,
-            vMoveAniProm
-          );
-        }
-
-        if (rootAni) {
-          msg = "animating root " + rootID;
-          const resolvedMsg = await emitAndWaitForAni(
-            msg,
-            rootID,
-            cy,
-            rootAni,
-            rootAniProm
-          );
-        }
-
-        // change prev node to green as its processing is complete
-        if (preID) {
-          msg = "prev node " + preID + " processing is complete animation";
-          const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
-            cy.$("#" + preID),
-            dur,
-            "green"
-          );
-          const resolvedMsg = await emitAndWaitForAni(
-            msg,
-            preID,
-            cy,
-            doneWithPrevNodeAni,
-            prom
-          );
-        }
-
-        if (
-          !cy
-            .$("#" + currID)
-            .outgoers()
-            .size()
-        ) {
-          msg = "prev node " + preID + " processing is finished animation";
-          const { ani: doneWithCurrLeafNodeAni, prom } =
-            getAnimationPromiseForEle(cy.$("#" + currID), dur, "green");
-          const resolvedMsg = await emitAndWaitForAni(
-            msg,
-            preID,
-            cy,
-            doneWithCurrLeafNodeAni,
-            prom
-          );
-        }
-      }
-    } else {
-      cy.stop(false, true);
-      cy.style()
-        .selector('node[nodeType != "ANNOTATION"]')
-        .style({ "background-color": "green" })
-        .update();
+      await playNodeAnimationsOneByOne(cy, animations, dur);
     }
+
+    // Emit event to update animation description to complete
     emitStyleEventForExplainerText(cy, "Beautiflowifying", "", false, true);
-    // console.log("animating bfs completed");
     /**
      *
      *
@@ -1396,9 +1214,15 @@ export const beautiflowify = async (
      */
   }
 
+  /**
+   * Fit the viewport to the newly adjusted nodes
+   */
   const paddingPX = 25;
   cy.fit(cy.nodes('[nodeType != "ANNOTATION"]'), paddingPX);
 
+  /**
+   * Return the cytoscape object in case it's needed for anything
+   */
   return cy;
 };
 
@@ -1466,6 +1290,133 @@ export const getFlowJSON = (ogFlowJSON, cy) => {
   return copyOfFlowJSON;
 };
 
+async function playNodeAnimationsOneByOne(cy, animations, dur) {
+  // Emits an event that we can watch for in the main app UI to update the text
+  // of the animation description box
+  emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
+
+  for (const ani of animations) {
+    const {
+      preID,
+      preAniProm,
+      preAni,
+      currID,
+      currAni,
+      currAniProm,
+      rootID,
+      rootAni,
+      rootAniProm,
+      newRootPos,
+      vMovePos,
+      vMoveAni,
+      vMoveAniProm,
+    } = ani;
+    let msg;
+
+    // Need to figure out how to calculate for rows with multiple levels
+    if (rootID) {
+      let viewportAni;
+      cy.fit(newRootPos, 50);
+
+      const viewportAniProm = new Promise((resolve, reject) => {
+        viewportAni = cy.animation({
+          zoom: {
+            level: 0.3,
+            position: newRootPos,
+          },
+          duration: dur / 2,
+          complete: () =>
+            resolve("Adjusted viewport (panBy) to animating elements"),
+        });
+      });
+      viewportAni.play();
+      await viewportAniProm;
+    }
+
+    if (preAniProm && preAni) {
+      msg = "animating " + preID;
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        preID,
+        cy,
+        preAni,
+        preAniProm
+      );
+    }
+
+    msg = "animating " + currID;
+    const currAniResolvedMsg = await emitAndWaitForAni(
+      msg,
+      currID,
+      cy,
+      currAni,
+      currAniProm
+    );
+
+    if (vMovePos) {
+      msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        currID,
+        cy,
+        vMoveAni,
+        vMoveAniProm
+      );
+    }
+
+    if (rootAni) {
+      msg = "animating root " + rootID;
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        rootID,
+        cy,
+        rootAni,
+        rootAniProm
+      );
+    }
+
+    // Change prev node to green as its processing is complete
+    if (preID) {
+      msg = "prev node " + preID + " processing is complete animation";
+      const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
+        cy.$("#" + preID),
+        dur,
+        "green"
+      );
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        preID,
+        cy,
+        doneWithPrevNodeAni,
+        prom
+      );
+    }
+
+    // If the current node is a leaf node, we're done processing it. Change
+    // its color to green as well.
+    if (
+      !cy
+        .$("#" + currID)
+        .outgoers()
+        .size()
+    ) {
+      msg = "prev node " + preID + " processing is finished animation";
+      const { ani: doneWithCurrLeafNodeAni, prom } = getAnimationPromiseForEle(
+        cy.$("#" + currID),
+        dur,
+        "green"
+      );
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        preID,
+        cy,
+        doneWithCurrLeafNodeAni,
+        prom
+      );
+    }
+  }
+  emitStyleEventForExplainerText(cy, "Beautiflowifying", "", false, true);
+}
 // export const writeFlowJSON = (outputFilePath, ogFlowJSON, cy) => {
 //   writeFileSync(outputFilePath, getFlowJSON(ogFlowJSON, cy));
 // };
