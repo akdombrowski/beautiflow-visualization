@@ -23,7 +23,7 @@ import HomeFileImportForm from "./HomeFileImportForm.jsx";
 function App() {
   const defaultAnimationDuration = 0.5;
   const maxAnimationDuration = 10;
-  const minAnimationDuration = 0.1;
+  const minAnimationDuration = 0.05;
   const cyRef = useRef(null);
   const fileRef = useRef(null);
   const flowJSONRef = useRef(null);
@@ -196,7 +196,11 @@ function App() {
 
   const onAnimationDurationChange = (e) => {
     e.preventDefault();
-    setAniDur(e.currentTarget.value);
+    setAniDur(
+      new Intl.NumberFormat("en-US", { minimumFractionDigits: 2 }).format(
+        e.currentTarget.value
+      )
+    );
   };
 
   useEffect(() => {
@@ -244,47 +248,54 @@ function App() {
     >
       {elesForCyInit ? (
         <Row className="h-100">
-          <Col xs={12} id="cyContainerCol">
+          <Col className="h-100" xs={9} id="cyContainerCol">
             <CytoscapeComponent
               id="cy"
               elements={elesForCyInit}
               layout={{ name: "preset" }}
               style={{
-                width: "97.5vw",
-                height: "70vh",
+                width: "100%",
+                height: "100%",
                 border: ".1rem solid black",
               }}
               cy={(cy) => {
                 cyRef.current = cy;
               }}
-              WheelSensitivity={0.1}
+              wheelSensitivity={0.1}
               zoom={4}
+              boxSelectionEnabled={false}
               stylesheet={[
                 {
                   selector: "node",
                   style: {
-                    "background-opacity": 0.75,
-                    shape(ele) {
+                    "background-opacity": (ele) => {
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return 0.5;
+                      } else {
+                        return 0.75;
+                      }
+                    },
+                    shape: (ele) => {
                       if (ele.data("nodeType") !== "EVAL") {
                         return "rectangle";
                       }
 
                       return "round-diamond";
                     },
-                    width(ele) {
+                    width: (ele) => {
                       if (ele.data("nodeType") === "CONNECTION") {
-                        return "75rem";
+                        return "75";
                       }
 
                       if (ele.data("nodeType") === "ANNOTATION") {
                         return ele.data("properties").width.value;
                       }
 
-                      return "50rem";
+                      return "50";
                     },
-                    height(ele) {
+                    height: (ele) => {
                       if (ele.data("nodeType") === "CONNECTION") {
-                        return "75rem";
+                        return "75";
                       }
 
                       if (ele.data("nodeType") === "ANNOTATION") {
@@ -292,9 +303,9 @@ function App() {
                         return h ? 25 : 20;
                       }
 
-                      return "50rem";
+                      return "50";
                     },
-                    "background-color"(ele) {
+                    "background-color": (ele) => {
                       const props = ele.data("properties");
                       const readBGColor = props ? props.backgroundColor : null;
                       if (readBGColor) {
@@ -302,16 +313,16 @@ function App() {
                       }
 
                       if (ele.data("nodeType") === "CONNECTION") {
-                        return "#ffffff";
+                        return "#FFFFFF";
                       }
 
                       if (ele.data("nodeType") === "ANNOTATION") {
                         return "#f2f3f4";
                       }
 
-                      return "orange";
+                      return "#ee6c4d";
                     },
-                    label(ele) {
+                    label: (ele) => {
                       if (ele.data("nodeType") === "ANNOTATION") {
                         return ele.data("nodeType").slice(0, 4);
                       }
@@ -338,33 +349,134 @@ function App() {
                 {
                   selector: "edge",
                   style: {
-                    width: 8,
+                    width: 5,
                     color: "cyan",
-                    opacity: 0.7,
-                    "font-size": "30rem",
+                    opacity: 0.6,
+                    "font-size": "25",
                     "text-justification": "center",
-                    "text-margin-x": "-10rem",
-                    "text-margin-y": "25rem",
+                    "text-margin-x": "-10",
                     "text-rotation": "autorotate",
+                    "text-wrap": "wrap",
+                    "text-valign": "bottom",
+                    "text-margin-y": "30",
                     label: (ele) =>
-                      ele.target().position("x") - ele.source().position("x"),
-                    "line-color": "#777",
+                      "x:" +
+                      (ele.target().position("x") -
+                        ele.source().position("x")) +
+                      "\n" +
+                      "y:" +
+                      (ele.target().position("y") - ele.source().position("y")),
+                    "line-color": "#FFF",
+                    "line-opacity": 1,
                     "target-arrow-color": "#000",
                     "target-arrow-shape": "triangle-backcurve",
                     "curve-style": "bezier",
                     "source-endpoint": "outside-to-line-or-label",
                     "target-endpoint": "outside-to-line-or-label",
-                    "source-distance-from-node": "10rem",
-                    "target-distance-from-node": "0rem",
+                    "source-distance-from-node": "10",
+                    "target-distance-from-node": "1",
                     "arrow-scale": 2,
                   },
                 },
               ]}
             />
           </Col>
-          <Col xs={12}>
-            <Row height="20vh">
-              <Col xs={8}>
+          <Col xs={3} className="p-0">
+            <Row
+              className="p-3"
+              style={{
+                border: ".1rem solid black",
+              }}
+            >
+              <Col xs={12} className="">
+                <Form className="pb-5">
+                  <Row className="gap-1 justify-content-center">
+                    <Col xs={12} className="pb-3 p-0">
+                      <Form.Floating className="">
+                        <Form.Label
+                          className="text-center"
+                          placeholder=".1"
+                          style={{ paddingBottom: "10vh" }}
+                        >
+                          <p className="text-light">
+                            <small>Duration: </small>
+                            {aniDur}s
+                          </p>
+                        </Form.Label>
+                        <Form.Range
+                          value={aniDur}
+                          min={minAnimationDuration}
+                          max={maxAnimationDuration}
+                          step={0.05}
+                          onChange={(e) => onAnimationDurationChange(e)}
+                        />
+                      </Form.Floating>
+                    </Col>
+                    <Col xs={12} className="p-0">
+                      <div className="d-grid gap-1">
+                        <Button
+                          variant="outline-light"
+                          size="sm"
+                          onClick={(e) => watchBeautiflowify(e)}
+                        >
+                          Beautiflowify
+                        </Button>
+                        <Button
+                          variant="outline-light"
+                          size="sm"
+                          onClick={(e) => formatSpacing(e)}
+                        >
+                          Space Out
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col xs={12} className="my-5 p-0">
+                      <Form.Group controlId="formFileLg" className="">
+                        <Form.Label className="text-light small m-0">
+                          Upload JSON
+                        </Form.Label>
+                        <Form.Control
+                          type="file"
+                          size="sm"
+                          onChange={(e) => loadFlowJSONFromFile(e)}
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12} className="mb-3 p-0">
+                      <div className="d-grid gap-1">
+                        <Button
+                          variant="outline-light"
+                          size="sm"
+                          onClick={(e) => exportToDVJSON(e)}
+                        >
+                          Export
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col xs={12} className="p-0">
+                      <div className="d-grid gap-1">
+                        <Button
+                          variant="outline-light"
+                          size="sm"
+                          onClick={(e) => clear(e)}
+                        >
+                          Clear
+                        </Button>
+                        <Button
+                          variant="outline-light"
+                          size="sm"
+                          onClick={(e) => reset(e)}
+                        >
+                          Reset
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+                </Form>
+              </Col>
+            </Row>
+            <Row className="p-0" style={{ height: "40vh" }}>
+              <Col xs={12} className="p-0">
                 <Accordion
                   flush
                   className="h-100 text-light bs-headings-color-light"
@@ -403,102 +515,12 @@ function App() {
                   </Accordion.Item>
                 </Accordion>
               </Col>
-              <Col xs={4}>
-                <Form className="pb-5 m-5">
-                  <Row className="gap-1 justify-content-center">
-                    <Col xs={12} className="pb-4">
-                      <Form.Floating className="mt-2">
-                        <Form.Label
-                          className="pb-4 mt-1 text-center"
-                          placeholder=".1"
-                        >
-                          <p className="text-light">
-                            Animation Duration: {aniDur}s
-                          </p>
-                        </Form.Label>
-                        <Form.Range
-                          value={aniDur}
-                          min={minAnimationDuration}
-                          max={maxAnimationDuration}
-                          step={0.1}
-                          onChange={(e) => onAnimationDurationChange(e)}
-                        />
-                      </Form.Floating>
-                    </Col>
-                    <Col xs={5} className="">
-                      <div className="d-grid gap-5">
-                        <Button
-                          variant="outline-light"
-                          size="sm"
-                          onClick={(e) => watchBeautiflowify(e)}
-                        >
-                          Beautiflowify
-                        </Button>
-                      </div>
-                    </Col>
-                    <Col xs={5} className="">
-                      <div className="d-grid gap-5">
-                        <Button
-                          variant="outline-light"
-                          size="sm"
-                          onClick={(e) => formatSpacing(e)}
-                        >
-                          Space Out
-                        </Button>
-                      </div>
-                    </Col>
-                    <Col xs={5} className="">
-                      <Form.Group controlId="formFileLg" className="mb-3">
-                        <Form.Label>Large file input example</Form.Label>
-                        <Form.Control
-                          type="file"
-                          size="sm"
-                          onChange={(e) => loadFlowJSONFromFile(e)}
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col xs={5}>
-                      <div className="d-grid gap-5">
-                        <Button
-                          variant="outline-light"
-                          size="sm"
-                          onClick={(e) => exportToDVJSON(e)}
-                        >
-                          Export
-                        </Button>
-                      </div>
-                    </Col>
-                    <Col xs={3}>
-                      <div className="d-grid gap-5">
-                        <Button
-                          variant="outline-light"
-                          size="sm"
-                          onClick={(e) => clear(e)}
-                        >
-                          Clear
-                        </Button>
-                      </div>
-                    </Col>
-                    <Col xs={3}>
-                      <div className="d-grid gap-5">
-                        <Button
-                          variant="outline-light"
-                          size="sm"
-                          onClick={(e) => reset(e)}
-                        >
-                          Reset
-                        </Button>
-                      </div>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col xs={12}>
-                      <p className="text-light text-center mb-0 mt-3">
-                        <small>*work in progress</small>
-                      </p>
-                    </Col>
-                  </Row>
-                </Form>
+            </Row>
+            <Row>
+              <Col xs={12}>
+                <p className="text-light text-center mb-0 mt-3">
+                  <small>*work in progress</small>
+                </p>
               </Col>
             </Row>
           </Col>
