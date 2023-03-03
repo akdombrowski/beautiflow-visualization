@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import { useAccordionButton } from "react-bootstrap/AccordionButton";
 import Card from "react-bootstrap/Card";
 
-const CustomToggle = ({ children, eventKey, setAccordionCollapsedState }) => {
+function CustomToggle({ children, eventKey, setAccordionCollapsedState }) {
   const decoratedOnClick = useAccordionButton(eventKey, () => {
     setAccordionCollapsedState(eventKey);
   });
@@ -15,6 +15,6 @@ const CustomToggle = ({ children, eventKey, setAccordionCollapsedState }) => {
       </Button>
     </div>
   );
-};
+}
 
 export default CustomToggle;

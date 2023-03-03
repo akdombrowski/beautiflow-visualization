@@ -4,11 +4,10 @@
   "homepage": "https://akdombrowski.github.io/beautiflow-visualization",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.4.3",
+    "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.2.3",
     "clipboardy": "^3.0.0",
+    "cytoscape": "^3.23.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
     "react-cytoscapejs": "^2.0.0",
@@ -19,17 +18,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "",
     "eject": "react-scripts eject",
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "yarn predeploy && gh-pages -d build",
     "analyze": "source-map-explorer 'build/static/js/*.js' --html analyze/result.html"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [

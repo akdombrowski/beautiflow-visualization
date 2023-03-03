@@ -1,7 +1,7 @@
 import CytoscapeComponent from "react-cytoscapejs";
 import { forwardRef } from "react";
 
-// export const CyGraph = forwardRef(({ elements }, cyRef) => {
+// Export const CyGraph = forwardRef(({ elements }, cyRef) => {
 // export const CyGraph = ({ elements, cyRef }) => {
 export default function CyGraph({ elements, cyRef }) {
   return (
@@ -14,7 +14,7 @@ export default function CyGraph({ elements, cyRef }) {
         height: "70vh",
         border: ".1rem solid black",
       }}
-      //  cy={(cy) => setCyRef(cy)}
+      //  Cy={(cy) => setCyRef(cy)}
       cy={(cy) => {
         cyRef.current = cy;
       }}
@@ -26,60 +26,66 @@ export default function CyGraph({ elements, cyRef }) {
           style: {
             "background-opacity": 0.75,
             // "background-blacken": -.1,
-            shape: (ele) => {
+            shape(ele) {
               if (ele.data("nodeType") !== "EVAL") {
                 return "rectangle";
               }
             },
-            width: (ele) => {
+            width(ele) {
               if (ele.data("nodeType") === "CONNECTION") {
                 return "75rem";
-              } else if (ele.data("nodeType") === "ANNOTATION") {
-                return ele.data("properties").width.value;
-              } else {
-                return "50rem";
               }
+
+              if (ele.data("nodeType") === "ANNOTATION") {
+                return ele.data("properties").width.value;
+              }
+
+              return "50rem";
             },
-            height: (ele) => {
+            height(ele) {
               if (ele.data("nodeType") === "CONNECTION") {
                 return "75rem";
-              } else if (ele.data("nodeType") === "ANNOTATION") {
+              }
+
+              if (ele.data("nodeType") === "ANNOTATION") {
                 const h = ele.data("properties").height?.value;
                 return h ? 25 : 20;
-              } else {
-                return "50rem";
               }
+
+              return "50rem";
             },
-            "background-color": (ele) => {
+            "background-color"(ele) {
               const props = ele.data("properties");
               const readBGColor = props ? props.backgroundColor : null;
               if (readBGColor) {
                 return readBGColor.value.slice(0, 7);
-              } else {
-                if (ele.data("nodeType") === "CONNECTION") {
-                  return "#ffffff";
-                } else if (ele.data("nodeType") === "ANNOTATION") {
-                  return "#f2f3f4";
-                } else {
-                  return "orange";
-                }
               }
+
+              if (ele.data("nodeType") === "CONNECTION") {
+                return "#ffffff";
+              }
+
+              if (ele.data("nodeType") === "ANNOTATION") {
+                return "#f2f3f4";
+              }
+
+              return "orange";
             },
-            label: (ele) => {
+            label(ele) {
               if (ele.data("nodeType") === "ANNOTATION") {
                 return ele.data("nodeType").slice(0, 4);
-              } else {
-                return (
-                  ele.data("nodeType")?.slice(0, 4) +
-                  ":\n" +
-                  ele.id() +
-                  "\n(" +
-                  ele.position("x") +
-                  "," +
-                  ele.position("y") +
-                  ")"
-                );
               }
+
+              return (
+                ele.data("nodeType")?.slice(0, 4) +
+                ":\n" +
+                ele.id() +
+                "\n(" +
+                ele.position("x") +
+                "," +
+                ele.position("y") +
+                ")"
+              );
             },
             "font-size": "25rem",
             "text-wrap": "wrap",
@@ -114,7 +120,7 @@ export default function CyGraph({ elements, cyRef }) {
           },
         },
       ]}
-    ></CytoscapeComponent>
+    />
   );
 }
 // };

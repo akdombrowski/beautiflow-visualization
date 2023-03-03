@@ -1,4 +1,3 @@
-import "./App.css";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
@@ -8,18 +7,18 @@ import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import { useState, useEffect, useRef } from "react";
+import CytoscapeComponent from "react-cytoscapejs";
 import {
   getCopyOfElementsObj,
   convertStrToJSON,
-  beautiflowifyWithAnimation,
-  beautiflowifyWithAnimationAllAtOnce,
+  beautiflowify,
   shiftAnnosPosFromNodes,
   resetAnnosPosFromNodes,
   getFlowJSON,
   getDateTime,
-} from "./Cy";
-import CustomToggle from "./CustomToggle";
-import CytoscapeComponent from "react-cytoscapejs";
+} from "./cy.js";
+import CustomToggle from "./CustomToggle.jsx";
+import HomeFileImportForm from "./HomeFileImportForm.jsx";
 
 function App() {
   const defaultAnimationDuration = 0.5;
@@ -30,7 +29,6 @@ function App() {
   const flowJSONRef = useRef(null);
   const cloneElesRef = useRef(null);
   const [elesForCyInit, setElesForCyInit] = useState(null);
-  // const [flowJSON, setFlowJSON] = useState("");
   const [ogElesClone, setOGElesClone] = useState(null);
   const [aniText, setAniText] = useState("Ready!");
   const [aniDescriptionText, setAniDescriptionText] = useState("");
@@ -40,14 +38,14 @@ function App() {
 
   const handleFileInputLabelClick = (e) => {
     e.preventDefault();
-    document.getElementById("fileInput").click();
+    document.querySelector("#fileInput").click();
   };
 
   const loadFlowJSONFromFile = async (e) => {
     e.preventDefault();
 
     const reader = new FileReader();
-    reader.onload = async (e) => {
+    reader.addEventListener("load", async (e) => {
       const text = e.target.result;
       const fileJSON = convertStrToJSON(text);
       flowJSONRef.current = fileJSON;
@@ -57,7 +55,7 @@ function App() {
 
       setElesForCyInit(normEles);
       setAnnosShifted(false);
-    };
+    });
 
     if (e.target.files[0]) {
       fileRef.current = e.target.files[0];
@@ -67,7 +65,7 @@ function App() {
 
   const reloadFlowJSONFromFile = async (file) => {
     const reader = new FileReader();
-    reader.onload = async (e) => {
+    reader.addEventListener("load", async (e) => {
       const text = e.target.result;
       const fileJSON = convertStrToJSON(text);
       flowJSONRef.current = fileJSON;
@@ -77,7 +75,7 @@ function App() {
 
       setElesForCyInit(normEles);
       setAnnosShifted(false);
-    };
+    });
 
     if (file) {
       reader.readAsText(file);
@@ -87,19 +85,14 @@ function App() {
   const formatSpacing = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      beautiflowifyWithAnimationAllAtOnce(
-        cyRef.current,
-        150,
-        330,
-        aniDur * 1000
-      );
+      beautiflowify(cyRef.current, 150, 0, aniDur * 1000, false);
     }
   };
 
   const watchBeautiflowify = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      beautiflowifyWithAnimation(cyRef.current, 150, 330, aniDur * 1000);
+      beautiflowify(cyRef.current, 150, 330, aniDur * 1000, true);
     }
   };
 
@@ -124,8 +117,8 @@ function App() {
       resetAnnosPosFromNodes(cyRef.current.nodes());
 
       const updatedDVFlowJSON = getFlowJSON(flowJSONRef.current, cyRef.current);
-      const updatedDVFlowJSONStr = JSON.stringify(updatedDVFlowJSON);
-      const blob = new Blob([updatedDVFlowJSONStr], { type: "text/plain" });
+      const updatedDVFlowJSONString = JSON.stringify(updatedDVFlowJSON);
+      const blob = new Blob([updatedDVFlowJSONString], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       const dateTime = getDateTime();
@@ -135,6 +128,7 @@ function App() {
       } else {
         link.download = "dvBeautiflow---" + dateTime;
       }
+
       link.href = url;
       link.click();
     }
@@ -157,7 +151,7 @@ function App() {
   const reset = (e) => {
     e.preventDefault();
     const file = fileRef.current;
-    // intermediate node elemnent to reset state
+    // Intermediate node elemnent to reset state
     setElesForCyInit([
       {
         data: {
@@ -226,11 +220,12 @@ function App() {
         } else if (end) {
           setAniText(ani + " completed");
 
-          if ("Breadth First Search" === ani) {
+          if (ani === "Breadth First Search") {
             setAniDescriptionText("animations completed");
           }
         }
       }
+
       if (aniDes) {
         if (start) {
           setAniDescriptionText(aniDes);
@@ -259,72 +254,78 @@ function App() {
                 height: "70vh",
                 border: ".1rem solid black",
               }}
-              //  cy={(cy) => setCyRef(cy)}
               cy={(cy) => {
                 cyRef.current = cy;
               }}
-              wheelSensitivity={0.1}
+              WheelSensitivity={0.1}
               zoom={4}
               stylesheet={[
                 {
                   selector: "node",
                   style: {
                     "background-opacity": 0.75,
-                    // "background-blacken": -.1,
-                    shape: (ele) => {
+                    shape(ele) {
                       if (ele.data("nodeType") !== "EVAL") {
                         return "rectangle";
                       }
+
+                      return "round-diamond";
                     },
-                    width: (ele) => {
+                    width(ele) {
                       if (ele.data("nodeType") === "CONNECTION") {
                         return "75rem";
-                      } else if (ele.data("nodeType") === "ANNOTATION") {
-                        return ele.data("properties").width.value;
-                      } else {
-                        return "50rem";
                       }
+
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return ele.data("properties").width.value;
+                      }
+
+                      return "50rem";
                     },
-                    height: (ele) => {
+                    height(ele) {
                       if (ele.data("nodeType") === "CONNECTION") {
                         return "75rem";
-                      } else if (ele.data("nodeType") === "ANNOTATION") {
+                      }
+
+                      if (ele.data("nodeType") === "ANNOTATION") {
                         const h = ele.data("properties").height?.value;
                         return h ? 25 : 20;
-                      } else {
-                        return "50rem";
                       }
+
+                      return "50rem";
                     },
-                    "background-color": (ele) => {
+                    "background-color"(ele) {
                       const props = ele.data("properties");
                       const readBGColor = props ? props.backgroundColor : null;
                       if (readBGColor) {
                         return readBGColor.value.slice(0, 7);
-                      } else {
-                        if (ele.data("nodeType") === "CONNECTION") {
-                          return "#ffffff";
-                        } else if (ele.data("nodeType") === "ANNOTATION") {
-                          return "#f2f3f4";
-                        } else {
-                          return "orange";
-                        }
                       }
+
+                      if (ele.data("nodeType") === "CONNECTION") {
+                        return "#ffffff";
+                      }
+
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return "#f2f3f4";
+                      }
+
+                      return "orange";
                     },
-                    label: (ele) => {
+                    label(ele) {
                       if (ele.data("nodeType") === "ANNOTATION") {
                         return ele.data("nodeType").slice(0, 4);
-                      } else {
-                        return (
-                          ele.data("nodeType")?.slice(0, 4) +
-                          ":\n" +
-                          ele.id() +
-                          "\n(" +
-                          ele.position("x") +
-                          "," +
-                          ele.position("y") +
-                          ")"
-                        );
                       }
+
+                      return (
+                        ele.data("nodeType")?.slice(0, 4) +
+                        ":\n" +
+                        ele.id() +
+                        "\n(" +
+                        ele.position("x") +
+                        "," +
+                        ele.position("y") +
+                        ")"
+                      );
                     },
                     "font-size": "25rem",
                     "text-wrap": "wrap",
@@ -359,52 +360,51 @@ function App() {
                   },
                 },
               ]}
-            ></CytoscapeComponent>
+            />
           </Col>
           <Col xs={12}>
-            <Form className="h-100">
-              <Row height="20vh">
-                <Col xs={8}>
-                  <Accordion
-                    className="h-100 text-light bs-headings-color-light"
-                    defaultActiveKey="0"
-                    flush
-                    onSelect={(eKey) => toggleAccordion(eKey)}
+            <Row height="20vh">
+              <Col xs={8}>
+                <Accordion
+                  flush
+                  className="h-100 text-light bs-headings-color-light"
+                  defaultActiveKey="0"
+                  onSelect={(eKey) => toggleAccordion(eKey)}
+                >
+                  <Accordion.Item
+                    eventKey="0"
+                    className="h-100 bs-text-light bs-headings-color-light"
                   >
-                    <Accordion.Item
-                      eventKey="0"
-                      className="h-100 bs-text-light bs-headings-color-light"
-                    >
-                      {/* <Accordion.Header className="bg-dark bs-text-light bs-headings-color-light"> */}
-                      <Card className="h-100 bg-dark">
-                        <Card.Header>
-                          <CustomToggle
-                            eventKey="0"
-                            setAccordionCollapsedState={toggleAccordion}
+                    <Card className="h-100 bg-dark">
+                      <Card.Header>
+                        <CustomToggle
+                          eventKey="0"
+                          setAccordionCollapsedState={toggleAccordion}
+                        >
+                          Description of Animation - Expand/Collapse
+                        </CustomToggle>
+                      </Card.Header>
+                      <Accordion.Collapse eventKey="0">
+                        <Card.Body>
+                          <Stack
+                            className=""
+                            style={{ minHeight: "8vh", height: "100%" }}
                           >
-                            Description of Animation - Expand/Collapse
-                          </CustomToggle>
-                        </Card.Header>
-                        <Accordion.Collapse eventKey="0">
-                          <Card.Body>
-                            <Stack
-                              className=""
-                              style={{ minHeight: "8vh", height: "100%" }}
-                            >
-                              <h1 className="display-6 fs-4 text-light text-center">
-                                {aniText}
-                              </h1>
-                              <p className="lead text-light">
-                                <small>{aniDescriptionText}</small>
-                              </p>
-                            </Stack>
-                          </Card.Body>
-                        </Accordion.Collapse>
-                      </Card>
-                    </Accordion.Item>
-                  </Accordion>
-                </Col>
-                <Col xs={4}>
+                            <h1 className="display-6 fs-4 text-light text-center">
+                              {aniText}
+                            </h1>
+                            <p className="lead text-light">
+                              <small>{aniDescriptionText}</small>
+                            </p>
+                          </Stack>
+                        </Card.Body>
+                      </Accordion.Collapse>
+                    </Card>
+                  </Accordion.Item>
+                </Accordion>
+              </Col>
+              <Col xs={4}>
+                <Form className="pb-5 m-5">
                   <Row className="gap-1 justify-content-center">
                     <Col xs={12} className="pb-4">
                       <Form.Floating className="mt-2">
@@ -417,11 +417,11 @@ function App() {
                           </p>
                         </Form.Label>
                         <Form.Range
-                          onChange={(e) => onAnimationDurationChange(e)}
                           value={aniDur}
                           min={minAnimationDuration}
                           max={maxAnimationDuration}
                           step={0.1}
+                          onChange={(e) => onAnimationDurationChange(e)}
                         />
                       </Form.Floating>
                     </Col>
@@ -447,34 +447,15 @@ function App() {
                         </Button>
                       </div>
                     </Col>
-                    <Col xs={5} className="pb-4 pt-4">
-                      <div className="d-grid gap-5">
-                        <Button
-                          id="clickableLableForFileInput"
-                          name="clickableLableForFileInput"
-                          className=""
-                          variant="light"
-                          size="sm"
-                          onClick={(e) => handleFileInputLabelClick(e)}
-                        >
-                          {/* <Form.Label
-                            className="text-dark text-center"
-                            htmlFor="fileInput"
-                          > */}
-                          <p className="text-dark text-center pt-3">
-                            Choose JSON file
-                          </p>
-                          {/* </Form.Label> */}
-                        </Button>
-                        <input
+                    <Col xs={5} className="">
+                      <Form.Group controlId="formFileLg" className="mb-3">
+                        <Form.Label>Large file input example</Form.Label>
+                        <Form.Control
                           type="file"
-                          id="fileInput"
-                          name="fileInput"
-                          accept=".json"
+                          size="sm"
                           onChange={(e) => loadFlowJSONFromFile(e)}
-                          style={{ display: "none" }}
-                        ></input>
-                      </div>
+                        />
+                      </Form.Group>
                     </Col>
                     <Col xs={5}>
                       <div className="d-grid gap-5">
@@ -517,72 +498,45 @@ function App() {
                       </p>
                     </Col>
                   </Row>
-                </Col>
-              </Row>
-            </Form>
+                </Form>
+              </Col>
+            </Row>
           </Col>
         </Row>
       ) : (
-        <Form className="h-100 p-5">
-          <Row className="justify-content-center align-content-center">
-            <Col xs={12} className="pt-5">
-              <h1 className="display-1 text-light text-center">
-                Import a DV flow JSON export file to get started!
-              </h1>
-            </Col>
-            <Col xs={12} className="pb-5 m-5">
-              <div className="d-grid">
-                <Button
-                  id="clickableLableForFileInput"
-                  name="clickableLableForFileInput"
-                  className=""
-                  variant="light"
-                  size="lg"
-                  onClick={(e) => handleFileInputLabelClick(e)}
-                >
-                  <Row>
-                    <Col xs={12} className="pb-3">
-                      <h3 className="text-dark text-center pt-3">
-                        Import a JSON file
-                      </h3>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col xs={12}>
-                      <p>
-                        <small>*(imports client-side only)</small>
-                      </p>
-                    </Col>
-                  </Row>
-                </Button>
-                <input
+        <Row className="pt-5 justify-content-center align-content-center">
+          <Col xs={12} className="pt-5">
+            <h1 className="display-1 text-light text-center">
+              Import a DV flow JSON export file to get started!
+            </h1>
+          </Col>
+          <Col xs={8} className="py-5 m-5">
+            <Form className="pb-5 m-5">
+              <Form.Group controlId="formFileLg" className="mb-3">
+                <Form.Label>Large file input example</Form.Label>
+                <Form.Control
                   type="file"
-                  id="fileInput"
-                  name="fileInput"
-                  accept=".json"
+                  size="lg"
                   onChange={(e) => loadFlowJSONFromFile(e)}
-                  style={{ display: "none" }}
-                ></input>
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={12}>
-              <p className="text-light text-center">
-                <small>
-                  Okay, so beauty is in the eye of the beholder. It spaces nodes
-                  out nicely (skipping annotations) and only works for simple
-                  flows... for now.
-                </small>
-              </p>
-            </Col>
-            <Col xs={12}>
-              <p className="text-light text-center">
-                <small>*work in progress</small>
-              </p>
-            </Col>
-          </Row>
-        </Form>
+                />
+              </Form.Group>
+            </Form>
+          </Col>
+          <Col xs={12}>
+            <p className="text-light text-center">
+              <small>
+                Okay, so beauty is in the eye of the beholder. It spaces nodes
+                out nicely (skipping annotations) and only works for simple
+                flows... for now.
+              </small>
+            </p>
+          </Col>
+          <Col xs={12}>
+            <p className="text-light text-center">
+              <small>*work in progress</small>
+            </p>
+          </Col>
+        </Row>
       )}
     </Container>
   );
