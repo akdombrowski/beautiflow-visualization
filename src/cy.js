@@ -979,18 +979,32 @@ export const beautiflowify = async (
   lockAnnotationPositions(cy);
 
   const visitedNodes = cy.collection();
+  // keep track of new pos of nodes in case animations are saved for after
+  // calculations
   const updatedPos = {};
+  // start rows at pos.x = 0
   const rowStartPosX = 0;
+  // the y value for the starting row
   const firstRowStartPosY = 180;
+  // the spacing for nodes in the same row section, aka when a row has multiple
+  // vertical levels
   const sameRowDiffHeightSpacingY = 240;
+  // before calculations, the y value for nodes in top level of each row
   const sectionBaselinePosY = [];
+  // spacing between row sections
   const rowSpacingY = 300;
+  // the y pos value of the visually lowest node (highest y pos value)
   const highestYPosValueInSection = [];
-  // For (const ele of roots) {
+  // iterate over the roots
   for (let row = 0; row < rootsSorted.length; row++) {
+    // a root element (there could be multiple roots for a single row section)
+    // for the current row section
     const ele = rootsSorted[row];
+    // holder for animations in case animations are played after calculations
     const animations = [];
+    // collection of successor nodes from the current root
     const nodesInCurrRow = getRowOfNodesFromRoot(ele);
+    // clone of current root successor nodes
     const nodesInCurrRowClone = nodesInCurrRow.clone();
     /**
      * sectionBasePosY is the y-value for the starting nodes and any following
@@ -1011,7 +1025,7 @@ export const beautiflowify = async (
     highestYPosValueInSection[row] = sectionBaselinePosY[row];
 
     /**
-     * BFS
+     * Use BFS to iterate over current root's successor nodes
      *
      * runs @see {@link Cytoscape#breadthFirstSearch} on nodes in the same
      * section as the current iterated root node
@@ -1019,13 +1033,21 @@ export const beautiflowify = async (
     nodesInCurrRow.breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
+        // holder for current visited node's animations and related info
         const currStepAnimations = {};
+        // current visited node's position
         const vPos = v.position();
+        // current visited node's id
         const vID = v.id();
+        // variables for prev node's (source node's) animation and the promise
+        // containing that animation
         let prevNodeAniProm;
         let prevNodeAni;
+        // variables for current visited node's animation and the promise
+        // containing that animation
         let currNodeAniProm;
         let currNodeAni;
+        // updated pos holder for the current visited node
         const pos = {};
 
         // Skip if we've already visited this node
@@ -1033,7 +1055,7 @@ export const beautiflowify = async (
           const vSuccessors = v.successors();
 
           /**
-           * Current node color animation
+           * Current node color animation - yellow
            */
           currNodeAniProm = new Promise((resolve, reject) => {
             currNodeAni = v.animation(
@@ -1047,6 +1069,8 @@ export const beautiflowify = async (
             );
           });
 
+          // Check if animations are played at the end (watch mode) or played
+          // immediately after calculation
           if (watchAnimation) {
             currStepAnimations.currID = vID;
             currStepAnimations.currAni = currNodeAni;
@@ -1072,10 +1096,16 @@ export const beautiflowify = async (
           if (rootsSorted.getElementById(vID).length > 0) {
             // At a root node
 
+            /**
+             * Check if this root's path leads into already visited nodes
+             * in other words, check if any of the root's successors have
+             * already been visited
+             */
             if (vSuccessors.anySame(visitedNodes)) {
               // This root contains a path that leads into nodes we've already
-              // visited
-              // Get the edges and sources coming into vSuccessors
+              // visited, aka this row section contains multiple roots
+
+              // Calculate the y pos based on already visited nodes
               pos.y = doesNodePathMergeWithAlreadyVisitedNodes(
                 vSuccessors,
                 v,
@@ -1102,21 +1132,45 @@ export const beautiflowify = async (
               const maxOfRow = visitedNodes.max((ele, i, eles) =>
                 ele.position("y")
               );
+
+              // the visually lowest node's y pos value, or the highest y pos
+              // value for this row will be the greater of the current node's
+              // new y pos value or there's an already visited node that has a
+              // greater y pos value (is visually lower)
               highestYPosValueInSection[row] = Math.max(pos.y, maxOfRow.value);
             } else {
+              // the currently visited node and its successors do not overlap
+              // with any already visited nodes
               pos.y = sectionBaselinePosY[row];
 
+              // update greatest y pos value of this row if the current node's
+              // new y pos is greater than any already visited node's
               highestYPosValueInSection[row] = Math.max(
                 highestYPosValueInSection[row],
                 pos.y
               );
             }
+            /**
+             *
+             */
 
             /**
-             * Root node animation
-             * color and position
+             * =====================
+             *  Root Node Animation
+             * =====================
+             * 
+             * color - white
+             *  and
+             * new position
+             *
              */
             let rootAni;
+
+            // TODO: a root node might not belong at the start of the row on the horizontal axis.
+            // e.g.,
+            // a root that edges into the end of the row of nodes above it
+            
+            // it's a root node so start at our row starting position
             pos.x = rowStartPosX;
             const rootAniProm = new Promise((resolve, reject) => {
               rootAni = v.animation(
@@ -1157,6 +1211,7 @@ export const beautiflowify = async (
             const prevOGPos = prevOG.position();
             const prevOGPosX = prevOGPos.x;
             const prevOGPosY = prevOGPos.y;
+            const prevNewPosy = updatedPos[prevID].y;
             const prevOutgoerNodes = prev.outgoers("node");
             // New x pos variable
             const posX = spacing * depth + rowStartPosX;
@@ -1251,12 +1306,12 @@ export const beautiflowify = async (
             //
             //
             if (prevOutgoerNodes.size() > 1) {
+              // sort from highest to lowest visually or, in other words, from smallest y pos value to largest y pos value
               const prevOutgoerNodesSorted = prevOutgoerNodes.sort(
                 (ele1, ele2) => ele1.position("y") - ele2.position("y")
               );
               const prevOutgoerNodesSortedArr =
                 prevOutgoerNodesSorted.toArray();
-              const prevNewPosy = updatedPos[prevID].y;
 
               // of the previous node's outgoers
               // which have already been visited,
@@ -1272,10 +1327,7 @@ export const beautiflowify = async (
                 const maxPosYValue = maxPosY.value;
                 const maxPosYValPlusSameRowVertSpacing =
                   maxPosYValue + sameRowDiffHeightSpacingY;
-                pos.y = Math.max(
-                  maxPosYValPlusSameRowVertSpacing,
-                  updatedPos[prevID].y
-                );
+                pos.y = Math.max(maxPosYValPlusSameRowVertSpacing, prevNewPosy);
               } else {
                 pos.y = prevNewPosy;
               }
