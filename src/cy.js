@@ -1327,11 +1327,8 @@ export const beautiflowify = async (
             /**
              * Accounting for a row with multiple roots
              */
-            // Get the eles already visited and is a successor of the current
-            // node and the current node itself and find the max y position
-            // value out of them
             //
-            // e.g.,
+            // ex:
             // suppose our graph looks like below
             // A - B - C - D - E - F
             //       /
@@ -1346,33 +1343,73 @@ export const beautiflowify = async (
             if (prevOutgoerNodes.size() > 1) {
               // sort from highest to lowest visually or, in other words, from smallest y pos value to largest y pos value
               const prevOutgoerNodesSorted = prevOutgoerNodes.sort(
-                (ele1, ele2) => ele1.position("y") - ele2.position("y")
+                (ele1, ele2) => {
+                  const ele1PosY = updatedPos[ele1]
+                    ? updatedPos[ele1].y
+                    : ele1.position("y");
+                  const ele2PosY = updatedPos[ele2]
+                    ? updatedPos[ele2].y
+                    : ele2.position("y");
+                  return ele1PosY - ele2PosY;
+                }
               );
               const prevOutgoerNodesSortedArr =
                 prevOutgoerNodesSorted.toArray();
 
               // of the previous node's outgoers
-              // which have already been visited,
-              // find the max y value,
+              // find which nodes have already been visited,
+              // find the max y value out of those nodes,
               // then add same row vertical spacing
-              const visitedPrevOutgoers =
-                prevOutgoerNodes.intersection(visitedNodes);
+              //
+              // preserving vertical order:
+              // A - B
+              //  \\
+              //   \ C
+              //     D
+              //
+              // B, C, D are outgoers of A
+              //
+              // imagine after A is processed C gets picked as the next node to
+              // process
+              //
+              // either try figuring out how to make sure B is chosen as the
+              // next node to process
+              // or let C be chosen as next and calc where B would go when it
+              // gets processed and calc C's pos off of that
+              //
+              //
+              const visitedNodesClone = visitedNodes.clone();
 
-              if (visitedPrevOutgoers.size() > 0) {
-                const maxPosY = visitedPrevOutgoers.max((ele, i, eles) => {
-                  return updatedPos[ele.id()].y;
-                });
-                const maxPosYValue = maxPosY.value;
-                const maxPosYValPlusSameRowVertSpacing =
-                  maxPosYValue + sameRowDiffHeightSpacingY;
-                pos.y = Math.max(maxPosYValPlusSameRowVertSpacing, prevNewPosY);
-              } else {
-                pos.y = prevNewPosY;
-              }
+              prevOutgoerNodesSorted.forEach((ele, i, eles) => {
+                if (ele.id() == vID) {
+                  const prevPosY = updatedPos[prevID]
+                    ? updatedPos[prevID].y
+                    : prev.position("y");
+                  pos.y = prevPosY + i * sameRowDiffHeightSpacingY;
+                  return false;
+                }
+              });
+
+              // const visitedPrevOutgoers =
+              //   prevOutgoerNodesSorted.intersection(visitedNodes);
+
+              // if (visitedPrevOutgoers.size() > 0) {
+              //   const maxPosY = visitedPrevOutgoers.max((ele, i, eles) => {
+              //     return updatedPos[ele.id()].y;
+              //   });
+              //   const maxPosYValue = maxPosY.value;
+              //   const maxPosYValPlusSameRowVertSpacing =
+              //     maxPosYValue + sameRowDiffHeightSpacingY;
+              //   pos.y = Math.max(maxPosYValPlusSameRowVertSpacing, prevNewPosY);
+              // } else {
+              //   pos.y = prevNewPosY;
+              // }
             } else {
               pos.y = updatedPos[prevID].y;
             }
             /**
+             *
+             *
              *
              */
 
