@@ -1138,10 +1138,54 @@ export const beautiflowify = async (
               // new y pos value or there's an already visited node that has a
               // greater y pos value (is visually lower)
               highestYPosValueInSection[row] = Math.max(pos.y, maxOfRow.value);
+
+              /**
+               *
+               * Calculate new x pos
+               *
+               */
+              // TODO: a root node might not belong at the start of the row on the horizontal axis.
+              // e.g.,
+              // a root that edges into the end of the row of nodes above it
+
+              // find the first already visited node that this row merges into
+              // count the number of unvisited nodes up to that point
+              // unvisited nodes up to that point will be that first already
+              // visited nodes unvisited predecessors that are in this row
+              // multiply that count by the horizontal spacing
+              // that should be this root's x pos
+              const visitedVSuccessors = visitedNodes.intersection(vSuccessors);
+              const visitedVSuccessorsSortedX = visitedVSuccessors.sort(
+                (ele1, ele2) => {
+                  // a negative value means ele1 will be placed before ele2
+                  // this will return a neg value if ele2's updated x pos value
+                  // is greater than ele1's
+                  return updatedPos[ele1.id()].x - updatedPos[ele2.id()].x;
+                }
+              );
+              const firstVisitedVSuccessor = visitedVSuccessorsSortedX.first();
+              const firstVisitedVSuccessorPredecessors =
+                firstVisitedVSuccessor.predecessors("node");
+              const currRowNodesLeadingIntoFirstVisitedVSuccessor =
+                nodesInCurrRow.intersection(firstVisitedVSuccessorPredecessors);
+              const count =
+                currRowNodesLeadingIntoFirstVisitedVSuccessor.size();
+              const xDisFromRootNewPosToFirstVisitedVSuccessor =
+                count * spacing;
+              const firstVisitedVSuccessorPosX =
+                firstVisitedVSuccessor.position("x");
+              const rootNewPosX =
+                firstVisitedVSuccessorPosX -
+                xDisFromRootNewPosToFirstVisitedVSuccessor;
+              pos.x = rootNewPosX;
             } else {
               // the currently visited node and its successors do not overlap
               // with any already visited nodes
               pos.y = sectionBaselinePosY[row];
+
+              // it's a root node that does not lead into already visited nodes
+              // start at the horizontal beginning
+              pos.x = rowStartPosX;
 
               // update greatest y pos value of this row if the current node's
               // new y pos is greater than any already visited node's
@@ -1158,20 +1202,13 @@ export const beautiflowify = async (
              * =====================
              *  Root Node Animation
              * =====================
-             * 
+             *
              * color - white
              *  and
              * new position
              *
              */
             let rootAni;
-
-            // TODO: a root node might not belong at the start of the row on the horizontal axis.
-            // e.g.,
-            // a root that edges into the end of the row of nodes above it
-            
-            // it's a root node so start at our row starting position
-            pos.x = rowStartPosX;
             const rootAniProm = new Promise((resolve, reject) => {
               rootAni = v.animation(
                 {
@@ -1211,10 +1248,11 @@ export const beautiflowify = async (
             const prevOGPos = prevOG.position();
             const prevOGPosX = prevOGPos.x;
             const prevOGPosY = prevOGPos.y;
-            const prevNewPosy = updatedPos[prevID].y;
+            const prevNewPosX = updatedPos[prevID].x;
+            const prevNewPosY = updatedPos[prevID].y;
             const prevOutgoerNodes = prev.outgoers("node");
             // New x pos variable
-            const posX = spacing * depth + rowStartPosX;
+            const posX = spacing + prevNewPosX;
 
             /**
              *
@@ -1327,9 +1365,9 @@ export const beautiflowify = async (
                 const maxPosYValue = maxPosY.value;
                 const maxPosYValPlusSameRowVertSpacing =
                   maxPosYValue + sameRowDiffHeightSpacingY;
-                pos.y = Math.max(maxPosYValPlusSameRowVertSpacing, prevNewPosy);
+                pos.y = Math.max(maxPosYValPlusSameRowVertSpacing, prevNewPosY);
               } else {
-                pos.y = prevNewPosy;
+                pos.y = prevNewPosY;
               }
             } else {
               pos.y = updatedPos[prevID].y;
