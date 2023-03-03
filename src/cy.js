@@ -1389,20 +1389,20 @@ export const beautiflowify = async (
               //
               const visitedNodesClone = visitedNodes.clone();
               const prevUpdatedPosY = updatedPos[prevID].y;
-
               const i = prevOutgoerNodesSortedArr.indexOf(v);
               const prevOutgoerNodesUpToV = prevOutgoerNodesSorted.slice(0, i);
+
               if (prevOutgoerNodesUpToV.size() > 0) {
                 let startY = prevUpdatedPosY;
                 const visitedPrevOutgoerNodesUpToV =
                   prevOutgoerNodesUpToV.intersection(visitedNodes);
-
+                const numVisAboveV = visitedPrevOutgoerNodesUpToV.size();
                 const unvisitedPrevOutgoersAboveV =
                   prevOutgoerNodesUpToV.difference(visitedNodes);
                 // need to sort by y again or is the order preserved?
                 const numOfUnvisitedPrevOutgoersAboveV =
                   unvisitedPrevOutgoersAboveV.size();
-                if (visitedPrevOutgoerNodesUpToV.size() > 0) {
+                if (numVisAboveV > 0) {
                   const visPrevOutgoersAboveVMaxY =
                     visitedPrevOutgoerNodesUpToV.max((ele, i, eles) => {
                       return updatedPos[ele.id()]
@@ -1414,19 +1414,25 @@ export const beautiflowify = async (
                   // calc starting from the visually lowest already visited node if
                   // it's visually lower than prev node's y pos
                   // if not, start with prev node's y pos value
-                  startY =
-                    visPrevOutgoersAboveVMaxYVal <
-                    prevUpdatedPosY - sameRowDiffHeightSpacingY
-                      ? prevUpdatedPosY - sameRowDiffHeightSpacingY
-                      : visPrevOutgoersAboveVMaxYVal;
+                  const areAnyVisNodesInTheWay =
+                    visPrevOutgoersAboveVMaxYVal >
+                    prevUpdatedPosY - sameRowDiffHeightSpacingY;
+
+                  startY = areAnyVisNodesInTheWay
+                    ? visPrevOutgoersAboveVMaxYVal
+                    : prevUpdatedPosY;
                 }
 
                 if (numOfUnvisitedPrevOutgoersAboveV > 0) {
-                  pos.y =
-                    startY +  numOfUnvisitedPrevOutgoersAboveV *
+                  const spacingBetweenNodes =
+                    numOfUnvisitedPrevOutgoersAboveV *
                     sameRowDiffHeightSpacingY;
+                  pos.y = startY + spacingBetweenNodes;
                 } else {
-                  pos.y = startY + sameRowDiffHeightSpacingY;
+                  const numNodesAboveInTheWaySpacing =
+                    numOfUnvisitedPrevOutgoersAboveV *
+                    sameRowDiffHeightSpacingY;
+                  pos.y = startY + numNodesAboveInTheWaySpacing;
                 }
 
                 // formula to find y pos value:
