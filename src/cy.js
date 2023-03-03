@@ -986,7 +986,7 @@ export const beautiflowify = async (
   const rowStartPosX = 0;
   // the y value for the starting row
   const firstRowStartPosY = 180;
-  // the spacing for nodes in the same row section, aka when a row has multiple
+  // the spacing for nodes in the same row-section, aka when a row has multiple
   // vertical levels
   const sameRowDiffHeightSpacingY = 240;
   // before calculations, the y value for nodes in top level of each row
@@ -997,8 +997,8 @@ export const beautiflowify = async (
   const highestYPosValueInSection = [];
   // iterate over the roots
   for (let row = 0; row < rootsSorted.length; row++) {
-    // a root element (there could be multiple roots for a single row section)
-    // for the current row section
+    // a root element (there could be multiple roots for a single row-section)
+    // for the current row-section
     const ele = rootsSorted[row];
     // holder for animations in case animations are played after calculations
     const animations = [];
@@ -1103,7 +1103,7 @@ export const beautiflowify = async (
              */
             if (vSuccessors.anySame(visitedNodes)) {
               // This root contains a path that leads into nodes we've already
-              // visited, aka this row section contains multiple roots
+              // visited, aka this row-section contains multiple roots
 
               // Calculate the y pos based on already visited nodes
               pos.y = doesNodePathMergeWithAlreadyVisitedNodes(
@@ -1144,7 +1144,6 @@ export const beautiflowify = async (
                * Calculate new x pos
                *
                */
-              // TODO: a root node might not belong at the start of the row on the horizontal axis.
               // e.g.,
               // a root that edges into the end of the row of nodes above it
 
@@ -1344,11 +1343,11 @@ export const beautiflowify = async (
               // sort from highest to lowest visually or, in other words, from smallest y pos value to largest y pos value
               const prevOutgoerNodesSorted = prevOutgoerNodes.sort(
                 (ele1, ele2) => {
-                  const ele1PosY = updatedPos[ele1]
-                    ? updatedPos[ele1].y
+                  const ele1PosY = updatedPos[ele1.id()]
+                    ? updatedPos[ele1.id()].y
                     : ele1.position("y");
-                  const ele2PosY = updatedPos[ele2]
-                    ? updatedPos[ele2].y
+                  const ele2PosY = updatedPos[ele2.id()]
+                    ? updatedPos[ele2.id()].y
                     : ele2.position("y");
                   return ele1PosY - ele2PosY;
                 }
@@ -1377,33 +1376,72 @@ export const beautiflowify = async (
               // or let C be chosen as next and calc where B would go when it
               // gets processed and calc C's pos off of that
               //
+              // what if we have a graph that looks like this
+              //
+              // A - B - C
+              //   /
+              // D - E
+              //   \ ^
+              //     F
+              //
+              // We've already visited A-D and are now on E
+              //
               //
               const visitedNodesClone = visitedNodes.clone();
+              const prevUpdatedPosY = updatedPos[prevID].y;
 
-              prevOutgoerNodesSorted.forEach((ele, i, eles) => {
-                if (ele.id() == vID) {
-                  const prevPosY = updatedPos[prevID]
-                    ? updatedPos[prevID].y
-                    : prev.position("y");
-                  pos.y = prevPosY + i * sameRowDiffHeightSpacingY;
-                  return false;
+              const i = prevOutgoerNodesSortedArr.indexOf(v);
+              const prevOutgoerNodesUpToV = prevOutgoerNodesSorted.slice(0, i);
+              if (prevOutgoerNodesUpToV.size() > 0) {
+                let startY = prevUpdatedPosY;
+                const visitedPrevOutgoerNodesUpToV =
+                  prevOutgoerNodesUpToV.intersection(visitedNodes);
+
+                const unvisitedPrevOutgoersAboveV =
+                  prevOutgoerNodesUpToV.difference(visitedNodes);
+                // need to sort by y again or is the order preserved?
+                const numOfUnvisitedPrevOutgoersAboveV =
+                  unvisitedPrevOutgoersAboveV.size();
+                if (visitedPrevOutgoerNodesUpToV.size() > 0) {
+                  const visPrevOutgoersAboveVMaxY =
+                    visitedPrevOutgoerNodesUpToV.max((ele, i, eles) => {
+                      return updatedPos[ele.id()]
+                        ? updatedPos[ele.id()].y
+                        : ele.position("y");
+                    });
+                  const visPrevOutgoersAboveVMaxYVal =
+                    visPrevOutgoersAboveVMaxY.value;
+                  // calc starting from the visually lowest already visited node if
+                  // it's visually lower than prev node's y pos
+                  // if not, start with prev node's y pos value
+                  startY =
+                    visPrevOutgoersAboveVMaxYVal <
+                    prevUpdatedPosY - sameRowDiffHeightSpacingY
+                      ? prevUpdatedPosY - sameRowDiffHeightSpacingY
+                      : visPrevOutgoersAboveVMaxYVal;
                 }
-              });
 
-              // const visitedPrevOutgoers =
-              //   prevOutgoerNodesSorted.intersection(visitedNodes);
+                if (numOfUnvisitedPrevOutgoersAboveV > 0) {
+                  pos.y =
+                    startY +  numOfUnvisitedPrevOutgoersAboveV *
+                    sameRowDiffHeightSpacingY;
+                } else {
+                  pos.y = startY + sameRowDiffHeightSpacingY;
+                }
 
-              // if (visitedPrevOutgoers.size() > 0) {
-              //   const maxPosY = visitedPrevOutgoers.max((ele, i, eles) => {
-              //     return updatedPos[ele.id()].y;
-              //   });
-              //   const maxPosYValue = maxPosY.value;
-              //   const maxPosYValPlusSameRowVertSpacing =
-              //     maxPosYValue + sameRowDiffHeightSpacingY;
-              //   pos.y = Math.max(maxPosYValPlusSameRowVertSpacing, prevNewPosY);
-              // } else {
-              //   pos.y = prevNewPosY;
-              // }
+                // formula to find y pos value:
+                // either the previous node's y pos value or the greatest y pos
+                // value of visited outgoers of the prev node
+                // plus
+                // the number of times we need to move the node down a row to
+                // account for unvisited nodes that were originally above the
+                // current node or the number of unvisited nodes that will be
+                // positioned above the current node
+                // multiplied by
+                // the same row-section row-height-spacing]
+              } else {
+                pos.y = prevPosY;
+              }
             } else {
               pos.y = updatedPos[prevID].y;
             }
