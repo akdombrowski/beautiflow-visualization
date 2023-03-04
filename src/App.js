@@ -335,9 +335,18 @@ function App() {
                         return ele.data("nodeType").slice(0, 4);
                       }
 
+                      const props = ele.data("properties");
+                      let title;
+                      if (props) {
+                        title = props.nodeTitle?.value;
+                      }
+
+                      const name = ele.data("name");
+
+                      let firstRowLabel = title || name;
                       return (
-                        ele.data("nodeType")?.slice(0, 4) +
-                        ":\n" +
+                        (firstRowLabel ? firstRowLabel : "") +
+                        "\n" +
                         ele.id() +
                         "\n(" +
                         new Intl.NumberFormat("en-US", {
@@ -352,7 +361,12 @@ function App() {
                         ")"
                       );
                     },
-                    "font-size": "17",
+                    "font-size": (ele) => {
+                      if (ele.data("nodeType") === "CONNECTION") {
+                        return "20";
+                      }
+                      return "15";
+                    },
                     "text-opacity": (ele) => {
                       if (ele.data("nodeType") === "ANNOTATION") {
                         return 0.25;
@@ -367,17 +381,24 @@ function App() {
                       }
                       return "bottom";
                     },
-                    "text-margin-y": "5",
-                    "text-transform": "uppercase",
+                    "text-margin-y": (ele) => {
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return 0;
+                      }
+                      return 5;
+                    },
+                    "text-transform": "lowercase",
                     "text-outline-opacity": "1",
-                    "text-outline-color": "#0FA3B1",
+                    "text-outline-color": "#F0F66E",
                     "text-outline-width": ".1",
+                    "text-max-width": "200",
+                    "line-height": 1.1,
                     color: (ele) => {
                       if (ele.data("nodeType") === "ANNOTATION") {
                         return "#aaaaaa";
                       }
 
-                      return "#C7F2A7";
+                      return "#FAFAFF";
                     },
                     "z-index": (ele) => {
                       const nodeType = ele.data("nodeType");
@@ -428,7 +449,7 @@ function App() {
                     "curve-style": "bezier",
                     "source-endpoint": "outside-to-line-or-label",
                     "target-endpoint": "outside-to-line-or-label",
-                    "source-distance-from-node": "10",
+                    "source-distance-from-node": "3",
                     "target-distance-from-node": "1",
                     "arrow-scale": 2,
                     "z-index": 2,
