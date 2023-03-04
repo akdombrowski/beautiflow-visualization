@@ -278,18 +278,18 @@ function App() {
                     },
                     width: (ele) => {
                       if (ele.data("nodeType") === "CONNECTION") {
-                        return "75";
+                        return 75;
                       }
 
                       if (ele.data("nodeType") === "ANNOTATION") {
                         return ele.data("properties").width.value;
                       }
 
-                      return "50";
+                      return 50;
                     },
                     height: (ele) => {
                       if (ele.data("nodeType") === "CONNECTION") {
-                        return "75";
+                        return 75;
                       }
 
                       if (ele.data("nodeType") === "ANNOTATION") {
@@ -297,7 +297,7 @@ function App() {
                         return h ? 25 : 20;
                       }
 
-                      return "50";
+                      return 50;
                     },
                     "background-opacity": (ele) => {
                       if (ele.data("nodeType") === "ANNOTATION") {
@@ -363,9 +363,9 @@ function App() {
                     },
                     "font-size": (ele) => {
                       if (ele.data("nodeType") === "CONNECTION") {
-                        return "20";
+                        return 20;
                       }
-                      return "15";
+                      return 15;
                     },
                     "text-opacity": (ele) => {
                       if (ele.data("nodeType") === "ANNOTATION") {
@@ -382,16 +382,16 @@ function App() {
                       return "bottom";
                     },
                     "text-margin-y": (ele) => {
-                      if (ele.data("nodeType") === "ANNOTATION") {
-                        return 0;
+                      if (ele.data("nodeType") === "CONNECTION") {
+                        return 5;
                       }
-                      return 5;
+                      return 0;
                     },
                     "text-transform": "lowercase",
                     "text-outline-opacity": "1",
                     "text-outline-color": "#F0F66E",
-                    "text-outline-width": ".1",
-                    "text-max-width": "200",
+                    "text-outline-width": .1,
+                    "text-max-width": 200,
                     "line-height": 1.1,
                     color: (ele) => {
                       if (ele.data("nodeType") === "ANNOTATION") {
