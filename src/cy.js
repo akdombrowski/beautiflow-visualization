@@ -797,19 +797,20 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
 
   for (const ani of animations) {
     const {
-      preID,
-      preAniProm,
-      preAni,
-      currID,
-      currAni,
-      currAniProm,
+      currIDDone,
+      prevIDDone,
       rootID,
+      rootColorAni,
+      rootColorAniProm,
       rootAni,
       rootAniProm,
       newRootPos,
+      vColorAni,
+      vColorAniProm,
       vMovePos,
       vMoveAni,
       vMoveAniProm,
+      currID,
     } = ani;
     let msg;
 
@@ -833,34 +834,14 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
       await viewportAniProm;
     }
 
-    if (preAniProm && preAni) {
-      msg = "animating " + preID;
+    if (rootColorAni) {
+      msg = "coloring root " + rootID;
       const resolvedMsg = await emitAndWaitForAni(
         msg,
-        preID,
+        rootID,
         cy,
-        preAni,
-        preAniProm
-      );
-    }
-
-    msg = "animating " + currID;
-    const currAniResolvedMsg = await emitAndWaitForAni(
-      msg,
-      currID,
-      cy,
-      currAni,
-      currAniProm
-    );
-
-    if (vMovePos) {
-      msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
-      const resolvedMsg = await emitAndWaitForAni(
-        msg,
-        currID,
-        cy,
-        vMoveAni,
-        vMoveAniProm
+        rootColorAni,
+        rootColorAniProm
       );
     }
 
@@ -875,17 +856,56 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
       );
     }
 
+    if (vColorAni) {
+      msg = "coloring current node" + currID;
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        currID,
+        cy,
+        vColorAni,
+        vColorAniProm
+      );
+    }
+
+    if (vMovePos) {
+      msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        currID,
+        cy,
+        vMoveAni,
+        vMoveAniProm
+      );
+    }
+
     // Change prev node to green as its processing is complete
-    if (preID) {
-      msg = "prev node " + preID + " processing is complete animation";
+    if (prevIDDone) {
+      msg = "curr node " + prevIDDone + " processing is complete animation";
       const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
-        cy.$("#" + preID),
+        cy.$("#" + prevIDDone),
         dur,
         "green"
       );
       const resolvedMsg = await emitAndWaitForAni(
         msg,
-        preID,
+        prevIDDone,
+        cy,
+        doneWithPrevNodeAni,
+        prom
+      );
+    }
+
+    // Change prev node to green as its processing is complete
+    if (currIDDone) {
+      msg = "curr node " + currIDDone + " processing is complete animation";
+      const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
+        cy.$("#" + currIDDone),
+        dur,
+        "green"
+      );
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        currIDDone,
         cy,
         doneWithPrevNodeAni,
         prom
@@ -900,7 +920,7 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
         .outgoers()
         .size()
     ) {
-      msg = "prev node " + preID + " processing is finished animation";
+      msg = "prev node " + currID + " processing is finished animation";
       const { ani: doneWithCurrLeafNodeAni, prom } = getAnimationPromiseForEle(
         cy.$("#" + currID),
         dur,
@@ -908,7 +928,7 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
       );
       const resolvedMsg = await emitAndWaitForAni(
         msg,
-        preID,
+        currID,
         cy,
         doneWithCurrLeafNodeAni,
         prom
@@ -1035,52 +1055,21 @@ export const beautiflowify = async (
       visit: async (v, edge, prev, j, depth) => {
         // holder for current visited node's animations and related info
         const currStepAnimations = {};
-        // current visited node's position
-        const vPos = v.position();
         // current visited node's id
         const vID = v.id();
+        // current visited node's position
+        const vPos = v.position();
+        // updated pos holder for the current visited node
+        const pos = {};
         // variables for prev node's (source node's) animation and the promise
         // containing that animation
         let prevNodeAniProm;
         let prevNodeAni;
-        // variables for current visited node's animation and the promise
-        // containing that animation
-        let currNodeAniProm;
-        let currNodeAni;
-        // updated pos holder for the current visited node
-        const pos = {};
 
         // Skip if we've already visited this node
         if (!visitedNodes.anySame(v)) {
+          currStepAnimations.currID = vID;
           const vSuccessors = v.successors();
-
-          /**
-           * Current node color animation - yellow
-           */
-          currNodeAniProm = new Promise((resolve, reject) => {
-            currNodeAni = v.animation(
-              {
-                style: { backgroundColor: "yellow" },
-              },
-              {
-                duration: dur,
-                complete: () => resolve("animated " + vID),
-              }
-            );
-          });
-
-          // Check if animations are played at the end (watch mode) or played
-          // immediately after calculation
-          if (watchAnimation) {
-            currStepAnimations.currID = vID;
-            currStepAnimations.currAni = currNodeAni;
-            currStepAnimations.currAniProm = currNodeAniProm;
-          } else {
-            currNodeAni.play();
-          }
-          /**
-           *
-           */
 
           /**
            * Decide new position based on whether if it's a root node or not
@@ -1129,8 +1118,8 @@ export const beautiflowify = async (
               //
               // G's successors will be:
               // H, I, J, C, D, E, F
-              const maxOfRow = visitedNodes.max((ele, i, eles) =>
-                ele.position("y")
+              const maxOfRow = visitedNodes.max(
+                (ele, i, eles) => updatedPos[ele.id()].y
               );
 
               // the visually lowest node's y pos value, or the highest y pos
@@ -1207,12 +1196,30 @@ export const beautiflowify = async (
              * new position
              *
              */
+            let rootColorAni;
+            const rootColorAniProm = new Promise((resolve, reject) => {
+              rootColorAni = v.animation(
+                {
+                  style: { backgroundColor: "brown" },
+                },
+                {
+                  duration: dur / 2,
+                  complete: () => {
+                    resolve("animating root " + vID);
+                  },
+                }
+              );
+            });
+
+            const rootColorFlashDur = dur;
+            const rootColorFlashClass = "bgBrown";
+            const root = v;
+
             let rootAni;
             const rootAniProm = new Promise((resolve, reject) => {
               rootAni = v.animation(
                 {
                   position: pos,
-                  style: { backgroundColor: "white" },
                 },
                 {
                   duration: dur,
@@ -1227,11 +1234,16 @@ export const beautiflowify = async (
 
             if (watchAnimation) {
               currStepAnimations.rootID = vID;
+              currStepAnimations.currID = vID;
+              currStepAnimations.currIDDone = vID;
+              currStepAnimations.rootColorAni = rootColorAni;
+              currStepAnimations.rootColorAniProm = rootColorAniProm;
               currStepAnimations.rootAniProm = rootAniProm;
               currStepAnimations.rootAni = rootAni;
               currStepAnimations.newRootPos = pos;
               animations.push(currStepAnimations);
             } else {
+              v.delayAnimation(row * 10 + dur + 15);
               rootAni.play();
             }
             /**
@@ -1253,29 +1265,19 @@ export const beautiflowify = async (
             // New x pos variable
             const posX = spacing + prevNewPosX;
 
-            /**
-             *
-             * Animate previous node's (source node) color
-             *
-             */
-            prevNodeAniProm = new Promise((resolve, reject) => {
-              prevNodeAni = prev.animation(
-                {
-                  style: { backgroundColor: "blue" },
-                },
-                {
-                  duration: dur,
-                  complete: () => resolve("animated " + prevID),
-                }
-              );
-            });
-
             if (watchAnimation) {
-              currStepAnimations.preID = prev?.id();
-              currStepAnimations.preAniProm = prevNodeAniProm;
-              currStepAnimations.preAni = prevNodeAni;
-            } else {
-              prevNodeAni.play();
+              const prevOutgoersUnvisited =
+                prevOutgoerNodes.difference(visitedNodes);
+              const isPrevProcessingComplete = prevOutgoersUnvisited.size() > 1;
+              const vOutgoers = v.outgoers("node");
+              const vOutgoersUnvisitied = vOutgoers.difference(visitedNodes);
+              const isVProcessingComplete = vOutgoersUnvisitied.size() > 1;
+              currStepAnimations.prevIDDone = isPrevProcessingComplete
+                ? null
+                : prevID;
+              currStepAnimations.currIDDone = isVProcessingComplete
+                ? null
+                : vID;
             }
             /**
              *
@@ -1468,6 +1470,24 @@ export const beautiflowify = async (
             updatedPos[vID] = pos;
 
             /**
+             * Color animation
+             */
+            let vColorAni;
+            const vColorAniProm = new Promise((resolve, reject) => {
+              vColorAni = v.animation(
+                {
+                  style: { backgroundColor: "purple" },
+                },
+                {
+                  duration: dur / 2,
+                  complete: () => {
+                    resolve("animating " + vID + "'s color to purple");
+                  },
+                }
+              );
+            });
+
+            /**
              * Move animation
              */
             let vMoveAni;
@@ -1493,12 +1513,17 @@ export const beautiflowify = async (
 
             if (watchAnimation) {
               // Add v's movement animation to current animations object
+              currStepAnimations.vColorAniProm = vColorAniProm;
+              currStepAnimations.vColorAni = vColorAni;
               currStepAnimations.vMovePos = pos;
               currStepAnimations.vMoveAniProm = vMoveAniProm;
               currStepAnimations.vMoveAni = vMoveAni;
               // Curr animations object to collective animations holder
               animations.push(currStepAnimations);
             } else {
+              v.delayAnimation(row * 10 + dur + 25);
+              vColorAni.play();
+              v.delayAnimation(row * 10 + dur + 30);
               vMoveAni.play();
             }
             /**

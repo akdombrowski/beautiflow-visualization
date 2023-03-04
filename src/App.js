@@ -22,8 +22,8 @@ import HomeFileImportForm from "./HomeFileImportForm.jsx";
 
 function App() {
   const defaultAnimationDuration = 0.5;
-  const maxAnimationDuration = 10;
-  const minAnimationDuration = 0.05;
+  const maxAnimationDuration = 5;
+  const minAnimationDuration = 0.01;
   const cyRef = useRef(null);
   const fileRef = useRef(null);
   const flowJSONRef = useRef(null);
@@ -268,13 +268,6 @@ function App() {
                 {
                   selector: "node",
                   style: {
-                    "background-opacity": (ele) => {
-                      if (ele.data("nodeType") === "ANNOTATION") {
-                        return 0.5;
-                      } else {
-                        return 0.75;
-                      }
-                    },
                     shape: (ele) => {
                       if (ele.data("nodeType") !== "EVAL") {
                         return "rectangle";
@@ -305,6 +298,13 @@ function App() {
 
                       return "50";
                     },
+                    "background-opacity": (ele) => {
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return 0.4;
+                      }
+
+                      return 1;
+                    },
                     "background-color": (ele) => {
                       const props = ele.data("properties");
                       const readBGColor = props ? props.backgroundColor : null;
@@ -313,7 +313,7 @@ function App() {
                       }
 
                       if (ele.data("nodeType") === "CONNECTION") {
-                        return "#FFFFFF";
+                        return "#CCFBFE";
                       }
 
                       if (ele.data("nodeType") === "ANNOTATION") {
@@ -321,6 +321,13 @@ function App() {
                       }
 
                       return "#ee6c4d";
+                    },
+                    "background-blacken": (ele) => {
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return 0.5;
+                      }
+
+                      return 0;
                     },
                     label: (ele) => {
                       if (ele.data("nodeType") === "ANNOTATION") {
@@ -332,41 +339,88 @@ function App() {
                         ":\n" +
                         ele.id() +
                         "\n(" +
-                        ele.position("x") +
+                        new Intl.NumberFormat("en-US", {
+                          minimumFractionDigits: 0,
+                          useGrouping: false,
+                        }).format(ele.position("x")) +
                         "," +
-                        ele.position("y") +
+                        new Intl.NumberFormat("en-US", {
+                          minimumFractionDigits: 0,
+                          useGrouping: false,
+                        }).format(ele.position("y")) +
                         ")"
                       );
                     },
-                    "font-size": "25rem",
+                    "font-size": "17",
+                    "text-opacity": (ele) => {
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return 0.25;
+                      }
+
+                      return 1;
+                    },
                     "text-wrap": "wrap",
-                    "text-valign": "bottom",
-                    "text-transform": "lowercase",
-                    color: "cyan",
+                    "text-valign": (ele) => {
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return "center";
+                      }
+                      return "bottom";
+                    },
+                    "text-margin-y": "5",
+                    "text-transform": "uppercase",
+                    "text-outline-opacity": "1",
+                    "text-outline-color": "#0FA3B1",
+                    "text-outline-width": ".1",
+                    color: (ele) => {
+                      if (ele.data("nodeType") === "ANNOTATION") {
+                        return "#aaaaaa";
+                      }
+
+                      return "#C7F2A7";
+                    },
+                    "z-index": (ele) => {
+                      const nodeType = ele.data("nodeType");
+                      if (nodeType === "ANNOTATION") {
+                        return 0;
+                      } else if (nodeType === "EVALUATION") {
+                        return 1;
+                      } else {
+                        return 5;
+                      }
+                    },
+                    "z-index-compare": "manual",
                   },
                 },
-
                 {
                   selector: "edge",
                   style: {
                     width: 5,
-                    color: "cyan",
-                    opacity: 0.6,
-                    "font-size": "25",
+                    color: "#4E937A",
+                    opacity: 0.75,
+                    "font-size": "15",
                     "text-justification": "center",
                     "text-margin-x": "-10",
+                    "text-margin-y": "20",
                     "text-rotation": "autorotate",
                     "text-wrap": "wrap",
                     "text-valign": "bottom",
-                    "text-margin-y": "30",
                     label: (ele) =>
                       "x:" +
-                      (ele.target().position("x") -
-                        ele.source().position("x")) +
+                      new Intl.NumberFormat("en-US", {
+                        minimumFractionDigits: 0,
+                        useGrouping: false,
+                      }).format(
+                        ele.target().position("x") - ele.source().position("x")
+                      ) +
                       "\n" +
                       "y:" +
-                      (ele.target().position("y") - ele.source().position("y")),
-                    "line-color": "#FFF",
+                      new Intl.NumberFormat("en-US", {
+                        minimumFractionDigits: 0,
+                        useGrouping: false,
+                      }).format(
+                        ele.target().position("y") - ele.source().position("y")
+                      ),
+                    "line-color": "#0A81D1",
                     "line-opacity": 1,
                     "target-arrow-color": "#000",
                     "target-arrow-shape": "triangle-backcurve",
@@ -376,6 +430,8 @@ function App() {
                     "source-distance-from-node": "10",
                     "target-distance-from-node": "1",
                     "arrow-scale": 2,
+                    "z-index": 2,
+                    "z-index-compare": "manual",
                   },
                 },
               ]}
@@ -395,7 +451,7 @@ function App() {
                       <Form.Floating className="">
                         <Form.Label
                           className="text-center"
-                          placeholder=".1"
+                          placeholder=".01"
                           style={{ paddingBottom: "10vh" }}
                         >
                           <p className="text-light">
@@ -407,7 +463,7 @@ function App() {
                           value={aniDur}
                           min={minAnimationDuration}
                           max={maxAnimationDuration}
-                          step={0.05}
+                          step={0.01}
                           onChange={(e) => onAnimationDurationChange(e)}
                         />
                       </Form.Floating>
