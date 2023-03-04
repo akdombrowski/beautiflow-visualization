@@ -790,7 +790,12 @@ export const emitAndWaitForAni = async (msg, id, cy, ani, aniProm) => {
   return animated;
 };
 
-export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
+export const playNodeAnimationsOneByOne = async (
+  cy,
+  animations,
+  dur,
+  spacing
+) => {
   // Emits an event that we can watch for in the main app UI to update the text
   // of the animation description box
   emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
@@ -799,6 +804,7 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
     const {
       currIDDone,
       prevIDDone,
+      nodesInCurrRowSection,
       rootID,
       rootColorAni,
       rootColorAniProm,
@@ -813,26 +819,6 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
       currID,
     } = ani;
     let msg;
-
-    // Need to figure out how to calculate for rows with multiple levels
-    if (rootID) {
-      let viewportAni;
-      cy.fit(newRootPos, 50);
-
-      const viewportAniProm = new Promise((resolve, reject) => {
-        viewportAni = cy.animation({
-          zoom: {
-            level: 0.3,
-            position: newRootPos,
-          },
-          duration: dur / 2,
-          complete: () =>
-            resolve("Adjusted viewport (panBy) to animating elements"),
-        });
-      });
-      viewportAni.play();
-      await viewportAniProm;
-    }
 
     if (rootColorAni) {
       msg = "coloring root " + rootID;
@@ -993,7 +979,7 @@ export const beautiflowify = async (
 
   const roots = normalizedNodesWOAnnotations.roots();
   const rootsSorted = sortRoots(roots, verticalTolerance);
-  cy.fit(getRowOfNodesFromRoot(rootsSorted.first()), 150);
+  // cy.fit(getRowOfNodesFromRoot(rootsSorted.first()), 150);
 
   // Just in case, lock annotations' pos
   lockAnnotationPositions(cy);
@@ -1050,6 +1036,8 @@ export const beautiflowify = async (
      * runs @see {@link Cytoscape#breadthFirstSearch} on nodes in the same
      * section as the current iterated root node
      */
+
+    cy.fit(cy.nodes().filter("[nodeType != 'ANNOTATION']"));
     nodesInCurrRow.breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
@@ -1084,6 +1072,7 @@ export const beautiflowify = async (
            */
           if (rootsSorted.getElementById(vID).length > 0) {
             // At a root node
+            currStepAnimations.nodesInCurrRowSection = nodesInCurrRow;
 
             /**
              * Check if this root's path leads into already visited nodes
@@ -1210,10 +1199,6 @@ export const beautiflowify = async (
                 }
               );
             });
-
-            const rootColorFlashDur = dur;
-            const rootColorFlashClass = "bgBrown";
-            const root = v;
 
             let rootAni;
             const rootAniProm = new Promise((resolve, reject) => {
@@ -1564,7 +1549,7 @@ export const beautiflowify = async (
      *
      */
     if (watchAnimation) {
-      await playNodeAnimationsOneByOne(cy, animations, dur);
+      await playNodeAnimationsOneByOne(cy, animations, dur, spacing);
     }
 
     // Emit event to update animation description to complete
