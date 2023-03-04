@@ -264,6 +264,8 @@ function App() {
               wheelSensitivity={0.1}
               zoom={4}
               boxSelectionEnabled={false}
+              autoungrabify={true}
+              autounselectify={true}
               stylesheet={[
                 {
                   selector: "node",
