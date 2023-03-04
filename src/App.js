@@ -567,7 +567,7 @@ function App() {
             </Row>
             <Row className="align-content-end align-self-end">
               <Col xs={12}>
-                <p className="text-light text-center mb-0 mt-3">
+                <p className="text-light text-end fixed-bottom pe-3 mb-1">
                   <small>*work in progress</small>
                 </p>
               </Col>
@@ -575,16 +575,20 @@ function App() {
           </Col>
         </Row>
       ) : (
-        <Row className="pt-5 justify-content-center align-content-center">
-          <Col xs={12} className="pt-5">
-            <h1 className="display-1 text-light text-center">
-              Import a DV flow JSON export file to get started!
-            </h1>
-          </Col>
-          <Col xs={8} className="py-5 m-5">
-            <Form className="pb-5 m-5">
+        <Stack
+          gap={5}
+          className="p-5 justify-content-center align-items-center align-content-center"
+        >
+          {/* <Row className="pt-5 justify-content-center align-content-center"> */}
+          <div className="pb-5 px-5 m-5">
+            {/* <Col xs={8} className="py-5 m-5"> */}
+            <Form>
               <Form.Group controlId="formFileLg" className="mb-3">
-                <Form.Label>Large file input example</Form.Label>
+                <Form.Label>
+                  <h1 className="display-1 text-light text-center">
+                    Import a DV flow JSON export file to get started!
+                  </h1>
+                </Form.Label>
                 <Form.Control
                   type="file"
                   size="lg"
@@ -592,22 +596,27 @@ function App() {
                 />
               </Form.Group>
             </Form>
-          </Col>
-          <Col xs={12}>
-            <p className="text-light text-center">
-              <small>
-                Okay, so beauty is in the eye of the beholder. It spaces nodes
-                out nicely (skipping annotations) and only works for simple
-                flows... for now.
-              </small>
+            {/* </Col> */}
+          </div>
+          <div className="px-5">
+            {/* <Col xs={12}> */}
+            <p className="fs-3 text-light text-center font-monospace fw-lighter text-break">
+              Okay, so beauty is in the eye of the beholder.
             </p>
-          </Col>
-          <Col xs={12}>
+            <p className="fs-3 text-light text-center font-monospace fw-lighter text-break">
+              It spaces nodes out nicely (skipping annotations) in simple flows.
+            </p>
+            {/* </Col> */}
+          </div>
+          <div className="fixed-bottom">
+            {/* <Col xs={12}> */}
             <p className="text-light text-center">
               <small>*work in progress</small>
             </p>
-          </Col>
-        </Row>
+            {/* </Col> */}
+          </div>
+          {/* </Row> */}
+        </Stack>
       )}
     </Container>
   );
