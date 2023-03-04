@@ -1001,6 +1001,8 @@ export const beautiflowify = async (
   const rowSpacingY = 300;
   // the y pos value of the visually lowest node (highest y pos value)
   const highestYPosValueInSection = [];
+  // fit whole graph (minus annotations before beginning)
+  cy.fit(cy.nodes().filter("[nodeType != 'ANNOTATION']"));
   // iterate over the roots
   for (let row = 0; row < rootsSorted.length; row++) {
     // a root element (there could be multiple roots for a single row-section)
@@ -1037,7 +1039,6 @@ export const beautiflowify = async (
      * section as the current iterated root node
      */
 
-    cy.fit(cy.nodes().filter("[nodeType != 'ANNOTATION']"));
     nodesInCurrRow.breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
@@ -1480,7 +1481,6 @@ export const beautiflowify = async (
               vMoveAni = v.animation(
                 {
                   position: pos,
-                  style: { backgroundColor: "purple" },
                 },
                 {
                   duration: dur,

@@ -21,8 +21,8 @@ import CustomToggle from "./CustomToggle.jsx";
 import HomeFileImportForm from "./HomeFileImportForm.jsx";
 
 function App() {
-  const defaultAnimationDuration = 0.5;
-  const maxAnimationDuration = 5;
+  const defaultAnimationDuration = 0.01;
+  const maxAnimationDuration = 3;
   const minAnimationDuration = 0.01;
   const cyRef = useRef(null);
   const fileRef = useRef(null);
