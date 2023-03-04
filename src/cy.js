@@ -1341,19 +1341,18 @@ export const beautiflowify = async (
             //
             if (prevOutgoerNodes.size() > 1) {
               // sort from highest to lowest visually or, in other words, from smallest y pos value to largest y pos value
-              const prevOutgoerNodesSorted = prevOutgoerNodes.sort(
-                (ele1, ele2) => {
-                  const ele1PosY = updatedPos[ele1.id()]
-                    ? updatedPos[ele1.id()].y
-                    : ele1.position("y");
-                  const ele2PosY = updatedPos[ele2.id()]
-                    ? updatedPos[ele2.id()].y
-                    : ele2.position("y");
-                  return ele1PosY - ele2PosY;
-                }
-              );
-              const prevOutgoerNodesSortedArr =
-                prevOutgoerNodesSorted.toArray();
+              const allOutgoersSorted = prevOutgoerNodes.sort((ele1, ele2) => {
+                // const ele1PosY = updatedPos[ele1.id()]
+                //   ? updatedPos[ele1.id()].y
+                //   : ele1.position("y");
+                // const ele2PosY = updatedPos[ele2.id()]
+                //   ? updatedPos[ele2.id()].y
+                //   : ele2.position("y");
+                const ele1PosY = ele1.position("y");
+                const ele2PosY = ele2.position("y");
+                return ele1PosY - ele2PosY;
+              });
+              const allOutgoersSortedArr = allOutgoersSorted.toArray();
 
               // of the previous node's outgoers
               // find which nodes have already been visited,
@@ -1388,52 +1387,56 @@ export const beautiflowify = async (
               //
               //
               const visitedNodesClone = visitedNodes.clone();
-              const prevUpdatedPosY = updatedPos[prevID].y;
-              const i = prevOutgoerNodesSortedArr.indexOf(v);
-              const prevOutgoerNodesUpToV = prevOutgoerNodesSorted.slice(0, i);
+              const i = allOutgoersSortedArr.indexOf(v);
+              const prevOutgoerNodesAboveV = allOutgoersSorted.slice(0, i);
 
-              if (prevOutgoerNodesUpToV.size() > 0) {
-                let startY = prevUpdatedPosY;
-                const visitedPrevOutgoerNodesUpToV =
-                  prevOutgoerNodesUpToV.intersection(visitedNodes);
-                const numVisAboveV = visitedPrevOutgoerNodesUpToV.size();
-                const unvisitedPrevOutgoersAboveV =
-                  prevOutgoerNodesUpToV.difference(visitedNodes);
+              if (prevOutgoerNodesAboveV.size() > 0) {
+                let startY = prevNewPosY;
+                const visited =
+                  prevOutgoerNodesAboveV.intersection(visitedNodes);
+                const unvisited = prevOutgoerNodesAboveV.difference(visited);
+                const numVisited = visited.size();
+                const numUnvisited = unvisited.size();
                 // need to sort by y again or is the order preserved?
-                const numOfUnvisitedPrevOutgoersAboveV =
-                  unvisitedPrevOutgoersAboveV.size();
-                if (numVisAboveV > 0) {
-                  const visPrevOutgoersAboveVMaxY =
-                    visitedPrevOutgoerNodesUpToV.max((ele, i, eles) => {
-                      return updatedPos[ele.id()]
-                        ? updatedPos[ele.id()].y
-                        : ele.position("y");
-                    });
-                  const visPrevOutgoersAboveVMaxYVal =
-                    visPrevOutgoersAboveVMaxY.value;
+                if (numVisited > 0) {
+                  const visitedMaxY = visited.max((ele, i, eles) => {
+                    return updatedPos[ele.id()]
+                      ? updatedPos[ele.id()].y
+                      : ele.position("y");
+                  });
+                  const visitedMaxYVal = visitedMaxY.value;
+                  const lowestVisitedNode = visitedMaxY.ele;
                   // calc starting from the visually lowest already visited node if
                   // it's visually lower than prev node's y pos
                   // if not, start with prev node's y pos value
-                  const areAnyVisNodesInTheWay =
-                    visPrevOutgoersAboveVMaxYVal >
-                    prevUpdatedPosY - sameRowDiffHeightSpacingY;
+                  const areAnyVisitedNodesInTheWay =
+                    visitedMaxYVal > prevNewPosY - sameRowDiffHeightSpacingY;
 
-                  startY = areAnyVisNodesInTheWay
-                    ? visPrevOutgoersAboveVMaxYVal
-                    : prevUpdatedPosY;
-                }
-
-                if (numOfUnvisitedPrevOutgoersAboveV > 0) {
-                  const spacingBetweenNodes =
-                    numOfUnvisitedPrevOutgoersAboveV *
+                  startY = areAnyVisitedNodesInTheWay
+                    ? visitedMaxYVal + sameRowDiffHeightSpacingY
+                    : prevNewPosY;
+                  // need to add spacing if, in their og positions, there
+                  // are unvisited nodes in between the current node and the
+                  // visually lowest visited node
+                  const unvisitedBetween = unvisited.filter((ele, i, eles) => {
+                    return ele.position("y") > lowestVisitedNode.position("y");
+                  });
+                  const numUnvisitedNodesInTheWayBelowMaxVisitedNode =
+                    unvisitedBetween.size();
+                  const spacingBetweenVisitedAndV =
+                    numUnvisitedNodesInTheWayBelowMaxVisitedNode *
                     sameRowDiffHeightSpacingY;
-                  pos.y = startY + spacingBetweenNodes;
+                  pos.y = startY + spacingBetweenVisitedAndV;
                 } else {
-                  const numNodesAboveInTheWaySpacing =
-                    numOfUnvisitedPrevOutgoersAboveV *
-                    sameRowDiffHeightSpacingY;
-                  pos.y = startY + numNodesAboveInTheWaySpacing;
+                  const spacingBetweenNodes =
+                    numUnvisited * sameRowDiffHeightSpacingY;
+                  pos.y = startY + spacingBetweenNodes;
                 }
+
+                // if (numUnvisited > 0) {
+                // } else {
+                //   pos.y = startY;
+                // }
 
                 // formula to find y pos value:
                 // either the previous node's y pos value or the greatest y pos
@@ -1446,10 +1449,10 @@ export const beautiflowify = async (
                 // multiplied by
                 // the same row-section row-height-spacing]
               } else {
-                pos.y = prevPosY;
+                pos.y = prevNewPosY;
               }
             } else {
-              pos.y = updatedPos[prevID].y;
+              pos.y = prevNewPosY;
             }
             /**
              *
