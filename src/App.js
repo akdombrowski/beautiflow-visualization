@@ -244,11 +244,11 @@ function App() {
     <Container
       fluid
       className="bg-dark justify-content-center"
-      style={{ height: "100vh", overflow: "auto" }}
+      style={{ height: "100vh", maxWidth: "100vw", overflow: "hidden auto" }}
     >
       {elesForCyInit ? (
-        <Row className="h-100">
-          <Col className="h-100" xs={9} id="cyContainerCol">
+        <Row className="h-100 p-0  m-0 ">
+          <Col className="h-100 p-1 m-0" xs={9} lg={10} id="cyContainerCol">
             <CytoscapeComponent
               id="cy"
               elements={elesForCyInit}
@@ -256,7 +256,6 @@ function App() {
               style={{
                 width: "100%",
                 height: "100%",
-                border: ".1rem solid black",
               }}
               cy={(cy) => {
                 cyRef.current = cy;
@@ -439,25 +438,20 @@ function App() {
               ]}
             />
           </Col>
-          <Col xs={3} className="p-0">
-            <Row
-              className="p-3"
-              style={{
-                border: ".1rem solid black",
-              }}
-            >
-              <Col xs={12} className="">
-                <Form className="pb-5">
-                  <Row className="gap-1 justify-content-center">
-                    <Col xs={12} className="pb-3 p-0">
+          <Col xs={3} lg={2} className="p-0 m-0">
+            <Row className="py-1 px-0 m-0">
+              <Col xs={12} className="px-0 py-3 m-0">
+                <Form className="px-0 m-0">
+                  <Row className="pt-2 px-0 m-0 gap-1 justify-content-center">
+                    <Col xs={12} className="p-0 pb-2 m-0">
                       <Form.Floating className="">
                         <Form.Label
                           className="text-center"
                           placeholder=".01"
                           style={{ paddingBottom: "10vh" }}
                         >
-                          <p className="text-light">
-                            <small>Duration: </small>
+                          <p className="text-light w-100 text-wrap text-xs-start text-md-center">
+                            <small>t: </small>
                             {aniDur}s
                           </p>
                         </Form.Label>
@@ -470,8 +464,8 @@ function App() {
                         />
                       </Form.Floating>
                     </Col>
-                    <Col xs={12} className="p-0">
-                      <div className="d-grid gap-1">
+                    <Col xs={12} className="p-0  m-0 ">
+                      <div className="d-grid w-100 p-0  m-0 ">
                         <Button
                           variant="outline-light"
                           size="sm"
@@ -479,16 +473,9 @@ function App() {
                         >
                           Beautiflowify
                         </Button>
-                        <Button
-                          variant="outline-light"
-                          size="sm"
-                          onClick={(e) => formatSpacing(e)}
-                        >
-                          Space Out
-                        </Button>
                       </div>
                     </Col>
-                    <Col xs={12} className="my-5 p-0">
+                    <Col xs={12} className="py-5 px-0">
                       <Form.Group controlId="formFileLg" className="">
                         <Form.Label className="text-light small m-0">
                           Upload JSON
@@ -500,7 +487,7 @@ function App() {
                         />
                       </Form.Group>
                     </Col>
-                    <Col xs={12} className="mb-3 p-0">
+                    <Col xs={12} className="pb-3 px-0">
                       <div className="d-grid gap-1">
                         <Button
                           variant="outline-light"
@@ -533,21 +520,25 @@ function App() {
                 </Form>
               </Col>
             </Row>
-            <Row className="p-0" style={{ height: "40vh" }}>
-              <Col xs={12} className="p-0">
+            <Row className="p-0 m-0" style={{ minHeight: "50vh" }}>
+              <Col
+                xs={12}
+                className="p-0 m-0 justify-content-end align-content-end"
+              >
                 <Accordion
                   flush
-                  className="h-100 text-light bs-headings-color-light"
+                  className="h-100 px-0 m-0 text-light bs-headings-color-light"
                   defaultActiveKey="0"
                   onSelect={(eKey) => toggleAccordion(eKey)}
                 >
                   <Accordion.Item
                     eventKey="0"
-                    className="h-100 bs-text-light bs-headings-color-light"
+                    className="h-100 px-0 m-0 bs-text-light bs-headings-color-light"
                   >
-                    <Card className="h-100 bg-dark">
-                      <Card.Header>
+                    <Card className="h-100 bg-dark px-0 m-0">
+                      <Card.Header className="p-0 m-0">
                         <CustomToggle
+                          className="px-0 m-0"
                           eventKey="0"
                           setAccordionCollapsedState={toggleAccordion}
                         >
@@ -574,7 +565,7 @@ function App() {
                 </Accordion>
               </Col>
             </Row>
-            <Row>
+            <Row className="align-content-end align-self-end">
               <Col xs={12}>
                 <p className="text-light text-center mb-0 mt-3">
                   <small>*work in progress</small>
