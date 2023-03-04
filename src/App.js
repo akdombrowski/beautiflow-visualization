@@ -285,7 +285,7 @@ function App() {
                         return ele.data("properties").width.value;
                       }
 
-                      return 50;
+                      return 40;
                     },
                     height: (ele) => {
                       if (ele.data("nodeType") === "CONNECTION") {
@@ -297,7 +297,7 @@ function App() {
                         return h ? 25 : 20;
                       }
 
-                      return 50;
+                      return 40;
                     },
                     "background-opacity": (ele) => {
                       if (ele.data("nodeType") === "ANNOTATION") {
@@ -390,7 +390,7 @@ function App() {
                     "text-transform": "lowercase",
                     "text-outline-opacity": "1",
                     "text-outline-color": "#F0F66E",
-                    "text-outline-width": .1,
+                    "text-outline-width": 0.1,
                     "text-max-width": 200,
                     "line-height": 1.1,
                     color: (ele) => {
@@ -427,6 +427,7 @@ function App() {
                     "text-wrap": "wrap",
                     "text-valign": "bottom",
                     label: (ele) =>
+                      "\u0394" +
                       "x:" +
                       new Intl.NumberFormat("en-US", {
                         minimumFractionDigits: 0,
@@ -435,6 +436,7 @@ function App() {
                         ele.target().position("x") - ele.source().position("x")
                       ) +
                       "\n" +
+                      "\u0394" +
                       "y:" +
                       new Intl.NumberFormat("en-US", {
                         minimumFractionDigits: 0,
