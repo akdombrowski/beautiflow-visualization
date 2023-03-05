@@ -607,10 +607,11 @@ function App() {
                 Beautfilow<i>-ify</i>
               </h1>
             </Col>
-          </Row>
+            </Row>
+            
           <div className="">
             <Form>
-              <Form.Group controlId="formFileLg" className="mb-3">
+              <Form.Group controlId="formFileLg" className="">
                 <Form.Label className="pb-1">
                   <h6 className="display-5 text-info text-center">
                     Import a JSON export of a DV flow to get started!
@@ -626,7 +627,7 @@ function App() {
             </Form>
           </div>
 
-          <Row className="justify-content-center p-5">
+          <Row className="justify-content-center px-5">
             <Col xs={10} lg={6}>
               <Row className="justify-content-center">
                 <Col xs={12}>
