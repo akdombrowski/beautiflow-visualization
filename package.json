@@ -22,7 +22,7 @@
     "test": "",
     "eject": "react-scripts eject",
     "predeploy": "yarn run build",
-    "deploy": "yarn predeploy && gh-pages -d build",
+    "deploy": "yarn predeploy && yarn dlx gh-pages -d build",
     "analyze": "source-map-explorer 'build/static/js/*.js' --html analyze/result.html"
   },
   "browserslist": {
