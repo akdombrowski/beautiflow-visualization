@@ -52,10 +52,16 @@ function App() {
       try {
         const text = e.target.result;
         const fileJSON = convertStrToJSON(text);
-        flowJSONRef.current = fileJSON;
+        let flowJSON = fileJSON;
+        if (fileJSON.flows) {
+          flowJSON = fileJSON.flows[0];
+        } else {
+          flowJSONRef.current = fileJSON;
+        }
+        flowJSONRef.current = flowJSON;
 
         const normEles = CytoscapeComponent.normalizeElements(
-          getCopyOfElementsObj(fileJSON)
+          getCopyOfElementsObj(flowJSON)
         );
 
         setElesForCyInit(normEles);
