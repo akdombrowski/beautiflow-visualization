@@ -19,6 +19,7 @@ import {
 } from "./cy.js";
 import CustomToggle from "./CustomToggle.jsx";
 import HomeFileImportForm from "./HomeFileImportForm.jsx";
+import ErrorScreen from "./ErrorScreen.jsx";
 
 function App() {
   const defaultAnimationDuration = 0.01;
@@ -35,6 +36,8 @@ function App() {
   const [annosShifted, setAnnosShifted] = useState(false);
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
+  const [doesFlowCauseError, setDoesFlowCauseError] = useState(false);
+  const [flowErrorMessage, setFlowErrorMessage] = useState("");
 
   const handleFileInputLabelClick = (e) => {
     e.preventDefault();
@@ -46,15 +49,21 @@ function App() {
 
     const reader = new FileReader();
     reader.addEventListener("load", async (e) => {
-      const text = e.target.result;
-      const fileJSON = convertStrToJSON(text);
-      flowJSONRef.current = fileJSON;
-      const normEles = CytoscapeComponent.normalizeElements(
-        getCopyOfElementsObj(fileJSON)
-      );
+      try {
+        const text = e.target.result;
+        const fileJSON = convertStrToJSON(text);
+        flowJSONRef.current = fileJSON;
 
-      setElesForCyInit(normEles);
-      setAnnosShifted(false);
+        const normEles = CytoscapeComponent.normalizeElements(
+          getCopyOfElementsObj(fileJSON)
+        );
+
+        setElesForCyInit(normEles);
+        setAnnosShifted(false);
+      } catch (err) {
+        setDoesFlowCauseError(true);
+        setFlowErrorMessage(err);
+      }
     });
 
     if (e.target.files[0]) {
@@ -66,15 +75,20 @@ function App() {
   const reloadFlowJSONFromFile = async (file) => {
     const reader = new FileReader();
     reader.addEventListener("load", async (e) => {
-      const text = e.target.result;
-      const fileJSON = convertStrToJSON(text);
-      flowJSONRef.current = fileJSON;
-      const normEles = CytoscapeComponent.normalizeElements(
-        getCopyOfElementsObj(fileJSON)
-      );
+      try {
+        const text = e.target.result;
+        const fileJSON = convertStrToJSON(text);
+        flowJSONRef.current = fileJSON;
+        const normEles = CytoscapeComponent.normalizeElements(
+          getCopyOfElementsObj(fileJSON)
+        );
 
-      setElesForCyInit(normEles);
-      setAnnosShifted(false);
+        setElesForCyInit(normEles);
+        setAnnosShifted(false);
+      } catch (err) {
+        setDoesFlowCauseError(true);
+        setFlowErrorMessage(err);
+      }
     });
 
     if (file) {
@@ -132,6 +146,19 @@ function App() {
       link.href = url;
       link.click();
     }
+  };
+
+  const clearErr = (e) => {
+    e.preventDefault();
+
+    console.log("doesFlowCauseError");
+    console.log(doesFlowCauseError);
+    console.log("flowErrorMessage");
+    console.log(flowErrorMessage);
+    console.error(flowErrorMessage);
+
+    setDoesFlowCauseError(false);
+    setFlowErrorMessage("");
   };
 
   const clear = (e) => {
@@ -204,6 +231,12 @@ function App() {
   };
 
   useEffect(() => {
+    if (flowErrorMessage) {
+      console.error(flowErrorMessage);
+    }
+  }, [flowErrorMessage]);
+
+  useEffect(() => {
     if (!annosShifted && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
       cloneElesRef.current = createClonedNodes(cyRef.current);
@@ -240,12 +273,20 @@ function App() {
     });
   }
 
+  if (doesFlowCauseError) {
+    return <ErrorScreen clearErr={clearErr}></ErrorScreen>;
+  }
+
   try {
     return (
       <Container
         fluid
         className="bg-dark justify-content-center"
-        style={{ height: "100vh", maxWidth: "100vw", overflow: "hidden auto" }}
+        style={{
+          height: "100vh",
+          maxWidth: "100vw",
+          overflow: "hidden auto",
+        }}
       >
         {elesForCyInit ? (
           <Row className="h-100 p-0  m-0 ">
@@ -742,27 +783,7 @@ function App() {
       </Container>
     );
   } catch (err) {
-    return (
-      <Container>
-        <Row>
-          <Col xs={12}>
-            <h1>Well, this could've gone better.</h1>
-            <p>Are you sure this flow doesn't include a subflow?M</p>
-            <p>
-              If it does, try exporting from DV without the subflow and try it
-              again.
-            </p>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={4}>
-            <Button variant="primary" size="lg">
-              Go back to the home screen.
-            </Button>
-          </Col>
-        </Row>
-      </Container>
-    );
+    return <ErrorScreen clearErr={clearErr}></ErrorScreen>;
   }
 }
 
