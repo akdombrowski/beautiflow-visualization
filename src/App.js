@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
 import { useState, useEffect, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import {
@@ -27,6 +28,7 @@ function App() {
   const minAnimationDuration = 0.01;
   const cyRef = useRef(null);
   const fileRef = useRef(null);
+  const flowsRef = useRef(null);
   const flowJSONRef = useRef(null);
   const cloneElesRef = useRef(null);
   const [elesForCyInit, setElesForCyInit] = useState(null);
@@ -38,33 +40,81 @@ function App() {
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
   const [doesFlowCauseError, setDoesFlowCauseError] = useState(false);
   const [importFlowError, setFlowErrorMessage] = useState("");
+  const [show, setShow] = useState(false);
+
+  const handleClose = (e) => {
+    e.preventDefault();
+    clear(e);
+    setShow(false);
+  };
+
+  const handleContinueAnyways = (e) => {
+    e.preventDefault();
+    setShow(false);
+  };
+
+  const handleShow = (e) => {
+    e.preventDefault();
+    setShow(true);
+  };
 
   const handleFileInputLabelClick = (e) => {
     e.preventDefault();
     document.querySelector("#fileInput").click();
   };
 
-  const loadFlowJSONFromFile = async (e) => {
-    e.preventDefault();
+  const initializeElements = (flowJSON) => {
+    const normEles = CytoscapeComponent.normalizeElements(
+      getCopyOfElementsObj(flowJSON)
+    );
 
+    setElesForCyInit(normEles);
+    setAnnosShifted(false);
+  };
+
+  const readFileForFlowJSON = () => {
     const reader = new FileReader();
-    reader.addEventListener("load", async (e) => {
+    reader.addEventListener("load", (e) => {
       try {
         const text = e.target.result;
         const fileJSON = convertStrToJSON(text);
-        flowJSONRef.current = fileJSON;
+        let flowJSON = fileJSON;
 
-        const normEles = CytoscapeComponent.normalizeElements(
-          getCopyOfElementsObj(fileJSON)
-        );
+        // The file has multiple flows
+        if (fileJSON.flows) {
+          // pop open warning modal
+          handleShow(e);
 
-        setElesForCyInit(normEles);
-        setAnnosShifted(false);
+          // in case we don't find which one is the parent flow, default to the
+          // first flow in the array.
+          flowsRef.current = fileJSON.flows[0];
+          flowJSON = fileJSON.flows[0];
+
+          // iterate over the array of flows and find the parent flow
+          for (const flow of fileJSON.flows) {
+            if (flow.parentFlowId && flow.flowId === flow.parentFlowId) {
+              flowsRef.current = flow;
+              flowJSON = flow;
+            }
+          }
+        }
+
+        flowJSONRef.current = flowJSON;
+
+        initializeElements(flowJSON);
       } catch (err) {
         setDoesFlowCauseError(true);
         setFlowErrorMessage(err);
       }
     });
+
+    return reader;
+  };
+
+  const loadFlowJSONFromFile = async (e) => {
+    e.preventDefault();
+
+    const reader = readFileForFlowJSON();
 
     if (e.target.files[0]) {
       fileRef.current = e.target.files[0];
@@ -72,24 +122,8 @@ function App() {
     }
   };
 
-  const reloadFlowJSONFromFile = async (file) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", async (e) => {
-      try {
-        const text = e.target.result;
-        const fileJSON = convertStrToJSON(text);
-        flowJSONRef.current = fileJSON;
-        const normEles = CytoscapeComponent.normalizeElements(
-          getCopyOfElementsObj(fileJSON)
-        );
-
-        setElesForCyInit(normEles);
-        setAnnosShifted(false);
-      } catch (err) {
-        setDoesFlowCauseError(true);
-        setFlowErrorMessage(err);
-      }
-    });
+  const reloadFlowJSONFromFile = (file) => {
+    const reader = readFileForFlowJSON();
 
     if (file) {
       reader.readAsText(file);
@@ -179,7 +213,7 @@ function App() {
   const reset = (e) => {
     e.preventDefault();
     const file = fileRef.current;
-    // Intermediate node elemnent to reset state
+    // Intermediate node element to reset state
     setElesForCyInit([
       {
         data: {
@@ -243,7 +277,7 @@ function App() {
   }, [importFlowError]);
 
   useEffect(() => {
-    if (!annosShifted && cyRef.current) {
+    if (!annosShifted && !show && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
       cloneElesRef.current = createClonedNodes(cyRef.current);
     } else if (!flowJSONRef.current && cyRef.current) {
@@ -253,7 +287,7 @@ function App() {
       setOGElesClone(null);
       setAnnosShifted(false);
     }
-  }, [elesForCyInit]);
+  }, [elesForCyInit, show]);
 
   if (cyRef.current) {
     cyRef.current.on("style", (e, ani, aniDes, start, end) => {
@@ -290,11 +324,11 @@ function App() {
         className="bg-dark justify-content-center"
         style={{
           height: "100vh",
-          maxWidth: "100vw",
+          width: "100vw",
           overflow: "hidden auto",
         }}
       >
-        {elesForCyInit ? (
+        {elesForCyInit && !show ? (
           <Row className="h-100 p-0  m-0 ">
             <Col className="h-100 p-1 m-0" xs={9} lg={10} id="cyContainerCol">
               <CytoscapeComponent
@@ -542,7 +576,7 @@ function App() {
                         </Form.Floating>
                       </Col>
                       <Col xs={12} className="p-0  m-0 ">
-                        <div className="d-grid w-100 p-0  m-0 ">
+                        <div className="d-grid w-100 p-0 m-0">
                           <Button
                             variant="outline-light"
                             size="sm"
@@ -782,7 +816,7 @@ function App() {
                     </p>
                   </dd>
 
-                  <dt className="col-3">
+                  {/* <dt className="col-3">
                     <p className="fs-8 m-0 text-info text-start font-monospace fw-lighter text-wrap">
                       tips
                     </p>
@@ -792,7 +826,7 @@ function App() {
                       Use flows without included subflows (i.e., download
                       subflows separately)
                     </p>
-                  </dd>
+                  </dd> */}
                 </dl>
               </Col>
             </Row>
@@ -802,6 +836,98 @@ function App() {
                 <small>*work in progress</small>
               </p>
             </div>
+
+            <Modal
+              centered
+              className=""
+              size="lg"
+              show={show}
+              onHide={handleClose}
+            >
+              <Modal.Header closeButton className="bg-dark">
+                <Modal.Title className="text-warning">
+                  <h1>Ahh! The file contains multiple flows!</h1>
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body className="text-light bg-dark px-5 py-4">
+                <h5>The uploaded file contains multiple flows.</h5>
+                <h6>
+                  Using this file is{" "}
+                  <b>
+                    <i>not</i>
+                  </b>{" "}
+                  recommended.
+                </h6>
+                <h6>What's going to happen if you do, you ask?</h6>
+                <h6>
+                  Stuff.{" "}
+                  <b>
+                    <i>Serious</i>
+                  </b>{" "}
+                  stuff. Ok? Okay?!?!? Ok.
+                </h6>
+                <p className="p-0 m-0 text-wrap text-break">
+                  It'll try to find the parent flow and use that. If it can't
+                  figure out which one is the parent (weird situation), then
+                  it'll default to the first flow in the file.{" "}
+                </p>
+                <p className="p-0 m-0 text-wrap text-break">
+                  Try downloading the flows separately (without including
+                  subflows) and work with each of them in turn.
+                </p>
+              </Modal.Body>
+              <Modal.Footer className="bg-dark">
+                <Container fluid>
+                  <Row xs={2} className="w-100 justify-content-between m-0">
+                    <Col>
+                      <div className="d-grid h-100 w-100">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={handleContinueAnyways}
+                        >
+                          <Row className="h-100 w-100 m-0 justify-content-center">
+                            <Col xs={12}>
+                              <h4 className="p-0 m-0 text-wrap text-break text-center">
+                                Continue Anyways
+                              </h4>
+                            </Col>
+                            <Col xs={12}>
+                              <p className="p-0 m-0 fs-10 fw-lighter text-wrap text-break text-center">
+                                (are you seriously going to go through with
+                                this?)
+                              </p>
+                            </Col>
+                          </Row>
+                        </Button>
+                      </div>
+                    </Col>
+                    <Col>
+                      <div className="d-grid h-100 w-100">
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={handleClose}
+                        >
+                          <Row className="h-100 w-100 m-0 justify-content-between">
+                            <Col xs={12}>
+                              <h4 className="p-0 m-0 text-wrap text-break text-center">
+                                Import a different flow
+                              </h4>
+                            </Col>
+                            <Col xs={12}>
+                              <p className="p-0 m-0 fs-10 fw-lighter text-wrap text-break text-center">
+                                (coward's way out)
+                              </p>
+                            </Col>
+                          </Row>
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+                </Container>
+              </Modal.Footer>
+            </Modal>
           </Stack>
         )}
       </Container>

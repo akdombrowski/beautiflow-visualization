@@ -54,6 +54,21 @@ $my-font-sizes: (
 );
 
 // Import Bootstrap and its default variables
-@import "~bootstrap/scss/bootstrap.scss";
+@import "~bootstrap/scss/variables";
 
 $display-font-sizes: map-merge($display-font-sizes, $my-display-font-sizes);
+$font-sizes: map-merge($font-sizes, $my-font-sizes);
+
+@import "~bootstrap/scss/maps";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/root";
+
+@import "~bootstrap/scss/utilities";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/images";
+@import "~bootstrap/scss/containers";
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/helpers";
+
+@import "~bootstrap/scss/bootstrap";
