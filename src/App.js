@@ -74,7 +74,7 @@ function App() {
 
   const readFileForFlowJSON = () => {
     const reader = new FileReader();
-    reader.addEventListener("load", async (e) => {
+    reader.addEventListener("load", (e) => {
       try {
         const text = e.target.result;
         const fileJSON = convertStrToJSON(text);
