@@ -669,7 +669,11 @@ function App() {
                 <Form.Group controlId="formFileLg" className="">
                   <Form.Label className="pb-1">
                     <h6 className="display-5 text-info text-center">
-                      Import a JSON export of a DV flow to get started!
+                      Import a JSON export of a DV flow to make it{" "}
+                      <b>
+                        <i>beautiflow</i>
+                      </b>
+                      !
                     </h6>
                   </Form.Label>
                   <Form.Control
@@ -687,28 +691,42 @@ function App() {
                 <Row className="justify-content-center">
                   <Col xs={12}>
                     <p className="fs-5 p-0 text-light text-center font-monospace fw-lighter text-break">
-                      Okay, so beauty is in the eye of the beholder.
+                      Okay, so beauty is in the eye of the beholder...
                     </p>
                   </Col>
                 </Row>
                 <Row>
                   <Col xs={12}>
                     <p className="fs-6 p-0 text-light text-start font-monospace fw-lighter text-break">
-                      It <i>attempts</i> to space nodes out nicely (skipping
-                      annotations) in DaVinci flows. Then you can export from
-                      here and import it into DV and have a (mostly) nicely
-                      spaced flow.
+                      This will 🤞 <i>attempt</i> to space nodes out nicely
+                      (ignoring annotations) in DaVinci flows while trying to
+                      preserve the relative ordering of nodes. Then, you can
+                      export from here and import that into DV and have a nicely
+                      spaced flow. However, there are some caveats and there
+                      will be bugs.
                     </p>
                   </Col>
                 </Row>
                 <Row>
                   <Col xs={12}>
-                    <p className="fs-6 p-0 text-warning text-start font-monospace fw-lighter text-break">
-                      It's recommended to run this in between building your flow
-                      and adding annotations since this leaves annotations in
-                      their original positions. But, hey, go wild. Do whatever
-                      you want.
-                    </p>
+                    <ul>
+                      <li>
+                        <p className="fs-6 p-0 text-warning text-start font-monospace fw-lighter text-break">
+                          Only import flows that do <b>not</b> contain any
+                          subflows. i.e., don't include subflows when
+                          downloading a flow JSON from DV. Instead, download
+                          them separately and run each one through here.
+                        </p>
+                      </li>
+                      <li>
+                        <p className="fs-6 p-0 text-warning text-start font-monospace fw-lighter text-break">
+                          It's recommended to run this in between building your
+                          flow and adding annotations since this leaves
+                          annotations in their original positions. But, hey, go
+                          wild. Do whatever you want.
+                        </p>
+                      </li>
+                    </ul>
                   </Col>
                 </Row>
               </Col>
