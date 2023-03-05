@@ -551,7 +551,6 @@ function App() {
                 <Accordion
                   flush
                   className="h-100 px-0 m-0 text-light bs-headings-color-light"
-                  defaultActiveKey="0"
                   onSelect={(eKey) => toggleAccordion(eKey)}
                 >
                   <Accordion.Item
@@ -600,45 +599,134 @@ function App() {
       ) : (
         <Stack
           gap={5}
-          className="p-5 justify-content-center align-items-center align-content-center"
+          className="p-5 h-100 justify-content-start align-items-center align-content-center"
         >
-          {/* <Row className="pt-5 justify-content-center align-content-center"> */}
-          <div className="pb-5 px-5 m-5">
-            {/* <Col xs={8} className="py-5 m-5"> */}
+          <Row>
+            <Col>
+              <h1 className="display-1 text-light fw-bolder">
+                Beautfilow<i>-ify</i>
+              </h1>
+            </Col>
+          </Row>
+          <div className="">
             <Form>
               <Form.Group controlId="formFileLg" className="mb-3">
-                <Form.Label>
-                  <h1 className="display-1 text-light text-center">
-                    Import a DV flow JSON export file to get started!
-                  </h1>
+                <Form.Label className="pb-1">
+                  <h6 className="display-5 text-info text-center">
+                    Import a JSON export of a DV flow to get started!
+                  </h6>
                 </Form.Label>
                 <Form.Control
                   type="file"
                   size="lg"
+                  style={{ backgroundColor: "var(--bs-dark)" }}
                   onChange={(e) => loadFlowJSONFromFile(e)}
                 />
               </Form.Group>
             </Form>
-            {/* </Col> */}
           </div>
-          <div className="px-5">
-            {/* <Col xs={12}> */}
-            <p className="fs-3 text-light text-center font-monospace fw-lighter text-break">
-              Okay, so beauty is in the eye of the beholder.
-            </p>
-            <p className="fs-3 text-light text-center font-monospace fw-lighter text-break">
-              It spaces nodes out nicely (skipping annotations) in simple flows.
-            </p>
-            {/* </Col> */}
-          </div>
+
+          <Row className="justify-content-center p-5">
+            <Col xs={10} lg={6}>
+              <Row className="justify-content-center">
+                <Col xs={12}>
+                  <p className="fs-5 p-0 text-light text-center font-monospace fw-lighter text-break">
+                    Okay, so beauty is in the eye of the beholder.
+                  </p>
+                </Col>
+              </Row>
+              <Row>
+                <Col xs={12}>
+                  <p className="fs-6 p-0 text-light text-start font-monospace fw-lighter text-break">
+                    It <i>attempts</i> to space nodes out nicely (skipping
+                    annotations) in DaVinci flows. Then you can export from here
+                    and import it into DV and have a (mostly) nicely spaced
+                    flow.
+                  </p>
+                </Col>
+              </Row>
+              <Row>
+                <Col xs={12}>
+                  <p className="fs-6 p-0 text-warning text-start font-monospace fw-lighter text-break">
+                    It's recommended to run this in between building your flow
+                    and adding annotations since this leaves annotations in
+                    their original positions. But, hey, go wild. Do whatever you
+                    want.
+                  </p>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+
+          <Row className="justify-content-center p-0">
+            <Col xs={10} lg={6}>
+              <dl class="row p-0 m-0">
+                <dt class="col-3">
+                  <h5 className="font-monospace fw-bold m-0 text-info text-start text-break text-wrap">
+                    Beautiflowify
+                  </h5>
+                </dt>
+                <dd class="col-9">
+                  <p className="fs-6 m-0 text-info text-start font-monospace  text-wrap">
+                    Attempts to space nodes out nicely according to standardized
+                    spacing.
+                  </p>
+                </dd>
+
+                <dt class="col-3">
+                  <p className="fs-7 m-0 text-info text-start font-monospace  text-wrap">
+                    Export
+                  </p>
+                </dt>
+                <dd class="col-9 ">
+                  <p className="fs-8 m-0 text-info text-start font-monospace text-wrap">
+                    Exports an updated JSON file that you can upload to DaVinci.
+                  </p>
+                </dd>
+
+                <dt class="col-3">
+                  <p className="fs-7 m-0 text-info text-start font-monospace  text-wrap">
+                    Clear
+                  </p>
+                </dt>
+                <dd class="col-9 ">
+                  <p className="fs-8 m-0 text-info text-start font-monospace  text-wrap">
+                    Wipes out the nodes and Brings you back to this page.
+                  </p>
+                </dd>
+
+                <dt class="col-3">
+                  <p className="fs-7 m-0 text-info text-start font-monospace  text-wrap">
+                    Reset
+                  </p>
+                </dt>
+                <dd class="col-9">
+                  <p className="fs-8 m-0 text-info text-start font-monospace  text-wrap">
+                    Reset attempts to set nodes at their original positions.
+                    Warning: it does not stop animations.
+                  </p>
+                </dd>
+
+                <dt class="col-3">
+                  <p className="fs-8 m-0 text-info text-start font-monospace fw-lighter text-wrap">
+                    tips
+                  </p>
+                </dt>
+                <dd class="col-9">
+                  <p className="fs-7 m-0 text-info text-start font-monospace fw-lighter text-wrap">
+                    Use flows without included subflows (i.e., download subflows
+                    separately)
+                  </p>
+                </dd>
+              </dl>
+            </Col>
+          </Row>
+
           <div className="fixed-bottom">
-            {/* <Col xs={12}> */}
-            <p className="text-light text-center">
+            <p className="text-secondary text-end pe-3">
               <small>*work in progress</small>
             </p>
-            {/* </Col> */}
           </div>
-          {/* </Row> */}
         </Stack>
       )}
     </Container>

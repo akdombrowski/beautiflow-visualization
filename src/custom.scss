@@ -1,0 +1,59 @@
+// 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
+@import "~bootstrap/scss/functions";
+
+// Override default variables before the import
+$body-bg: #0d1821;
+$body-color: #c5decd;
+$primary: #0d1821;
+$secondary: #416788;
+$success: #2c6e49;
+$info: #bbb5bd;
+$warning: #f96e46;
+$danger: #dd0426;
+$light: #a0cbf3;
+$dark: #191919;
+
+// $input-btn-padding-x: 10rem;
+// $input-btn-padding-y: 100;
+// $input-padding-y: $input-btn-padding-y;
+// $input-padding-x: $input-btn-padding-x;
+$input-btn-padding-y-lg: 1rem;
+$input-btn-padding-x-lg: 5rem;
+$input-padding-y-lg: $input-btn-padding-y-lg;
+$input-padding-x-lg: $input-btn-padding-x-lg;
+$input-btn-font-size-lg: 1.5rem;
+$input-font-size-lg: $input-btn-font-size-lg;
+$input-height-border: 0rem;
+$form-text-color: $primary;
+$form-label-color: $primary;
+$form-file-button-color: $primary;
+$form-file-button-bg: $light;
+$form-file-button-hover-bg: $success;
+$font-size-base: 1rem;
+$h1-font-size: $font-size-base * 2.5;
+$h2-font-size: $font-size-base * 2;
+$h3-font-size: $font-size-base * 1.75;
+$h4-font-size: $font-size-base * 1.5;
+$h5-font-size: $font-size-base * 1.25;
+$h6-font-size: $font-size-base;
+
+$my-display-font-sizes: (
+  7: 2rem,
+  8: 1.5rem,
+  9: 1rem,
+  10: 0.5rem,
+  11: 0.25rem,
+  12: 0.1rem,
+);
+
+$my-font-sizes: (
+  7: $font-size-base * 0.75,
+  8: $font-size-base * 0.5,
+  9: $font-size-base * 0.25,
+  10: $font-size-base * 0.1,
+);
+
+// Import Bootstrap and its default variables
+@import "~bootstrap/scss/bootstrap.scss";
+
+$display-font-sizes: map-merge($display-font-sizes, $my-display-font-sizes);
