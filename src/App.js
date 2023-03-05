@@ -37,7 +37,7 @@ function App() {
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
   const [doesFlowCauseError, setDoesFlowCauseError] = useState(false);
-  const [flowErrorMessage, setFlowErrorMessage] = useState("");
+  const [importFlowError, setFlowErrorMessage] = useState("");
 
   const handleFileInputLabelClick = (e) => {
     e.preventDefault();
@@ -150,6 +150,14 @@ function App() {
 
   const clearErr = (e) => {
     e.preventDefault();
+
+    console.log("Copy both the message and cause below if reporting...");
+    console.log(JSON.stringify(importFlowError));
+    console.log("Error message:");
+    console.log(importFlowError);
+    console.log("Error cause:");
+    console.log(importFlowError.cause);
+
     setDoesFlowCauseError(false);
     setFlowErrorMessage("");
   };
@@ -224,10 +232,15 @@ function App() {
   };
 
   useEffect(() => {
-    if (flowErrorMessage) {
-      console.error(flowErrorMessage);
+    if (importFlowError) {
+      console.log("Copy both the message and cause below if reporting...");
+      console.log();
+      console.log("Error message:");
+      console.log(importFlowError);
+      console.log("Error cause:");
+      console.log(importFlowError.cause);
     }
-  }, [flowErrorMessage]);
+  }, [importFlowError]);
 
   useEffect(() => {
     if (!annosShifted && cyRef.current) {

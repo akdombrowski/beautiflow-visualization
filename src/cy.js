@@ -55,7 +55,7 @@ export const getGraphData = (flowJSON) => {
   try {
     return flowJSON.graphData;
   } catch (error) {
-    throw new Error("Could not extract graph data", { cause: error });
+    throw new Error("Could not extract the graph data", { cause: error });
   }
 };
 
@@ -68,7 +68,10 @@ export const getElements = (flowJSON) => {
   try {
     return getGraphData(flowJSON).elements;
   } catch (e) {
-    throw new Error("Could not extract elements.", { cause: e });
+    throw new Error(
+      "Could not extract elements. Something isn't right with fetching the graphData.",
+      { cause: e }
+    );
   }
 };
 
@@ -76,7 +79,7 @@ export const getNodes = (flowJSON) => {
   try {
     return getElements(flowJSON).nodes;
   } catch (e) {
-    throw new Error("Could not extract nodes.", { cause: e });
+    throw new Error("Could not extract the nodes.", { cause: e });
   }
 };
 
@@ -84,7 +87,7 @@ export const getEdges = (flowJSON) => {
   try {
     return getElements(flowJSON).edges;
   } catch (e) {
-    throw new Error("Could not extract edges.", { cause: e });
+    throw new Error("Could not extract the edges.", { cause: e });
   }
 };
 
@@ -93,7 +96,7 @@ export const getCopyOfElementsObj = (flowJSON) => {
     const elementsCopy = JSON.parse(JSON.stringify(getElements(flowJSON)));
     return elementsCopy;
   } catch (e) {
-    throw new Error("Could not get a copy of elements.", { cause: e });
+    throw new Error("Could not get a copy of the elements.", { cause: e });
   }
 };
 
@@ -101,7 +104,7 @@ export const getCopyOfNodesArr = (flowJSON) => {
   try {
     return getNodes(flowJSON).slice(0);
   } catch (e) {
-    throw new Error("Could not get nodes to make a copy.", { cause: e });
+    throw new Error("Could not get the nodes to make a copy.", { cause: e });
   }
 };
 
@@ -109,7 +112,7 @@ export const getCopyOfEdgesArr = (flowJSON) => {
   try {
     return getEdges(flowJSON).slice(0);
   } catch (e) {
-    throw new Error("Could not get edges to make a copy.", { cause: e });
+    throw new Error("Could not get the edges to make a copy.", { cause: e });
   }
 };
 
@@ -120,7 +123,7 @@ export const getCopyOfAnnotationsArr = (flowJSON) => {
       return n.data.nodeType === "ANNOTATION";
     });
   } catch (e) {
-    throw new Error("Could not extract annotations.", { cause: e });
+    throw new Error("Could not extract the annotations.", { cause: e });
   }
 };
 
@@ -131,7 +134,7 @@ export const getCopyOfNodesArrWOAnnotations = (flowJSON) => {
       return n.data.nodeType !== "ANNOTATION";
     });
   } catch (e) {
-    throw new Error("Could not get a copy of nodes without annotations.", {
+    throw new Error("Could not get a copy of the nodes without annotations.", {
       cause: e,
     });
   }
@@ -145,7 +148,7 @@ export const getCopyOfNodesArrWOAnnotationsFromNodes = (nodes) => {
     );
     return nodesCopyWOAnnotations;
   } catch (e) {
-    throw new Error("Could not get a copy of nodes without annotations.", {
+    throw new Error("Could not get a copy of the nodes without annotations.", {
       cause: e,
     });
   }
@@ -157,9 +160,12 @@ export const getCopyOfElementsObjWOAnnotations = (flowJSON) => {
     const edgesCopy = getCopyOfEdgesArr(flowJSON);
     return createElementsObjFromArrays(nodesWOAnnotationsCopy, edgesCopy);
   } catch (e) {
-    throw new Error("Could not get a copy of elements without annotations.", {
-      cause: e,
-    });
+    throw new Error(
+      "Could not get a copy of the elements without annotations.",
+      {
+        cause: e,
+      }
+    );
   }
 };
 
