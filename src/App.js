@@ -213,7 +213,7 @@ function App() {
   const reset = (e) => {
     e.preventDefault();
     const file = fileRef.current;
-    // Intermediate node elemnent to reset state
+    // Intermediate node element to reset state
     setElesForCyInit([
       {
         data: {
