@@ -55,9 +55,20 @@ function App() {
         const fileJSON = convertStrToJSON(text);
         let flowJSON = fileJSON;
 
+        // The file has multiple flows
         if (fileJSON.flows) {
-          flowsRef.current = fileJSON;
+          // in case we don't find which one is the parent flow, default to the
+          // first flow in the array.
+          flowsRef.current = fileJSON.flows[0];
           flowJSON = fileJSON.flows[0];
+
+          // iterate over the array of flows and find the parent flow
+          for (const flow of fileJSON.flows) {
+            if (flow.parentFlowId && flow.flowId === flow.parentFlowId) {
+              flowsRef.current = flow;
+              flowJSON = flow;
+            }
+          }
         }
 
         flowJSONRef.current = flowJSON;
@@ -88,9 +99,20 @@ function App() {
         const fileJSON = convertStrToJSON(text);
         let flowJSON = fileJSON;
 
+        // The file has multiple flows
         if (fileJSON.flows) {
-          flowsRef.current = fileJSON;
+          // in case we don't find which one is the parent flow, default to the
+          // first flow in the array.
+          flowsRef.current = fileJSON.flows[0];
           flowJSON = fileJSON.flows[0];
+
+          // iterate over the array of flows and find the parent flow
+          for (const flow of fileJSON.flows) {
+            if (flow.parentFlowId && flow.flowId === flow.parentFlowId) {
+              flowsRef.current = flow;
+              flowJSON = flow;
+            }
+          }
         }
 
         flowJSONRef.current = flowJSON;
