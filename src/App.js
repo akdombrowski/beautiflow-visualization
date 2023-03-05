@@ -40,7 +40,7 @@ function App() {
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
   const [doesFlowCauseError, setDoesFlowCauseError] = useState(false);
   const [importFlowError, setFlowErrorMessage] = useState("");
-  const [show, setShow] = useState("");
+  const [show, setShow] = useState(false);
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -837,7 +837,7 @@ function App() {
               </p>
             </div>
 
-            <Modal show={show} onHide={handleClose}>
+            <Modal className="bg-dark" show={show} onHide={handleClose}>
               <Modal.Header closeButton>
                 <Modal.Title className="text-warning">
                   The imported flow contains multiple flows
