@@ -55,7 +55,7 @@ export const getGraphData = (flowJSON) => {
   try {
     return flowJSON.graphData;
   } catch (error) {
-    throw new Error("Could not extract graph data", { cause: error });
+    throw new Error("Could not extract the graph data", { cause: error });
   }
 };
 
@@ -68,7 +68,10 @@ export const getElements = (flowJSON) => {
   try {
     return getGraphData(flowJSON).elements;
   } catch (e) {
-    throw new Error("Could not extract elements.", { cause: e });
+    throw new Error(
+      "Could not extract elements. Something isn't right with fetching the graphData.",
+      { cause: e }
+    );
   }
 };
 
@@ -76,7 +79,7 @@ export const getNodes = (flowJSON) => {
   try {
     return getElements(flowJSON).nodes;
   } catch (e) {
-    throw new Error("Could not extract nodes.", { cause: e });
+    throw new Error("Could not extract the nodes.", { cause: e });
   }
 };
 
@@ -84,7 +87,7 @@ export const getEdges = (flowJSON) => {
   try {
     return getElements(flowJSON).edges;
   } catch (e) {
-    throw new Error("Could not extract edges.", { cause: e });
+    throw new Error("Could not extract the edges.", { cause: e });
   }
 };
 
@@ -93,7 +96,7 @@ export const getCopyOfElementsObj = (flowJSON) => {
     const elementsCopy = JSON.parse(JSON.stringify(getElements(flowJSON)));
     return elementsCopy;
   } catch (e) {
-    throw new Error("Could not get a copy of elements.", { cause: e });
+    throw new Error("Could not get a copy of the elements.", { cause: e });
   }
 };
 
@@ -101,7 +104,7 @@ export const getCopyOfNodesArr = (flowJSON) => {
   try {
     return getNodes(flowJSON).slice(0);
   } catch (e) {
-    throw new Error("Could not get nodes to make a copy.", { cause: e });
+    throw new Error("Could not get the nodes to make a copy.", { cause: e });
   }
 };
 
@@ -109,7 +112,7 @@ export const getCopyOfEdgesArr = (flowJSON) => {
   try {
     return getEdges(flowJSON).slice(0);
   } catch (e) {
-    throw new Error("Could not get edges to make a copy.", { cause: e });
+    throw new Error("Could not get the edges to make a copy.", { cause: e });
   }
 };
 
@@ -120,7 +123,7 @@ export const getCopyOfAnnotationsArr = (flowJSON) => {
       return n.data.nodeType === "ANNOTATION";
     });
   } catch (e) {
-    throw new Error("Could not extract annotations.", { cause: e });
+    throw new Error("Could not extract the annotations.", { cause: e });
   }
 };
 
@@ -131,7 +134,7 @@ export const getCopyOfNodesArrWOAnnotations = (flowJSON) => {
       return n.data.nodeType !== "ANNOTATION";
     });
   } catch (e) {
-    throw new Error("Could not get a copy of nodes without annotations.", {
+    throw new Error("Could not get a copy of the nodes without annotations.", {
       cause: e,
     });
   }
@@ -145,7 +148,7 @@ export const getCopyOfNodesArrWOAnnotationsFromNodes = (nodes) => {
     );
     return nodesCopyWOAnnotations;
   } catch (e) {
-    throw new Error("Could not get a copy of nodes without annotations.", {
+    throw new Error("Could not get a copy of the nodes without annotations.", {
       cause: e,
     });
   }
@@ -157,9 +160,12 @@ export const getCopyOfElementsObjWOAnnotations = (flowJSON) => {
     const edgesCopy = getCopyOfEdgesArr(flowJSON);
     return createElementsObjFromArrays(nodesWOAnnotationsCopy, edgesCopy);
   } catch (e) {
-    throw new Error("Could not get a copy of elements without annotations.", {
-      cause: e,
-    });
+    throw new Error(
+      "Could not get a copy of the elements without annotations.",
+      {
+        cause: e,
+      }
+    );
   }
 };
 
@@ -455,7 +461,9 @@ export const shiftAnnosPosFromNodes = (nodes) => {
 
   annies.forEach((ele, i, eles) => {
     const posX = ele.position("x");
-    const width = ele.data("properties").width.value;
+    const width = ele.data("properties").width
+      ? ele.data("properties").width.value
+      : 300;
     const newPosX = posX + width / 2;
     ele.position("x", newPosX);
   });
@@ -790,77 +798,44 @@ export const emitAndWaitForAni = async (msg, id, cy, ani, aniProm) => {
   return animated;
 };
 
-export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
+export const playNodeAnimationsOneByOne = async (
+  cy,
+  animations,
+  dur,
+  spacing
+) => {
   // Emits an event that we can watch for in the main app UI to update the text
   // of the animation description box
   emitStyleEventForExplainerText(cy, "Beautiflowifying", "", true, false);
 
   for (const ani of animations) {
     const {
-      preID,
-      preAniProm,
-      preAni,
-      currID,
-      currAni,
-      currAniProm,
+      currIDDone,
+      prevIDDone,
+      nodesInCurrRowSection,
       rootID,
+      rootColorAni,
+      rootColorAniProm,
       rootAni,
       rootAniProm,
       newRootPos,
+      vColorAni,
+      vColorAniProm,
       vMovePos,
       vMoveAni,
       vMoveAniProm,
+      currID,
     } = ani;
     let msg;
 
-    // Need to figure out how to calculate for rows with multiple levels
-    if (rootID) {
-      let viewportAni;
-      cy.fit(newRootPos, 50);
-
-      const viewportAniProm = new Promise((resolve, reject) => {
-        viewportAni = cy.animation({
-          zoom: {
-            level: 0.3,
-            position: newRootPos,
-          },
-          duration: dur / 2,
-          complete: () =>
-            resolve("Adjusted viewport (panBy) to animating elements"),
-        });
-      });
-      viewportAni.play();
-      await viewportAniProm;
-    }
-
-    if (preAniProm && preAni) {
-      msg = "animating " + preID;
+    if (rootColorAni) {
+      msg = "coloring root " + rootID;
       const resolvedMsg = await emitAndWaitForAni(
         msg,
-        preID,
+        rootID,
         cy,
-        preAni,
-        preAniProm
-      );
-    }
-
-    msg = "animating " + currID;
-    const currAniResolvedMsg = await emitAndWaitForAni(
-      msg,
-      currID,
-      cy,
-      currAni,
-      currAniProm
-    );
-
-    if (vMovePos) {
-      msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
-      const resolvedMsg = await emitAndWaitForAni(
-        msg,
-        currID,
-        cy,
-        vMoveAni,
-        vMoveAniProm
+        rootColorAni,
+        rootColorAniProm
       );
     }
 
@@ -875,17 +850,56 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
       );
     }
 
+    if (vColorAni) {
+      msg = "coloring current node" + currID;
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        currID,
+        cy,
+        vColorAni,
+        vColorAniProm
+      );
+    }
+
+    if (vMovePos) {
+      msg = "animating " + ani.currID + " to " + JSON.stringify(vMovePos);
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        currID,
+        cy,
+        vMoveAni,
+        vMoveAniProm
+      );
+    }
+
     // Change prev node to green as its processing is complete
-    if (preID) {
-      msg = "prev node " + preID + " processing is complete animation";
+    if (prevIDDone) {
+      msg = "curr node " + prevIDDone + " processing is complete animation";
       const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
-        cy.$("#" + preID),
+        cy.$("#" + prevIDDone),
         dur,
         "green"
       );
       const resolvedMsg = await emitAndWaitForAni(
         msg,
-        preID,
+        prevIDDone,
+        cy,
+        doneWithPrevNodeAni,
+        prom
+      );
+    }
+
+    // Change prev node to green as its processing is complete
+    if (currIDDone) {
+      msg = "curr node " + currIDDone + " processing is complete animation";
+      const { ani: doneWithPrevNodeAni, prom } = getAnimationPromiseForEle(
+        cy.$("#" + currIDDone),
+        dur,
+        "green"
+      );
+      const resolvedMsg = await emitAndWaitForAni(
+        msg,
+        currIDDone,
         cy,
         doneWithPrevNodeAni,
         prom
@@ -900,7 +914,7 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
         .outgoers()
         .size()
     ) {
-      msg = "prev node " + preID + " processing is finished animation";
+      msg = "prev node " + currID + " processing is finished animation";
       const { ani: doneWithCurrLeafNodeAni, prom } = getAnimationPromiseForEle(
         cy.$("#" + currID),
         dur,
@@ -908,7 +922,7 @@ export const playNodeAnimationsOneByOne = async (cy, animations, dur) => {
       );
       const resolvedMsg = await emitAndWaitForAni(
         msg,
-        preID,
+        currID,
         cy,
         doneWithCurrLeafNodeAni,
         prom
@@ -973,7 +987,7 @@ export const beautiflowify = async (
 
   const roots = normalizedNodesWOAnnotations.roots();
   const rootsSorted = sortRoots(roots, verticalTolerance);
-  cy.fit(getRowOfNodesFromRoot(rootsSorted.first()), 150);
+  // cy.fit(getRowOfNodesFromRoot(rootsSorted.first()), 150);
 
   // Just in case, lock annotations' pos
   lockAnnotationPositions(cy);
@@ -995,6 +1009,8 @@ export const beautiflowify = async (
   const rowSpacingY = 300;
   // the y pos value of the visually lowest node (highest y pos value)
   const highestYPosValueInSection = [];
+  // fit whole graph (minus annotations before beginning)
+  cy.fit(cy.nodes().filter("[nodeType != 'ANNOTATION']"));
   // iterate over the roots
   for (let row = 0; row < rootsSorted.length; row++) {
     // a root element (there could be multiple roots for a single row-section)
@@ -1030,57 +1046,27 @@ export const beautiflowify = async (
      * runs @see {@link Cytoscape#breadthFirstSearch} on nodes in the same
      * section as the current iterated root node
      */
+
     nodesInCurrRow.breadthFirstSearch({
       root: ele,
       visit: async (v, edge, prev, j, depth) => {
         // holder for current visited node's animations and related info
         const currStepAnimations = {};
-        // current visited node's position
-        const vPos = v.position();
         // current visited node's id
         const vID = v.id();
+        // current visited node's position
+        const vPos = v.position();
+        // updated pos holder for the current visited node
+        const pos = {};
         // variables for prev node's (source node's) animation and the promise
         // containing that animation
         let prevNodeAniProm;
         let prevNodeAni;
-        // variables for current visited node's animation and the promise
-        // containing that animation
-        let currNodeAniProm;
-        let currNodeAni;
-        // updated pos holder for the current visited node
-        const pos = {};
 
         // Skip if we've already visited this node
         if (!visitedNodes.anySame(v)) {
+          currStepAnimations.currID = vID;
           const vSuccessors = v.successors();
-
-          /**
-           * Current node color animation - yellow
-           */
-          currNodeAniProm = new Promise((resolve, reject) => {
-            currNodeAni = v.animation(
-              {
-                style: { backgroundColor: "yellow" },
-              },
-              {
-                duration: dur,
-                complete: () => resolve("animated " + vID),
-              }
-            );
-          });
-
-          // Check if animations are played at the end (watch mode) or played
-          // immediately after calculation
-          if (watchAnimation) {
-            currStepAnimations.currID = vID;
-            currStepAnimations.currAni = currNodeAni;
-            currStepAnimations.currAniProm = currNodeAniProm;
-          } else {
-            currNodeAni.play();
-          }
-          /**
-           *
-           */
 
           /**
            * Decide new position based on whether if it's a root node or not
@@ -1095,6 +1081,7 @@ export const beautiflowify = async (
            */
           if (rootsSorted.getElementById(vID).length > 0) {
             // At a root node
+            currStepAnimations.nodesInCurrRowSection = nodesInCurrRow;
 
             /**
              * Check if this root's path leads into already visited nodes
@@ -1129,8 +1116,8 @@ export const beautiflowify = async (
               //
               // G's successors will be:
               // H, I, J, C, D, E, F
-              const maxOfRow = visitedNodes.max((ele, i, eles) =>
-                ele.position("y")
+              const maxOfRow = visitedNodes.max(
+                (ele, i, eles) => updatedPos[ele.id()].y
               );
 
               // the visually lowest node's y pos value, or the highest y pos
@@ -1207,12 +1194,26 @@ export const beautiflowify = async (
              * new position
              *
              */
+            let rootColorAni;
+            const rootColorAniProm = new Promise((resolve, reject) => {
+              rootColorAni = v.animation(
+                {
+                  style: { backgroundColor: "brown" },
+                },
+                {
+                  duration: dur / 2,
+                  complete: () => {
+                    resolve("animating root " + vID);
+                  },
+                }
+              );
+            });
+
             let rootAni;
             const rootAniProm = new Promise((resolve, reject) => {
               rootAni = v.animation(
                 {
                   position: pos,
-                  style: { backgroundColor: "white" },
                 },
                 {
                   duration: dur,
@@ -1227,11 +1228,16 @@ export const beautiflowify = async (
 
             if (watchAnimation) {
               currStepAnimations.rootID = vID;
+              currStepAnimations.currID = vID;
+              currStepAnimations.currIDDone = vID;
+              currStepAnimations.rootColorAni = rootColorAni;
+              currStepAnimations.rootColorAniProm = rootColorAniProm;
               currStepAnimations.rootAniProm = rootAniProm;
               currStepAnimations.rootAni = rootAni;
               currStepAnimations.newRootPos = pos;
               animations.push(currStepAnimations);
             } else {
+              v.delayAnimation(row * 10 + dur + 15);
               rootAni.play();
             }
             /**
@@ -1253,29 +1259,19 @@ export const beautiflowify = async (
             // New x pos variable
             const posX = spacing + prevNewPosX;
 
-            /**
-             *
-             * Animate previous node's (source node) color
-             *
-             */
-            prevNodeAniProm = new Promise((resolve, reject) => {
-              prevNodeAni = prev.animation(
-                {
-                  style: { backgroundColor: "blue" },
-                },
-                {
-                  duration: dur,
-                  complete: () => resolve("animated " + prevID),
-                }
-              );
-            });
-
             if (watchAnimation) {
-              currStepAnimations.preID = prev?.id();
-              currStepAnimations.preAniProm = prevNodeAniProm;
-              currStepAnimations.preAni = prevNodeAni;
-            } else {
-              prevNodeAni.play();
+              const prevOutgoersUnvisited =
+                prevOutgoerNodes.difference(visitedNodes);
+              const isPrevProcessingComplete = prevOutgoersUnvisited.size() > 1;
+              const vOutgoers = v.outgoers("node");
+              const vOutgoersUnvisitied = vOutgoers.difference(visitedNodes);
+              const isVProcessingComplete = vOutgoersUnvisitied.size() > 1;
+              currStepAnimations.prevIDDone = isPrevProcessingComplete
+                ? null
+                : prevID;
+              currStepAnimations.currIDDone = isVProcessingComplete
+                ? null
+                : vID;
             }
             /**
              *
@@ -1341,19 +1337,18 @@ export const beautiflowify = async (
             //
             if (prevOutgoerNodes.size() > 1) {
               // sort from highest to lowest visually or, in other words, from smallest y pos value to largest y pos value
-              const prevOutgoerNodesSorted = prevOutgoerNodes.sort(
-                (ele1, ele2) => {
-                  const ele1PosY = updatedPos[ele1.id()]
-                    ? updatedPos[ele1.id()].y
-                    : ele1.position("y");
-                  const ele2PosY = updatedPos[ele2.id()]
-                    ? updatedPos[ele2.id()].y
-                    : ele2.position("y");
-                  return ele1PosY - ele2PosY;
-                }
-              );
-              const prevOutgoerNodesSortedArr =
-                prevOutgoerNodesSorted.toArray();
+              const allOutgoersSorted = prevOutgoerNodes.sort((ele1, ele2) => {
+                // const ele1PosY = updatedPos[ele1.id()]
+                //   ? updatedPos[ele1.id()].y
+                //   : ele1.position("y");
+                // const ele2PosY = updatedPos[ele2.id()]
+                //   ? updatedPos[ele2.id()].y
+                //   : ele2.position("y");
+                const ele1PosY = ele1.position("y");
+                const ele2PosY = ele2.position("y");
+                return ele1PosY - ele2PosY;
+              });
+              const allOutgoersSortedArr = allOutgoersSorted.toArray();
 
               // of the previous node's outgoers
               // find which nodes have already been visited,
@@ -1388,46 +1383,56 @@ export const beautiflowify = async (
               //
               //
               const visitedNodesClone = visitedNodes.clone();
-              const prevUpdatedPosY = updatedPos[prevID].y;
+              const i = allOutgoersSortedArr.indexOf(v);
+              const prevOutgoerNodesAboveV = allOutgoersSorted.slice(0, i);
 
-              const i = prevOutgoerNodesSortedArr.indexOf(v);
-              const prevOutgoerNodesUpToV = prevOutgoerNodesSorted.slice(0, i);
-              if (prevOutgoerNodesUpToV.size() > 0) {
-                let startY = prevUpdatedPosY;
-                const visitedPrevOutgoerNodesUpToV =
-                  prevOutgoerNodesUpToV.intersection(visitedNodes);
-
-                const unvisitedPrevOutgoersAboveV =
-                  prevOutgoerNodesUpToV.difference(visitedNodes);
+              if (prevOutgoerNodesAboveV.size() > 0) {
+                let startY = prevNewPosY;
+                const visited =
+                  prevOutgoerNodesAboveV.intersection(visitedNodes);
+                const unvisited = prevOutgoerNodesAboveV.difference(visited);
+                const numVisited = visited.size();
+                const numUnvisited = unvisited.size();
                 // need to sort by y again or is the order preserved?
-                const numOfUnvisitedPrevOutgoersAboveV =
-                  unvisitedPrevOutgoersAboveV.size();
-                if (visitedPrevOutgoerNodesUpToV.size() > 0) {
-                  const visPrevOutgoersAboveVMaxY =
-                    visitedPrevOutgoerNodesUpToV.max((ele, i, eles) => {
-                      return updatedPos[ele.id()]
-                        ? updatedPos[ele.id()].y
-                        : ele.position("y");
-                    });
-                  const visPrevOutgoersAboveVMaxYVal =
-                    visPrevOutgoersAboveVMaxY.value;
+                if (numVisited > 0) {
+                  const visitedMaxY = visited.max((ele, i, eles) => {
+                    return updatedPos[ele.id()]
+                      ? updatedPos[ele.id()].y
+                      : ele.position("y");
+                  });
+                  const visitedMaxYVal = visitedMaxY.value;
+                  const lowestVisitedNode = visitedMaxY.ele;
                   // calc starting from the visually lowest already visited node if
                   // it's visually lower than prev node's y pos
                   // if not, start with prev node's y pos value
-                  startY =
-                    visPrevOutgoersAboveVMaxYVal <
-                    prevUpdatedPosY - sameRowDiffHeightSpacingY
-                      ? prevUpdatedPosY - sameRowDiffHeightSpacingY
-                      : visPrevOutgoersAboveVMaxYVal;
+                  const areAnyVisitedNodesInTheWay =
+                    visitedMaxYVal > prevNewPosY - sameRowDiffHeightSpacingY;
+
+                  startY = areAnyVisitedNodesInTheWay
+                    ? visitedMaxYVal + sameRowDiffHeightSpacingY
+                    : prevNewPosY;
+                  // need to add spacing if, in their og positions, there
+                  // are unvisited nodes in between the current node and the
+                  // visually lowest visited node
+                  const unvisitedBetween = unvisited.filter((ele, i, eles) => {
+                    return ele.position("y") > lowestVisitedNode.position("y");
+                  });
+                  const numUnvisitedNodesInTheWayBelowMaxVisitedNode =
+                    unvisitedBetween.size();
+                  const spacingBetweenVisitedAndV =
+                    numUnvisitedNodesInTheWayBelowMaxVisitedNode *
+                    sameRowDiffHeightSpacingY;
+                  pos.y = startY + spacingBetweenVisitedAndV;
+                } else {
+                  const spacingBetweenNodes =
+                    numUnvisited * sameRowDiffHeightSpacingY;
+                  pos.y = startY + spacingBetweenNodes;
                 }
 
-                if (numOfUnvisitedPrevOutgoersAboveV > 0) {
-                  pos.y =
-                    startY +  numOfUnvisitedPrevOutgoersAboveV *
-                    sameRowDiffHeightSpacingY;
-                } else {
-                  pos.y = startY + sameRowDiffHeightSpacingY;
-                }
+                // if (numUnvisited > 0) {
+                // } else {
+                //   pos.y = startY;
+                // }
 
                 // formula to find y pos value:
                 // either the previous node's y pos value or the greatest y pos
@@ -1440,10 +1445,10 @@ export const beautiflowify = async (
                 // multiplied by
                 // the same row-section row-height-spacing]
               } else {
-                pos.y = prevPosY;
+                pos.y = prevNewPosY;
               }
             } else {
-              pos.y = updatedPos[prevID].y;
+              pos.y = prevNewPosY;
             }
             /**
              *
@@ -1459,6 +1464,24 @@ export const beautiflowify = async (
             updatedPos[vID] = pos;
 
             /**
+             * Color animation
+             */
+            let vColorAni;
+            const vColorAniProm = new Promise((resolve, reject) => {
+              vColorAni = v.animation(
+                {
+                  style: { backgroundColor: "purple" },
+                },
+                {
+                  duration: dur / 2,
+                  complete: () => {
+                    resolve("animating " + vID + "'s color to purple");
+                  },
+                }
+              );
+            });
+
+            /**
              * Move animation
              */
             let vMoveAni;
@@ -1466,7 +1489,6 @@ export const beautiflowify = async (
               vMoveAni = v.animation(
                 {
                   position: pos,
-                  style: { backgroundColor: "purple" },
                 },
                 {
                   duration: dur,
@@ -1484,12 +1506,17 @@ export const beautiflowify = async (
 
             if (watchAnimation) {
               // Add v's movement animation to current animations object
+              currStepAnimations.vColorAniProm = vColorAniProm;
+              currStepAnimations.vColorAni = vColorAni;
               currStepAnimations.vMovePos = pos;
               currStepAnimations.vMoveAniProm = vMoveAniProm;
               currStepAnimations.vMoveAni = vMoveAni;
               // Curr animations object to collective animations holder
               animations.push(currStepAnimations);
             } else {
+              v.delayAnimation(row * 10 + dur + 25);
+              vColorAni.play();
+              v.delayAnimation(row * 10 + dur + 30);
               vMoveAni.play();
             }
             /**
@@ -1530,7 +1557,7 @@ export const beautiflowify = async (
      *
      */
     if (watchAnimation) {
-      await playNodeAnimationsOneByOne(cy, animations, dur);
+      await playNodeAnimationsOneByOne(cy, animations, dur, spacing);
     }
 
     // Emit event to update animation description to complete

@@ -9,7 +9,7 @@ function CustomToggle({ children, eventKey, setAccordionCollapsedState }) {
   });
 
   return (
-    <div className="d-grid h-100 w-100">
+    <div className="d-grid h-100 w-100 px-0 m-0">
       <Button variant="secondary" style={{}} onClick={decoratedOnClick}>
         {children}
       </Button>
