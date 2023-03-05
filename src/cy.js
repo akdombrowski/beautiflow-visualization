@@ -455,7 +455,9 @@ export const shiftAnnosPosFromNodes = (nodes) => {
 
   annies.forEach((ele, i, eles) => {
     const posX = ele.position("x");
-    const width = ele.data("properties").width.value;
+    const width = ele.data("properties").width
+      ? ele.data("properties").width.value
+      : 300;
     const newPosX = posX + width / 2;
     ele.position("x", newPosX);
   });
