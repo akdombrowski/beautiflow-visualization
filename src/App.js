@@ -150,13 +150,6 @@ function App() {
 
   const clearErr = (e) => {
     e.preventDefault();
-
-    console.log("doesFlowCauseError");
-    console.log(doesFlowCauseError);
-    console.log("flowErrorMessage");
-    console.log(flowErrorMessage);
-    console.error(flowErrorMessage);
-
     setDoesFlowCauseError(false);
     setFlowErrorMessage("");
   };
