@@ -27,6 +27,7 @@ function App() {
   const minAnimationDuration = 0.01;
   const cyRef = useRef(null);
   const fileRef = useRef(null);
+  const flowsRef = useRef(null);
   const flowJSONRef = useRef(null);
   const cloneElesRef = useRef(null);
   const [elesForCyInit, setElesForCyInit] = useState(null);
@@ -53,11 +54,12 @@ function App() {
         const text = e.target.result;
         const fileJSON = convertStrToJSON(text);
         let flowJSON = fileJSON;
+
         if (fileJSON.flows) {
+          flowsRef.current = fileJSON;
           flowJSON = fileJSON.flows[0];
-        } else {
-          flowJSONRef.current = fileJSON;
         }
+
         flowJSONRef.current = flowJSON;
 
         const normEles = CytoscapeComponent.normalizeElements(
@@ -85,11 +87,12 @@ function App() {
         const text = e.target.result;
         const fileJSON = convertStrToJSON(text);
         let flowJSON = fileJSON;
+
         if (fileJSON.flows) {
+          flowsRef.current = fileJSON;
           flowJSON = fileJSON.flows[0];
-        } else {
-          flowJSONRef.current = fileJSON;
         }
+
         flowJSONRef.current = flowJSON;
 
         const normEles = CytoscapeComponent.normalizeElements(
