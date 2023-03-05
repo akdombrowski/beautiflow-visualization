@@ -57,3 +57,4 @@ $my-font-sizes: (
 @import "~bootstrap/scss/bootstrap.scss";
 
 $display-font-sizes: map-merge($display-font-sizes, $my-display-font-sizes);
+$font-sizes: map-merge($font-sizes, $my-font-sizes);

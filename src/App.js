@@ -576,7 +576,7 @@ function App() {
                         </Form.Floating>
                       </Col>
                       <Col xs={12} className="p-0  m-0 ">
-                        <div className="d-grid w-100 p-0  m-0 ">
+                        <div className="d-grid w-100 p-0 m-0">
                           <Button
                             variant="outline-light"
                             size="sm"
@@ -816,7 +816,7 @@ function App() {
                     </p>
                   </dd>
 
-                  <dt className="col-3">
+                  {/* <dt className="col-3">
                     <p className="fs-8 m-0 text-info text-start font-monospace fw-lighter text-wrap">
                       tips
                     </p>
@@ -826,7 +826,7 @@ function App() {
                       Use flows without included subflows (i.e., download
                       subflows separately)
                     </p>
-                  </dd>
+                  </dd> */}
                 </dl>
               </Col>
             </Row>
@@ -837,23 +837,55 @@ function App() {
               </p>
             </div>
 
-            <Modal className="bg-dark" show={show} onHide={handleClose}>
-              <Modal.Header closeButton>
+            <Modal className="" show={show} onHide={handleClose}>
+              <Modal.Header closeButton className="bg-dark">
                 <Modal.Title className="text-warning">
-                  The imported flow contains multiple flows
+                  Ahh! The file contains multiple flows!
                 </Modal.Title>
               </Modal.Header>
-              <Modal.Body className="text-light">
-                The imported flow contains multiple flows. Using this file is
+              <Modal.Body className="text-light bg-dark">
+                The uploaded file contains multiple flows. Using this file is
                 not recommended. What's going to happen if you do, you ask?
+                Stuff. Serious stuff. Ok? Okay?!?!? Ok. It'll really just try to
+                find the parent flow and use that. If it can't figure out which
+                one is the parent (weird situation), then it'll default to the
+                first flow in the file. <br />
+                Try downloading the flows separately (without including
+                subflows) and work with each of them in turn.
               </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleContinueAnyways}>
-                  Continue anyways
-                </Button>
-                <Button variant="primary" onClick={handleClose}>
-                  Import a different flow
-                </Button>
+              <Modal.Footer className="bg-dark">
+                <Row xs={2} className="w-100 justify-content-center">
+                  <Col>
+                    <div className="d-grid h-100 w-100">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={handleContinueAnyways}
+                      >
+                        <p className="p-0 m-0 text-wrap text-break">
+                          Continue Anyways <br />
+                        </p>
+                        <p className="p-0 m-0 fw-lighter text-wrap text-break">
+                          (are you seriously going through
+                          <br />
+                          with this?)
+                        </p>
+                      </Button>
+                    </div>
+                  </Col>
+                  <Col>
+                    <div className="d-grid h-100 w-100">
+                      <Button variant="primary" onClick={handleClose}>
+                        <p className="p-0 m-0 text-wrap text-break">
+                          Import a different flow
+                        </p>
+                        <p className="p-0 m-0 fs-10 fw-lighter text-wrap text-break">
+                          (coward's way out)
+                        </p>
+                      </Button>
+                    </div>
+                  </Col>
+                </Row>
               </Modal.Footer>
             </Modal>
           </Stack>
