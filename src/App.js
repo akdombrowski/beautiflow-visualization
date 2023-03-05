@@ -277,7 +277,7 @@ function App() {
   }, [importFlowError]);
 
   useEffect(() => {
-    if (!annosShifted && cyRef.current) {
+    if (!annosShifted && !show && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
       cloneElesRef.current = createClonedNodes(cyRef.current);
     } else if (!flowJSONRef.current && cyRef.current) {
@@ -287,7 +287,7 @@ function App() {
       setOGElesClone(null);
       setAnnosShifted(false);
     }
-  }, [elesForCyInit]);
+  }, [elesForCyInit, show]);
 
   if (cyRef.current) {
     cyRef.current.on("style", (e, ani, aniDes, start, end) => {
@@ -324,11 +324,11 @@ function App() {
         className="bg-dark justify-content-center"
         style={{
           height: "100vh",
-          maxWidth: "100vw",
+          width: "100vw",
           overflow: "hidden auto",
         }}
       >
-        {elesForCyInit ? (
+        {elesForCyInit && !show ? (
           <Row className="h-100 p-0  m-0 ">
             <Col className="h-100 p-1 m-0" xs={9} lg={10} id="cyContainerCol">
               <CytoscapeComponent
