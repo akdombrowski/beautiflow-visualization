@@ -879,7 +879,10 @@ function App() {
                         <p className="p-0 m-0 text-wrap text-break">
                           Import a different flow
                         </p>
-                        <p className="p-0 m-0 fs-10 fw-lighter text-wrap text-break">
+                        <p
+                          className="p-0 m-0 fs-10 fw-lighter text-wrap text-break"
+                          style={{ fontSize: "var(--bs-font-size-10)" }}
+                        >
                           (coward's way out)
                         </p>
                       </Button>
