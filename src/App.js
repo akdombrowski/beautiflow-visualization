@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
 import { useState, useEffect, useRef } from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import {
@@ -39,15 +40,39 @@ function App() {
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
   const [doesFlowCauseError, setDoesFlowCauseError] = useState(false);
   const [importFlowError, setFlowErrorMessage] = useState("");
+  const [show, setShow] = useState("");
+
+  const handleClose = (e) => {
+    e.preventDefault();
+    clear(e);
+    setShow(false);
+  };
+
+  const handleContinueAnyways = (e) => {
+    e.preventDefault();
+    setShow(false);
+  };
+
+  const handleShow = (e) => {
+    e.preventDefault();
+    setShow(true);
+  };
 
   const handleFileInputLabelClick = (e) => {
     e.preventDefault();
     document.querySelector("#fileInput").click();
   };
 
-  const loadFlowJSONFromFile = async (e) => {
-    e.preventDefault();
+  const initializeElements = (flowJSON) => {
+    const normEles = CytoscapeComponent.normalizeElements(
+      getCopyOfElementsObj(flowJSON)
+    );
 
+    setElesForCyInit(normEles);
+    setAnnosShifted(false);
+  };
+
+  const readFileForFlowJSON = () => {
     const reader = new FileReader();
     reader.addEventListener("load", async (e) => {
       try {
@@ -57,6 +82,9 @@ function App() {
 
         // The file has multiple flows
         if (fileJSON.flows) {
+          // pop open warning modal
+          handleShow(e);
+
           // in case we don't find which one is the parent flow, default to the
           // first flow in the array.
           flowsRef.current = fileJSON.flows[0];
@@ -73,17 +101,20 @@ function App() {
 
         flowJSONRef.current = flowJSON;
 
-        const normEles = CytoscapeComponent.normalizeElements(
-          getCopyOfElementsObj(flowJSON)
-        );
-
-        setElesForCyInit(normEles);
-        setAnnosShifted(false);
+        initializeElements(flowJSON);
       } catch (err) {
         setDoesFlowCauseError(true);
         setFlowErrorMessage(err);
       }
     });
+
+    return reader;
+  };
+
+  const loadFlowJSONFromFile = async (e) => {
+    e.preventDefault();
+
+    const reader = readFileForFlowJSON();
 
     if (e.target.files[0]) {
       fileRef.current = e.target.files[0];
@@ -91,43 +122,8 @@ function App() {
     }
   };
 
-  const reloadFlowJSONFromFile = async (file) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", async (e) => {
-      try {
-        const text = e.target.result;
-        const fileJSON = convertStrToJSON(text);
-        let flowJSON = fileJSON;
-
-        // The file has multiple flows
-        if (fileJSON.flows) {
-          // in case we don't find which one is the parent flow, default to the
-          // first flow in the array.
-          flowsRef.current = fileJSON.flows[0];
-          flowJSON = fileJSON.flows[0];
-
-          // iterate over the array of flows and find the parent flow
-          for (const flow of fileJSON.flows) {
-            if (flow.parentFlowId && flow.flowId === flow.parentFlowId) {
-              flowsRef.current = flow;
-              flowJSON = flow;
-            }
-          }
-        }
-
-        flowJSONRef.current = flowJSON;
-
-        const normEles = CytoscapeComponent.normalizeElements(
-          getCopyOfElementsObj(flowJSON)
-        );
-
-        setElesForCyInit(normEles);
-        setAnnosShifted(false);
-      } catch (err) {
-        setDoesFlowCauseError(true);
-        setFlowErrorMessage(err);
-      }
-    });
+  const reloadFlowJSONFromFile = (file) => {
+    const reader = readFileForFlowJSON();
 
     if (file) {
       reader.readAsText(file);
@@ -840,6 +836,26 @@ function App() {
                 <small>*work in progress</small>
               </p>
             </div>
+
+            <Modal show={show} onHide={handleClose}>
+              <Modal.Header closeButton>
+                <Modal.Title className="text-warning">
+                  The imported flow contains multiple flows
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body className="text-light">
+                The imported flow contains multiple flows. Using this file is
+                not recommended. What's going to happen if you do, you ask?
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleContinueAnyways}>
+                  Continue anyways
+                </Button>
+                <Button variant="primary" onClick={handleClose}>
+                  Import a different flow
+                </Button>
+              </Modal.Footer>
+            </Modal>
           </Stack>
         )}
       </Container>
