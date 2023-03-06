@@ -691,7 +691,7 @@ function App() {
               <Row id="beautiflowifyTitle" className="justify-content-center">
                 <Col xs="auto">
                   <h1 className="display-1 text-light fw-bolder">
-                    Beautfilow<i>-ify</i>
+                    Beautiflow<i>-ify</i>
                   </h1>
                 </Col>
               </Row>
