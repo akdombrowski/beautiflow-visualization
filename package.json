@@ -1,6 +1,6 @@
 {
   "name": "beautiflow-visualization",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://akdombrowski.github.io/beautiflow-visualization",
   "private": true,
   "dependencies": {
@@ -13,8 +13,8 @@
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
-    "sass": "^1.58.3",
-    "web-vitals": "^3.1.1"
+    "sass": "^1.59.0",
+    "web-vitals": "^3.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
