@@ -965,6 +965,128 @@ export const doesNodePathMergeWithAlreadyVisitedNodes = (
   return posY;
 };
 
+export const getAllAnnotations = (cy) => {
+  const annies = cy.filter('[nodeType = "ANNOTATION"]');
+
+  return annies;
+};
+
+export const getAnniesByColor = (cy, color) => {
+  const annies = getAllAnnotations(cy);
+  const anniesColor = [];
+
+  annies.forEach((ele, i, eles) => {
+    const bgColor = ele.data().properties?.backgroundColor?.value;
+    if (bgColor && bgColor === color) {
+      annies.push(ele);
+    }
+  });
+
+  return anniesColor;
+};
+
+export const getSectionTitleAnnies = (cy, annieColor) => {
+  const color = annieColor || "#5D00D6";
+  const sectionTitleAnnies = getAnniesByColor(cy, color);
+
+  return sectionTitleAnnies;
+};
+
+export const getTitleAnnies = (cy) => {
+  const color = annieColor || "#4462ed";
+  const sectionTitleAnnies = getAnniesByColor(cy, color);
+
+  return sectionTitleAnnies;
+};
+
+export const getNodeNearestAnnotation = (nodes, annie, maxSearchRange) => {
+  return nodes[0];
+};
+
+export const isAnnieWithinRangeOfNode = (node, annie, range, direction) => {
+  const nodePosX = node.position("x");
+  const nodePosY = node.position("y");
+  const anniePosX = annie.position("x");
+  const anniePosY = annie.position("y");
+  const isWithinRangeX = Math.abs(nodePosX - anniePosX) <= range;
+  const isWithinRangeY = Math.abs(nodePosY - anniePosY) <= range;
+
+  if ("x" === direction) {
+    return isWithinRangeX;
+  }
+
+  if ("y" === direction) {
+    return isWithinRangeY;
+  }
+
+  return isWithinRangeX && isWithinRangeY;
+};
+
+export const isAnnieWithinRangeAboveNode = (node, annie, range) => {
+  const nodePosX = node.position("x");
+  const nodePosY = node.position("y");
+  const anniePosX = annie.position("x");
+  const anniePosY = annie.position("y");
+  const isWithinRangeAbove =
+    anniePosY >= nodePosY && anniePosY - nodePosY <= range;
+
+  return isWithinRangeAbove;
+};
+
+export const isAnnieWithinRangeLeftOfNode = (node, annie, range) => {
+  const nodePosX = node.position("x");
+  const anniePosX = annie.position("x");
+  const isWithinRangeToLeft =
+    anniePosX <= nodePosX && nodePosX - anniePosX <= range;
+
+  return isWithinRangeToLeft;
+};
+
+export const isAnnieWithinRangeRightOfNode = (node, annie, range) => {
+  const nodePosX = node.position("x");
+  const anniePosX = annie.position("x");
+  const isWithinRangeToLeft =
+    anniePosX >= nodePosX && anniePosX - nodePosX <= range;
+
+  return isWithinRangeToLeft;
+};
+
+export const getAnnieClosestToNode = (
+  cy,
+  node,
+  allowableDisX,
+  maxSearchRangeY
+) => {
+  const nodePosX = node.position("x");
+  const nodePosY = node.position("y");
+  const annies = getAllAnnotations(cy);
+  let closest;
+  let minDisY = Math.POSITIVE_INFINITY;
+
+  annies.forEach((ele, i, eles) => {
+    const anniePosX = ele.position("x");
+    const anniePosY = ele.position("y");
+    const disX = Math.abs(anniePosX - nodePosX);
+    const disY = Math.abs(anniePosY - nodePosY);
+    const checkXY = allowableDisX && maxSearchRangeY;
+    if (checkXY) {
+      const isAnnieWithinRangeOfNode = isAnnieWithinRangeOfNode(
+        node,
+        annie,
+        maxSearchRangeY
+      );
+      if (isAnnieWithinRangeOfNode && disX <= allowableDisX) {
+        if (disY < minDisY) {
+          closest = ele;
+          minDisY = disY;
+        }
+      }
+    }
+  });
+
+  return closest;
+};
+
 export const beautiflowify = async (
   cy,
   spacing,
