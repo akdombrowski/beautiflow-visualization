@@ -1,3 +1,6 @@
+import { useState, useEffect, useRef } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import CytoscapeComponent from "react-cytoscapejs";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
 import Row from "react-bootstrap/Row";
@@ -7,8 +10,6 @@ import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
-import { useState, useEffect, useRef } from "react";
-import CytoscapeComponent from "react-cytoscapejs";
 import {
   getCopyOfElementsObj,
   convertStrToJSON,
@@ -19,8 +20,8 @@ import {
   getDateTime,
 } from "./cy.js";
 import CustomToggle from "./CustomToggle.jsx";
-import HomeFileImportForm from "./HomeFileImportForm.jsx";
 import ErrorScreen from "./ErrorScreen.jsx";
+import ErrorFallback from "./ErrorFallback.jsx";
 
 function App() {
   const defaultAnimationDuration = 0.01;
@@ -75,37 +76,32 @@ function App() {
   const readFileForFlowJSON = () => {
     const reader = new FileReader();
     reader.addEventListener("load", (e) => {
-      try {
-        const text = e.target.result;
-        const fileJSON = convertStrToJSON(text);
-        let flowJSON = fileJSON;
+      const text = e.target.result;
+      const fileJSON = convertStrToJSON(text);
+      let flowJSON = fileJSON;
 
-        // The file has multiple flows
-        if (fileJSON.flows) {
-          // pop open warning modal
-          handleShow(e);
+      // The file has multiple flows
+      if (fileJSON.flows) {
+        // pop open warning modal
+        handleShow(e);
 
-          // in case we don't find which one is the parent flow, default to the
-          // first flow in the array.
-          flowsRef.current = fileJSON.flows[0];
-          flowJSON = fileJSON.flows[0];
+        // in case we don't find which one is the parent flow, default to the
+        // first flow in the array.
+        flowsRef.current = fileJSON.flows[0];
+        flowJSON = fileJSON.flows[0];
 
-          // iterate over the array of flows and find the parent flow
-          for (const flow of fileJSON.flows) {
-            if (flow.parentFlowId && flow.flowId === flow.parentFlowId) {
-              flowsRef.current = flow;
-              flowJSON = flow;
-            }
+        // iterate over the array of flows and find the parent flow
+        for (const flow of fileJSON.flows) {
+          if (flow.parentFlowId && flow.flowId === flow.parentFlowId) {
+            flowsRef.current = flow;
+            flowJSON = flow;
           }
         }
-
-        flowJSONRef.current = flowJSON;
-
-        initializeElements(flowJSON);
-      } catch (err) {
-        setDoesFlowCauseError(true);
-        setFlowErrorMessage(err);
       }
+
+      flowJSONRef.current = flowJSON;
+
+      initializeElements(flowJSON);
     });
 
     return reader;
@@ -197,7 +193,9 @@ function App() {
   };
 
   const clear = (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     if (cyRef.current) {
       cyRef.current.stop(true);
       cyRef.current.unmount();
@@ -266,17 +264,6 @@ function App() {
   };
 
   useEffect(() => {
-    if (importFlowError) {
-      console.log("Copy both the message and cause below if reporting...");
-      console.log();
-      console.log("Error message:");
-      console.log(importFlowError);
-      console.log("Error cause:");
-      console.log(importFlowError.cause);
-    }
-  }, [importFlowError]);
-
-  useEffect(() => {
     if (!annosShifted && !show && cyRef.current) {
       shiftAnnos(cyRef.current.nodes());
       cloneElesRef.current = createClonedNodes(cyRef.current);
@@ -313,12 +300,14 @@ function App() {
     });
   }
 
-  if (doesFlowCauseError) {
-    return <ErrorScreen clearErr={clearErr}></ErrorScreen>;
-  }
-
-  try {
-    return (
+  return (
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onReset={() => {
+        clear();
+      }}
+      resetKeys={[elesForCyInit, annosShifted]}
+    >
       <Container
         fluid
         className="bg-dark justify-content-center"
@@ -830,8 +819,8 @@ function App() {
                     <p className="fs-8 m-0 text-info text-start font-monospace fw-lighter text-wrap">
                       tips
                       </p>
-                  </dt>
-                  <dd className="col-9">
+                      </dt>
+                      <dd className="col-9">
                     <p className="fs-7 m-0 text-info text-start font-monospace fw-lighter text-wrap">
                       Use flows without included subflows (i.e., download
                       subflows separately)
@@ -944,17 +933,8 @@ function App() {
           </Row>
         )}
       </Container>
-    );
-  } catch (err) {
-    return (
-      <ErrorScreen
-        clearErr={(e) => {
-          setFlowErrorMessage(err);
-          clearErr(e);
-        }}
-      ></ErrorScreen>
-    );
-  }
+    </ErrorBoundary>
+  );
 }
 
 export default App;
