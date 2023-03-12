@@ -1738,7 +1738,7 @@ export const getDateTime = () => {
   const date = new Date();
   const month = date.getMonth() + 1;
   const monthDateYear =
-    month + 1 + "-" + date.getDate() + "-" + date.getFullYear();
+    month + "-" + date.getDate() + "-" + date.getFullYear();
   const hours24 = date.getHours();
   const meridiem = hours24 < 12 ? "am" : "pm";
   const h = hours24 % 12;

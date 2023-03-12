@@ -59,11 +59,6 @@ function App() {
     setShow(true);
   };
 
-  const handleFileInputLabelClick = (e) => {
-    e.preventDefault();
-    document.querySelector("#fileInput").click();
-  };
-
   const initializeElements = (flowJSON) => {
     const normEles = CytoscapeComponent.normalizeElements(
       getCopyOfElementsObj(flowJSON)
