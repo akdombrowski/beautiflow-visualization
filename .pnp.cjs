@@ -37,7 +37,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-cytoscapejs", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.0.0"],\
             ["react-dom", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:18.2.0"],\
             ["react-scripts", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.0.1"],\
-            ["sass", "npm:1.59.0"],\
+            ["sass", "npm:1.59.2"],\
             ["source-map-explorer", "npm:2.5.3"],\
             ["web-vitals", "npm:3.3.0"]\
           ],\
@@ -5990,7 +5990,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-cytoscapejs", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.0.0"],\
             ["react-dom", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:18.2.0"],\
             ["react-scripts", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.0.1"],\
-            ["sass", "npm:1.59.0"],\
+            ["sass", "npm:1.59.2"],\
             ["source-map-explorer", "npm:2.5.3"],\
             ["web-vitals", "npm:3.3.0"]\
           ],\
@@ -15195,10 +15195,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["sass", [\
-        ["npm:1.59.0", {\
-          "packageLocation": "./.yarn/cache/sass-npm-1.59.0-3e3aeed1e0-f3ab8c0611.zip/node_modules/sass/",\
+        ["npm:1.59.2", {\
+          "packageLocation": "./.yarn/cache/sass-npm-1.59.2-aa81e5ce17-ab015ac49b.zip/node_modules/sass/",\
           "packageDependencies": [\
-            ["sass", "npm:1.59.0"],\
+            ["sass", "npm:1.59.2"],\
             ["chokidar", "npm:3.5.3"],\
             ["immutable", "npm:4.2.4"],\
             ["source-map-js", "npm:1.0.2"]\

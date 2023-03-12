@@ -3859,7 +3859,7 @@ __metadata:
     react-cytoscapejs: ^2.0.0
     react-dom: ^18.2.0
     react-scripts: ^5.0.1
-    sass: ^1.59.0
+    sass: ^1.59.2
     source-map-explorer: ^2.5.3
     web-vitals: ^3.3.0
   languageName: unknown
@@ -11049,16 +11049,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.59.0":
-  version: 1.59.0
-  resolution: "sass@npm:1.59.0"
+"sass@npm:^1.59.2":
+  version: 1.59.2
+  resolution: "sass@npm:1.59.2"
   dependencies:
     chokidar: ">=3.0.0 <4.0.0"
     immutable: ^4.0.0
     source-map-js: ">=0.6.2 <2.0.0"
   bin:
     sass: sass.js
-  checksum: f3ab8c06115731a18d548972db9d1629df908e4f9b1c126f41ba4d5a38cf9f56cdb8a1f6003cdece18f6d87c2ec425c09c9e9329478aab2185f6c03af85da015
+  checksum: ab015ac49beb1252373023cc79b687aabd7850a7f450250b2fbe4eb3f64b0aef6759f8c7b33234221788a0e42cdd3999edfb5995218e474123b99cb126773e30
   languageName: node
   linkType: hard
 
