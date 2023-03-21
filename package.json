@@ -12,7 +12,7 @@
     "react-bootstrap": "^2.7.2",
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^18.2.0",
-    "react-error-boundary": "^3.1.4",
+    "react-error-boundary": "^4.0.0",
     "react-scripts": "^5.0.1",
     "sass": "^1.59.2",
     "web-vitals": "^3.3.0"
