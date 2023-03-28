@@ -24,9 +24,9 @@ import ErrorScreen from "./ErrorScreen.jsx";
 import ErrorFallback from "./ErrorFallback.jsx";
 
 function App() {
-  const defaultAnimationDuration = 0.01;
+  const defaultAnimationDuration = 0.001;
   const maxAnimationDuration = 3;
-  const minAnimationDuration = 0.01;
+  const minAnimationDuration = 0.001;
   const cyRef = useRef(null);
   const fileRef = useRef(null);
   const flowsRef = useRef(null);
@@ -556,7 +556,7 @@ function App() {
                             value={aniDur}
                             min={minAnimationDuration}
                             max={maxAnimationDuration}
-                            step={0.01}
+                            step={0.001}
                             onChange={(e) => onAnimationDurationChange(e)}
                           />
                         </Form.Floating>
