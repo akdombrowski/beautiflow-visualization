@@ -170,6 +170,8 @@ function App() {
 
       link.href = url;
       link.click();
+
+      shiftAnnosPosFromNodes(cyRef.current.nodes());
     }
   };
 
