@@ -28,7 +28,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
-            ["@popperjs/core", "npm:2.11.6"],\
+            ["@popperjs/core", "npm:2.11.7"],\
             ["bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.2.3"],\
             ["clipboardy", "npm:3.0.0"],\
             ["cytoscape", "npm:3.23.0"],\
@@ -36,9 +36,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.7.2"],\
             ["react-cytoscapejs", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.0.0"],\
             ["react-dom", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:18.2.0"],\
-            ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:3.1.4"],\
+            ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:4.0.3"],\
             ["react-scripts", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.0.1"],\
-            ["sass", "npm:1.59.2"],\
+            ["sass", "npm:1.60.0"],\
             ["source-map-explorer", "npm:2.5.3"],\
             ["web-vitals", "npm:3.3.0"]\
           ],\
@@ -3769,6 +3769,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@popperjs/core", "npm:2.11.6"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:2.11.7", {\
+          "packageLocation": "./.yarn/cache/@popperjs-core-npm-2.11.7-c1bac58243-5b65537478.zip/node_modules/@popperjs/core/",\
+          "packageDependencies": [\
+            ["@popperjs/core", "npm:2.11.7"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["@react-aria/ssr", [\
@@ -5982,7 +5989,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["beautiflow-visualization", "workspace:."],\
-            ["@popperjs/core", "npm:2.11.6"],\
+            ["@popperjs/core", "npm:2.11.7"],\
             ["bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.2.3"],\
             ["clipboardy", "npm:3.0.0"],\
             ["cytoscape", "npm:3.23.0"],\
@@ -5990,9 +5997,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.7.2"],\
             ["react-cytoscapejs", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.0.0"],\
             ["react-dom", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:18.2.0"],\
-            ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:3.1.4"],\
+            ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:4.0.3"],\
             ["react-scripts", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.0.1"],\
-            ["sass", "npm:1.59.2"],\
+            ["sass", "npm:1.60.0"],\
             ["source-map-explorer", "npm:2.5.3"],\
             ["web-vitals", "npm:3.3.0"]\
           ],\
@@ -6094,7 +6101,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/__virtual__/bootstrap-virtual-f5219c87a0/0/cache/bootstrap-npm-5.2.3-7458283a23-0211805dec.zip/node_modules/bootstrap/",\
           "packageDependencies": [\
             ["bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.2.3"],\
-            ["@popperjs/core", "npm:2.11.6"],\
+            ["@popperjs/core", "npm:2.11.7"],\
             ["@types/popperjs__core", null]\
           ],\
           "packagePeers": [\
@@ -14619,17 +14626,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["react-error-boundary", [\
-        ["npm:3.1.4", {\
-          "packageLocation": "./.yarn/cache/react-error-boundary-npm-3.1.4-2310dba89e-f36270a5d7.zip/node_modules/react-error-boundary/",\
+        ["npm:4.0.3", {\
+          "packageLocation": "./.yarn/cache/react-error-boundary-npm-4.0.3-abdbdb34e5-50813803d3.zip/node_modules/react-error-boundary/",\
           "packageDependencies": [\
-            ["react-error-boundary", "npm:3.1.4"]\
+            ["react-error-boundary", "npm:4.0.3"]\
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:3.1.4", {\
-          "packageLocation": "./.yarn/__virtual__/react-error-boundary-virtual-a57e0698e9/0/cache/react-error-boundary-npm-3.1.4-2310dba89e-f36270a5d7.zip/node_modules/react-error-boundary/",\
+        ["virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:4.0.3", {\
+          "packageLocation": "./.yarn/__virtual__/react-error-boundary-virtual-78faec54b6/0/cache/react-error-boundary-npm-4.0.3-abdbdb34e5-50813803d3.zip/node_modules/react-error-boundary/",\
           "packageDependencies": [\
-            ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:3.1.4"],\
+            ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:4.0.3"],\
             ["@babel/runtime", "npm:7.21.0"],\
             ["@types/react", null],\
             ["react", "npm:18.2.0"]\
@@ -15220,10 +15227,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["sass", [\
-        ["npm:1.59.2", {\
-          "packageLocation": "./.yarn/cache/sass-npm-1.59.2-aa81e5ce17-ab015ac49b.zip/node_modules/sass/",\
+        ["npm:1.60.0", {\
+          "packageLocation": "./.yarn/cache/sass-npm-1.60.0-fe0c721ae0-06e163c37a.zip/node_modules/sass/",\
           "packageDependencies": [\
-            ["sass", "npm:1.59.2"],\
+            ["sass", "npm:1.60.0"],\
             ["chokidar", "npm:3.5.3"],\
             ["immutable", "npm:4.2.4"],\
             ["source-map-js", "npm:1.0.2"]\

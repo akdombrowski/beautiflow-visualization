@@ -2179,6 +2179,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@popperjs/core@npm:^2.11.7":
+  version: 2.11.7
+  resolution: "@popperjs/core@npm:2.11.7"
+  checksum: 5b6553747899683452a1d28898c1b39173a4efd780e74360bfcda8eb42f1c5e819602769c81a10920fc68c881d07fb40429604517d499567eac079cfa6470f19
+  languageName: node
+  linkType: hard
+
 "@react-aria/ssr@npm:^3.4.1":
   version: 3.5.0
   resolution: "@react-aria/ssr@npm:3.5.0"
@@ -3850,7 +3857,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "beautiflow-visualization@workspace:."
   dependencies:
-    "@popperjs/core": ^2.11.6
+    "@popperjs/core": ^2.11.7
     bootstrap: ^5.2.3
     clipboardy: ^3.0.0
     cytoscape: ^3.23.0
@@ -3858,9 +3865,9 @@ __metadata:
     react-bootstrap: ^2.7.2
     react-cytoscapejs: ^2.0.0
     react-dom: ^18.2.0
-    react-error-boundary: ^3.1.4
+    react-error-boundary: ^4.0.3
     react-scripts: ^5.0.1
-    sass: ^1.59.2
+    sass: ^1.60.0
     source-map-explorer: ^2.5.3
     web-vitals: ^3.3.0
   languageName: unknown
@@ -10494,14 +10501,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-error-boundary@npm:^3.1.4":
-  version: 3.1.4
-  resolution: "react-error-boundary@npm:3.1.4"
+"react-error-boundary@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "react-error-boundary@npm:4.0.3"
   dependencies:
     "@babel/runtime": ^7.12.5
   peerDependencies:
     react: ">=16.13.1"
-  checksum: f36270a5d775a25c8920f854c0d91649ceea417b15b5bc51e270a959b0476647bb79abb4da3be7dd9a4597b029214e8fe43ea914a7f16fa7543c91f784977f1b
+  checksum: 50813803d3f03eb2ca07c1250a4a001ffe054f5b3f49b15ea5f0a4e1108f549bc7d8def15db51d518516997d34cebc663f4276246301b4a40a72e83a784f5c38
   languageName: node
   linkType: hard
 
@@ -11061,16 +11068,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.59.2":
-  version: 1.59.2
-  resolution: "sass@npm:1.59.2"
+"sass@npm:^1.60.0":
+  version: 1.60.0
+  resolution: "sass@npm:1.60.0"
   dependencies:
     chokidar: ">=3.0.0 <4.0.0"
     immutable: ^4.0.0
     source-map-js: ">=0.6.2 <2.0.0"
   bin:
     sass: sass.js
-  checksum: ab015ac49beb1252373023cc79b687aabd7850a7f450250b2fbe4eb3f64b0aef6759f8c7b33234221788a0e42cdd3999edfb5995218e474123b99cb126773e30
+  checksum: 06e163c37af466ec194cf2ed8dab616372afeb19322d356947d48ea664fc38398ae77c4d91bea9cb0ace954ce289d5518d0f8555ecc49f6bf2539a8ef52fc580
   languageName: node
   linkType: hard
 
