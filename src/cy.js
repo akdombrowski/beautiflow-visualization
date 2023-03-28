@@ -473,14 +473,13 @@ export const shiftAnnosPosFromNodes = (nodes) => {
 
 export const resetAnnosPosFromNodes = (nodes) => {
   const annies = nodes.filter('[nodeType = "ANNOTATION"]');
-
-  annies.forEach((ele, i, eles) => {
+  annies.unlock();
+  annies.positions((ele, i) => {
     const posX = ele.position("x");
-    const width = ele.data("properties").width
-      ? ele.data("properties").width.value
-      : 300;
-    const newPosX = posX + width / 2;
-    ele.position("x", -newPosX);
+    const width = ele.width() || 300;
+    const newPosX = posX - width / 2;
+    const newPosY = ele.position("y");
+    return { x: newPosX, y: newPosY };
   });
 
   return nodes;
@@ -1619,9 +1618,9 @@ export const beautiflowify = async (
                   complete: () => {
                     resolve(
                       "animating " +
-                        vID +
-                        "'s position to " +
-                        JSON.stringify(pos)
+                      vID +
+                      "'s position to " +
+                      JSON.stringify(pos)
                     );
                   },
                 }
