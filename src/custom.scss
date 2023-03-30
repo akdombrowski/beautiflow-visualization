@@ -13,10 +13,6 @@ $danger: #dd0426;
 $light: #a0cbf3;
 $dark: #191919;
 
-// $input-btn-padding-x: 10rem;
-// $input-btn-padding-y: 100;
-// $input-padding-y: $input-btn-padding-y;
-// $input-padding-x: $input-btn-padding-x;
 $input-btn-padding-y-lg: 1rem;
 $input-btn-padding-x-lg: 5rem;
 $input-padding-y-lg: $input-btn-padding-y-lg;
@@ -37,10 +33,14 @@ $h4-font-size: $font-size-base * 1.5;
 $h5-font-size: $font-size-base * 1.25;
 $h6-font-size: $font-size-base;
 
+$table-cell-padding-y-sm: 0;
+$table-cell-padding-x-sm: 1rem;
+$table-hover-bg-factor: 0.010;
+
 $my-display-font-sizes: (
   7: 2rem,
   8: 1.5rem,
-  9: 1rem,
+  9: 1.25rem,
   10: 0.5rem,
   11: 0.25rem,
   12: 0.1rem,

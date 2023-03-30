@@ -9,6 +9,7 @@ import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
+import Table from 'react-bootstrap/Table';
 import Modal from "react-bootstrap/Modal";
 import {
   getCopyOfElementsObj,
@@ -506,7 +507,7 @@ function App() {
                           useGrouping: false,
                         }).format(
                           ele.target().position("x") -
-                            ele.source().position("x")
+                          ele.source().position("x")
                         ) +
                         "\n" +
                         "\u0394" +
@@ -516,7 +517,7 @@ function App() {
                           useGrouping: false,
                         }).format(
                           ele.target().position("y") -
-                            ele.source().position("y")
+                          ele.source().position("y")
                         ),
                       "line-color": "#0A81D1",
                       "line-opacity": 1,
@@ -672,61 +673,74 @@ function App() {
             </Col>
           </Row>
         ) : (
-          <Row className="p-0 m-0 h-100">
-            <Col xs={12}>
-              <Row id="beautiflowifyTitle" className="justify-content-center">
-                <Col xs="auto">
+          <Row className="p-0 m-0 h-100 align-content-start gap-3">
+            <Col xs={12} className="pb-5">
+              <Row className="pb-5">
+
+                <Col
+                  id="beautiflowifyTitle"
+                  xs={10}
+                  sm={9}
+                  md={8}
+                  lg={7}
+                  xl={6}
+                >
                   <h1 className="display-1 text-light fw-bolder">
                     Beautiflow<i>-ify</i>
                   </h1>
                 </Col>
-              </Row>
-            </Col>
 
-            <Col xs={12}>
-              <Row id="fileImportContainer" className="justify-content-center">
-                <Col xs={10}>
-                  <Form>
-                    <Form.Group controlId="formFileLg" className="">
-                      <Form.Label className="pb-1">
-                        <h6 className="display-5 text-info text-center">
-                          Import a JSON export of a DV flow to make it{" "}
-                          <b>
-                            <i>beautiflow</i>
-                          </b>
-                          !
-                        </h6>
-                      </Form.Label>
-                      <Form.Control
-                        type="file"
-                        size="lg"
-                        style={{ backgroundColor: "var(--bs-dark)" }}
-                        onChange={(e) => loadFlowJSONFromFile(e)}
-                      />
-                    </Form.Group>
-                  </Form>
+
+                <Col xs={2} sm={3} md={4} lg={5} xl={6} className="pt-4">
+                  <h6 className="col-12 display-9 text-info text-center">
+                    Import a JSON export of a DV flow to make it
+                  </h6>
+                  <h5 className="col-12 display-7 text-info text-center">
+                    <b>
+                      <i>beautiflow</i>
+                    </b>
+                    !
+                  </h5>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Row id="fileImportContainer" className="justify-content-center">
+                    <Col xs={10}>
+                      <Form>
+                        <Form.Group controlId="formFileLg" >
+                          <Form.Control
+                            type="file"
+                            size="lg"
+                            style={{ backgroundColor: "var(--bs-dark)" }}
+                            onChange={(e) => loadFlowJSONFromFile(e)}
+                          />
+                        </Form.Group>
+                      </Form>
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </Col>
 
-            <Col xs={12}>
+            <Col xs={12} className="pb-5">
               <Row
                 id="textExplainationRow"
-                className="justify-content-center px-5"
+                className="justify-content-center flex-fill"
               >
-                <Col xs={10} lg={6}>
-                  <Row className="justify-content-center">
+                <Col xs={12}>
+                  <Row className="justify-content-center pb-2">
                     <Col xs={12}>
-                      <p className="fs-5 p-0 text-light text-center font-monospace fw-lighter text-break">
+                      <p className="fs-5 p-0 text-light text-center font-monospace text-break">
                         Okay, so beauty is in the eye of the beholder...
                       </p>
                     </Col>
                   </Row>
-                  <Row>
+                  <Row className="pb-1">
                     <Col xs={12}>
-                      <p className="fs-6 p-0 text-light text-start font-monospace fw-lighter text-break">
-                        This will 🤞 <i>attempt</i> to space nodes out nicely
-                        (ignoring annotations) in DaVinci flows while trying to
+                      <p className="fs-6 p-0 text-light text-center font-monospace fw-lighter text-break">
+                        This will 🤞 <i>attempt</i> to space nodes out nicely {" "}
+                        <i>(ignoring annotations)</i> in DaVinci flows while trying to
                         preserve the relative ordering of nodes. Then, you can
                         export from here and import that into DV and have a
                         nicely spaced flow. However, there are some caveats and
@@ -734,8 +748,8 @@ function App() {
                       </p>
                     </Col>
                   </Row>
-                  <Row>
-                    <Col xs={12}>
+                  <Row className="justify-content-center">
+                    <Col xs={10}>
                       <ul>
                         <li>
                           <p className="fs-6 p-0 text-warning text-start font-monospace fw-lighter text-break">
@@ -760,72 +774,68 @@ function App() {
               </Row>
             </Col>
 
-            <Col xs={12}>
-              <Row id="buttonDefnsTable" className="justify-content-center p-0">
-                <Col xs={10} lg={6}>
-                  <dl className="row p-0 m-0">
-                    <dt className="col-3">
-                      <h5 className="font-monospace fw-bold m-0 text-info text-start text-break text-wrap">
+            <Col id="buttonDefnsTable" xs={12}>
+              <Table borderless hover responsive variant="dark" size="sm" >
+                <tbody>
+                  <tr>
+                    <td className="col-lg-3 col-md-4 col-sm-4 col-5">
+                      <h3 className="font-monospace fw-bold m-0 text-info text-end text-break text-wrap">
                         Beautiflowify
-                      </h5>
-                    </dt>
-                    <dd className="col-9">
-                      <p className="fs-6 m-0 text-info text-start font-monospace  text-wrap">
+                      </h3>
+                    </td>
+
+                    <td className="col-lg-9 col-md-8 col-sm-8 col-7 align-middle">
+                      <p className="fs-5 m-0 text-info text-start font-monospace  text-wrap">
                         Attempts to space nodes out nicely according to
                         standardized spacing.
                       </p>
-                    </dd>
+                    </td>
+                  </tr>
 
-                    <dt className="col-3">
-                      <p className="fs-7 m-0 text-info text-start font-monospace  text-wrap">
+                  <tr>
+                    <td className="col-lg-3 col-md-4 col-6">
+                      <p className="fs-5 m-0 text-info text-end font-monospace  text-wrap">
                         Export
                       </p>
-                    </dt>
-                    <dd className="col-9 ">
-                      <p className="fs-8 m-0 text-info text-start font-monospace text-wrap">
+                    </td>
+                    <td className="col-lg-9 col-md-8 col-6 align-middle">
+                      <p className="fs-6 m-0 text-info text-start font-monospace text-wrap">
                         Exports an updated JSON file that you can upload to
                         DaVinci.
                       </p>
-                    </dd>
+                    </td>
+                  </tr>
 
-                    <dt className="col-3">
-                      <p className="fs-7 m-0 text-info text-start font-monospace  text-wrap">
+                  <tr>
+                    <td className="col-lg-3 col-md-4 col-6">
+                      <p className="fs-5 m-0 text-info text-end font-monospace  text-wrap">
                         Clear
                       </p>
-                    </dt>
-                    <dd className="col-9 ">
-                      <p className="fs-8 m-0 text-info text-start font-monospace  text-wrap">
+                    </td>
+                    <td className="col-lg-9 col-md-8 col-6 align-middle">
+                      <p className="fs-6 m-0 text-info text-start font-monospace  text-wrap">
                         Wipes out the nodes and brings you back to this screen.
                       </p>
-                    </dd>
+                    </td>
+                  </tr>
 
-                    <dt className="col-3">
-                      <p className="fs-7 m-0 text-info text-start font-monospace  text-wrap">
+                  <tr>
+                    <td className="col-lg-3 col-md-4 col-6">
+                      <p className="fs-5 m-0 text-info text-end font-monospace  text-wrap">
                         Reset
                       </p>
-                    </dt>
-                    <dd className="col-9">
-                      <p className="fs-8 m-0 text-info text-start font-monospace  text-wrap">
+                    </td>
+                    <td className="col-lg-9 col-md-8 col-6 align-middle">
+                      <p className="fs-6 m-0 text-info text-start font-monospace  text-wrap">
                         Reset attempts to set nodes at their original positions.
+                        <br />
                         Warning: animations might continue to run in the
                         background.
                       </p>
-                    </dd>
-
-                    {/* <dt className="col-3">
-                    <p className="fs-8 m-0 text-info text-start font-monospace fw-lighter text-wrap">
-                      tips
-                      </p>
-                      </dt>
-                      <dd className="col-9">
-                    <p className="fs-7 m-0 text-info text-start font-monospace fw-lighter text-wrap">
-                      Use flows without included subflows (i.e., download
-                      subflows separately)
-                    </p>
-                  </dd> */}
-                  </dl>
-                </Col>
-              </Row>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
             </Col>
 
             <Col xs={12}>
