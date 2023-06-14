@@ -4849,12 +4849,12 @@ __metadata:
   linkType: hard
 
 "cytoscape@npm:^3.23.0":
-  version: 3.23.0
-  resolution: "cytoscape@npm:3.23.0"
+  version: 3.25.0
+  resolution: "cytoscape@npm:3.25.0"
   dependencies:
     heap: ^0.2.6
     lodash: ^4.17.21
-  checksum: bcb3c48068384309287553a8b2561bf500562548563ef900c43d011b4a2c8e7cbf0c44f40f7f4ad1b661ff959385c627027f7e7a642021a3716054ae093d3749
+  checksum: 514ea396d90b16ffb6decff0ef1e790b9c35fbdfe3e842a56705d87e5d0a0ed78c94a5e7b66a93596245473868c46d4396886d940688e73a4d418701ac5caa34
   languageName: node
   linkType: hard
 
