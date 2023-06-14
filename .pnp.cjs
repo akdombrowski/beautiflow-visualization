@@ -28,7 +28,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
-            ["@popperjs/core", "npm:2.11.7"],\
+            ["@popperjs/core", "npm:2.11.8"],\
             ["bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.2.3"],\
             ["clipboardy", "npm:3.0.0"],\
             ["cytoscape", "npm:3.23.0"],\
@@ -3763,17 +3763,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@popperjs/core", [\
-        ["npm:2.11.6", {\
-          "packageLocation": "./.yarn/cache/@popperjs-core-npm-2.11.6-5bcdc104bd-47fb328cec.zip/node_modules/@popperjs/core/",\
+        ["npm:2.11.8", {\
+          "packageLocation": "./.yarn/cache/@popperjs-core-npm-2.11.8-f1692e11a0-e5c69fdebf.zip/node_modules/@popperjs/core/",\
           "packageDependencies": [\
-            ["@popperjs/core", "npm:2.11.6"]\
-          ],\
-          "linkType": "HARD"\
-        }],\
-        ["npm:2.11.7", {\
-          "packageLocation": "./.yarn/cache/@popperjs-core-npm-2.11.7-c1bac58243-5b65537478.zip/node_modules/@popperjs/core/",\
-          "packageDependencies": [\
-            ["@popperjs/core", "npm:2.11.7"]\
+            ["@popperjs/core", "npm:2.11.8"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -3837,7 +3830,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@restart/ui", "virtual:a06cea8f0db8f0a4cce48133d391a80851f388510fc34be478afce7ba6f83e325e506da826875cf0fac6d3ae9f0b35e03d2df5b79f6ae3251b6eef7d22bfa99f#npm:1.6.3"],\
             ["@babel/runtime", "npm:7.21.0"],\
-            ["@popperjs/core", "npm:2.11.6"],\
+            ["@popperjs/core", "npm:2.11.8"],\
             ["@react-aria/ssr", "virtual:d9193bf12c1a10409817e210c79c11de0d413abdbbe7567abdcd1b65d3d3e5584d7f32e34a523874fbb8386c601658d1329200fc6ae80277f99e30035110bbee#npm:3.6.0"],\
             ["@restart/hooks", "virtual:a06cea8f0db8f0a4cce48133d391a80851f388510fc34be478afce7ba6f83e325e506da826875cf0fac6d3ae9f0b35e03d2df5b79f6ae3251b6eef7d22bfa99f#npm:0.4.9"],\
             ["@types/react", null],\
@@ -5989,7 +5982,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["beautiflow-visualization", "workspace:."],\
-            ["@popperjs/core", "npm:2.11.7"],\
+            ["@popperjs/core", "npm:2.11.8"],\
             ["bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.2.3"],\
             ["clipboardy", "npm:3.0.0"],\
             ["cytoscape", "npm:3.23.0"],\
@@ -6101,7 +6094,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/__virtual__/bootstrap-virtual-f5219c87a0/0/cache/bootstrap-npm-5.2.3-7458283a23-0211805dec.zip/node_modules/bootstrap/",\
           "packageDependencies": [\
             ["bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.2.3"],\
-            ["@popperjs/core", "npm:2.11.7"],\
+            ["@popperjs/core", "npm:2.11.8"],\
             ["@types/popperjs__core", null]\
           ],\
           "packagePeers": [\
