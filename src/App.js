@@ -9,8 +9,7 @@ import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
-import Table from 'react-bootstrap/Table';
-import Modal from "react-bootstrap/Modal";
+import Table from "react-bootstrap/Table";
 import {
   getCopyOfElementsObj,
   convertStrToJSON,
@@ -23,6 +22,7 @@ import {
 import CustomToggle from "./CustomToggle.jsx";
 import ErrorScreen from "./ErrorScreen.jsx";
 import ErrorFallback from "./ErrorFallback.jsx";
+import WarningModal from "./WarningModal.jsx";
 
 function App() {
   const defaultAnimationDuration = 0.001;
@@ -507,7 +507,7 @@ function App() {
                           useGrouping: false,
                         }).format(
                           ele.target().position("x") -
-                          ele.source().position("x")
+                            ele.source().position("x")
                         ) +
                         "\n" +
                         "\u0394" +
@@ -517,7 +517,7 @@ function App() {
                           useGrouping: false,
                         }).format(
                           ele.target().position("y") -
-                          ele.source().position("y")
+                            ele.source().position("y")
                         ),
                       "line-color": "#0A81D1",
                       "line-opacity": 1,
@@ -676,7 +676,6 @@ function App() {
           <Row className="p-0 m-0 h-100 align-content-start gap-3">
             <Col xs={12} className="pb-5">
               <Row className="pb-5">
-
                 <Col
                   id="beautiflowifyTitle"
                   xs={10}
@@ -689,7 +688,6 @@ function App() {
                     Beautiflow<i>-ify</i>
                   </h1>
                 </Col>
-
 
                 <Col xs={2} sm={3} md={4} lg={5} xl={6} className="pt-4">
                   <h6 className="col-12 display-9 text-info text-center">
@@ -705,10 +703,13 @@ function App() {
               </Row>
               <Row>
                 <Col>
-                  <Row id="fileImportContainer" className="justify-content-center">
+                  <Row
+                    id="fileImportContainer"
+                    className="justify-content-center"
+                  >
                     <Col xs={10}>
                       <Form>
-                        <Form.Group controlId="formFileLg" >
+                        <Form.Group controlId="formFileLg">
                           <Form.Control
                             type="file"
                             size="lg"
@@ -722,7 +723,6 @@ function App() {
                 </Col>
               </Row>
             </Col>
-
             <Col xs={12} className="pb-5">
               <Row
                 id="textExplainationRow"
@@ -739,12 +739,12 @@ function App() {
                   <Row className="pb-1">
                     <Col xs={12}>
                       <p className="fs-6 p-0 text-light text-center font-monospace fw-lighter text-break">
-                        This will 🤞 <i>attempt</i> to space nodes out nicely {" "}
-                        <i>(ignoring annotations)</i> in DaVinci flows while trying to
-                        preserve the relative ordering of nodes. Then, you can
-                        export from here and import that into DV and have a
-                        nicely spaced flow. However, there are some caveats and
-                        there will be bugs.
+                        This will 🤞 <i>attempt</i> to space nodes out nicely{" "}
+                        <i>(ignoring annotations)</i> in DaVinci flows while
+                        trying to preserve the relative ordering of nodes. Then,
+                        you can export from here and import that into DV and
+                        have a nicely spaced flow. However, there are some
+                        caveats and there will be bugs.
                       </p>
                     </Col>
                   </Row>
@@ -773,9 +773,8 @@ function App() {
                 </Col>
               </Row>
             </Col>
-
             <Col id="buttonDefnsTable" xs={12}>
-              <Table borderless hover responsive variant="dark" size="sm" >
+              <Table borderless hover responsive variant="dark" size="sm">
                 <tbody>
                   <tr>
                     <td className="col-lg-3 col-md-4 col-sm-4 col-5">
@@ -837,7 +836,6 @@ function App() {
                 </tbody>
               </Table>
             </Col>
-
             <Col xs={12}>
               <div className="fixed-bottom">
                 <p className="text-secondary text-end pe-3">
@@ -845,98 +843,11 @@ function App() {
                 </p>
               </div>
             </Col>
-
-            <Modal
-              centered
-              className=""
-              size="lg"
+            <WarningModal
               show={show}
-              onHide={handleClose}
-            >
-              <Modal.Header closeButton className="bg-dark">
-                <Modal.Title className="text-warning">
-                  <h1>Ahh! The file contains multiple flows!</h1>
-                </Modal.Title>
-              </Modal.Header>
-              <Modal.Body className="text-light bg-dark px-5 py-4">
-                <h5>The uploaded file contains multiple flows.</h5>
-                <h6>
-                  Using this file is{" "}
-                  <b>
-                    <i>not</i>
-                  </b>{" "}
-                  recommended.
-                </h6>
-                <h6>What's going to happen if you do, you ask?</h6>
-                <h6>
-                  Stuff.{" "}
-                  <b>
-                    <i>Serious</i>
-                  </b>{" "}
-                  stuff. Ok? Okay?!?!? Ok.
-                </h6>
-                <p className="p-0 m-0 text-wrap text-break">
-                  It'll try to find the parent flow and use that. If it can't
-                  figure out which one is the parent (weird situation), then
-                  it'll default to the first flow in the file.{" "}
-                </p>
-                <p className="p-0 m-0 text-wrap text-break">
-                  Try downloading the flows separately (without including
-                  subflows) and work with each of them in turn.
-                </p>
-              </Modal.Body>
-              <Modal.Footer className="bg-dark">
-                <Container fluid>
-                  <Row xs={2} className="w-100 justify-content-between m-0">
-                    <Col>
-                      <div className="d-grid h-100 w-100">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={handleContinueAnyways}
-                        >
-                          <Row className="h-100 w-100 m-0 justify-content-center">
-                            <Col xs={12}>
-                              <h4 className="p-0 m-0 text-wrap text-break text-center">
-                                Continue Anyways
-                              </h4>
-                            </Col>
-                            <Col xs={12}>
-                              <p className="p-0 m-0 fs-10 fw-lighter text-wrap text-break text-center">
-                                (are you seriously going to go through with
-                                this?)
-                              </p>
-                            </Col>
-                          </Row>
-                        </Button>
-                      </div>
-                    </Col>
-                    <Col>
-                      <div className="d-grid h-100 w-100">
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          onClick={handleClose}
-                        >
-                          <Row className="h-100 w-100 m-0 justify-content-between">
-                            <Col xs={12}>
-                              <h4 className="p-0 m-0 text-wrap text-break text-center">
-                                Import a different flow
-                              </h4>
-                            </Col>
-                            <Col xs={12}>
-                              <p className="p-0 m-0 fs-10 fw-lighter text-wrap text-break text-center">
-                                (coward's way out)
-                              </p>
-                            </Col>
-                          </Row>
-                        </Button>
-                      </div>
-                    </Col>
-                  </Row>
-                </Container>
-              </Modal.Footer>
-            </Modal>
+              handleClose={handleClose}
+              handleContinueAnyways={handleContinueAnyways}
+            />
           </Row>
         )}
       </Container>
