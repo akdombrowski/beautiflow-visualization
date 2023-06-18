@@ -2172,7 +2172,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@popperjs/core@npm:^2.11.6, @popperjs/core@npm:^2.11.7":
+"@popperjs/core@npm:^2.11.6, @popperjs/core@npm:^2.11.8":
   version: 2.11.8
   resolution: "@popperjs/core@npm:2.11.8"
   checksum: e5c69fdebf52a4012f6a1f14817ca8e9599cb1be73dd1387e1785e2ed5e5f0862ff817f420a87c7fc532add1f88a12e25aeb010ffcbdc98eace3d55ce2139cf0
@@ -3850,19 +3850,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "beautiflow-visualization@workspace:."
   dependencies:
-    "@popperjs/core": ^2.11.7
-    bootstrap: ^5.2.3
+    "@popperjs/core": ^2.11.8
+    bootstrap: ^5.3.0
     clipboardy: ^3.0.0
-    cytoscape: ^3.23.0
+    cytoscape: ^3.25.0
     react: ^18.2.0
-    react-bootstrap: ^2.7.2
+    react-bootstrap: ^2.7.4
     react-cytoscapejs: ^2.0.0
     react-dom: ^18.2.0
-    react-error-boundary: ^4.0.3
+    react-error-boundary: ^4.0.10
     react-scripts: ^5.0.1
-    sass: ^1.60.0
+    sass: ^1.63.4
     source-map-explorer: ^2.5.3
-    web-vitals: ^3.3.0
+    web-vitals: ^3.3.2
   languageName: unknown
   linkType: soft
 
@@ -3938,7 +3938,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bootstrap@npm:^5.2.3":
+"bootstrap@npm:^5.3.0":
   version: 5.3.0
   resolution: "bootstrap@npm:5.3.0"
   peerDependencies:
@@ -4841,7 +4841,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cytoscape@npm:^3.23.0":
+"cytoscape@npm:^3.25.0":
   version: 3.25.0
   resolution: "cytoscape@npm:3.25.0"
   dependencies:
@@ -10411,7 +10411,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-bootstrap@npm:^2.7.2":
+"react-bootstrap@npm:^2.7.4":
   version: 2.7.4
   resolution: "react-bootstrap@npm:2.7.4"
   dependencies:
@@ -10494,7 +10494,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-error-boundary@npm:^4.0.3":
+"react-error-boundary@npm:^4.0.10":
   version: 4.0.10
   resolution: "react-error-boundary@npm:4.0.10"
   dependencies:
@@ -11061,7 +11061,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.60.0":
+"sass@npm:^1.63.4":
   version: 1.63.4
   resolution: "sass@npm:1.63.4"
   dependencies:
@@ -12442,7 +12442,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-vitals@npm:^3.3.0":
+"web-vitals@npm:^3.3.2":
   version: 3.3.2
   resolution: "web-vitals@npm:3.3.2"
   checksum: 76e832341d213d5de6f6767fef7f8c02163ab94326912a6355bbf6e194d930196ca5094b0d0d493b4c194acaaabcc96f0adc87870b913a7b9a51b225807abccf
