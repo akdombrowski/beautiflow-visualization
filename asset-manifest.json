@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/beautiflow-visualization/static/css/main.90aa741c.css",
-    "main.js": "/beautiflow-visualization/static/js/main.2efd07ef.js",
-    "static/js/286.13d93e2b.chunk.js": "/beautiflow-visualization/static/js/286.13d93e2b.chunk.js",
+    "main.css": "/beautiflow-visualization/static/css/main.ae035a97.css",
+    "main.js": "/beautiflow-visualization/static/js/main.2de3c32f.js",
+    "static/js/68.0b8beeaa.chunk.js": "/beautiflow-visualization/static/js/68.0b8beeaa.chunk.js",
     "index.html": "/beautiflow-visualization/index.html",
-    "main.90aa741c.css.map": "/beautiflow-visualization/static/css/main.90aa741c.css.map",
-    "main.2efd07ef.js.map": "/beautiflow-visualization/static/js/main.2efd07ef.js.map",
-    "286.13d93e2b.chunk.js.map": "/beautiflow-visualization/static/js/286.13d93e2b.chunk.js.map"
+    "main.ae035a97.css.map": "/beautiflow-visualization/static/css/main.ae035a97.css.map",
+    "main.2de3c32f.js.map": "/beautiflow-visualization/static/js/main.2de3c32f.js.map",
+    "68.0b8beeaa.chunk.js.map": "/beautiflow-visualization/static/js/68.0b8beeaa.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.90aa741c.css",
-    "static/js/main.2efd07ef.js"
+    "static/css/main.ae035a97.css",
+    "static/js/main.2de3c32f.js"
   ]
 }
