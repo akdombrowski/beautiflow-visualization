@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import CytoscapeComponent from "react-cytoscapejs";
 import Container from "react-bootstrap/Container";
