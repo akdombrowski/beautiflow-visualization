@@ -1091,7 +1091,8 @@ export const beautiflowify = async (
   spacing,
   verticalTolerance,
   dur,
-  watchAnimation
+  watchAnimation,
+  ySpacing
 ) => {
   const cyBeforeRepositioning = await createCytoscapeGraphFromEles(
     cy.$("*").clone().jsons()
@@ -1125,11 +1126,11 @@ export const beautiflowify = async (
   const firstRowStartPosY = 180;
   // the spacing for nodes in the same row-section, aka when a row has multiple
   // vertical levels
-  const sameRowDiffHeightSpacingY = 240;
+  const sameRowDiffHeightSpacingY = ySpacing;
   // before calculations, the y value for nodes in top level of each row
   const sectionBaselinePosY = [];
   // spacing between row sections
-  const rowSpacingY = 300;
+  const rowSpacingY = ySpacing + 60;
   // the y pos value of the visually lowest node (highest y pos value)
   const highestYPosValueInSection = [];
   // fit whole graph (minus annotations before beginning)
@@ -1618,9 +1619,9 @@ export const beautiflowify = async (
                   complete: () => {
                     resolve(
                       "animating " +
-                      vID +
-                      "'s position to " +
-                      JSON.stringify(pos)
+                        vID +
+                        "'s position to " +
+                        JSON.stringify(pos)
                     );
                   },
                 }
@@ -1736,8 +1737,7 @@ export const getCyJSON = (cy) => {
 export const getDateTime = () => {
   const date = new Date();
   const month = date.getMonth() + 1;
-  const monthDateYear =
-    month + "-" + date.getDate() + "-" + date.getFullYear();
+  const monthDateYear = month + "-" + date.getDate() + "-" + date.getFullYear();
   const hours24 = date.getHours();
   const meridiem = hours24 < 12 ? "am" : "pm";
   const h = hours24 % 12;

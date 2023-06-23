@@ -7,6 +7,7 @@ import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
 import CustomToggle from "./CustomToggle.jsx";
 import { beautiflowify } from "./cy.js";
 
@@ -14,39 +15,55 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
   { elesForCyInit, loadFlowJSONFromFile, exportToDVJSON, clear, reset },
   cyRef
 ) {
-  const defaultAnimationDuration = 0.001;
-  const maxAnimationDuration = 3;
-  const minAnimationDuration = 0.001;
+  const defaultAnimationDuration = 1;
+  const maxAnimationDuration = 1000;
+  const minAnimationDuration = 1;
   const [aniDur, setAniDur] = useState(defaultAnimationDuration);
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
   const [aniDescriptionText, setAniDescriptionText] = useState("");
   const [aniText, setAniText] = useState("Ready!");
+  const [xSpacing, setXSpacing] = useState(150);
+  const [ySpacing, setYSpacing] = useState(330);
 
   const toggleAccordion = () => {
     const currAccState = !isAccordionOpen;
     setIsAccordionOpen(currAccState);
   };
 
+  const onXSpacingChange = (e) => {
+    e.preventDefault();
+    setXSpacing(Number(e.currentTarget.value));
+  };
+
+  const onYSpacingChange = (e) => {
+    e.preventDefault();
+    setYSpacing(Number(e.currentTarget.value));
+  };
+
   const onAnimationDurationChange = (e) => {
     e.preventDefault();
-    setAniDur(
-      new Intl.NumberFormat("en-US", { minimumFractionDigits: 2 }).format(
-        e.currentTarget.value
-      )
-    );
+    setAniDur(Number(e.currentTarget.value));
   };
 
   const formatSpacing = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      beautiflowify(cyRef.current, 150, 0, aniDur * 1000, false);
+      beautiflowify(cyRef.current, 150, 0, aniDur, false);
     }
   };
 
   const watchBeautiflowify = (e) => {
     e.preventDefault();
+    const minXSpacing = Math.max(xSpacing, 50);
+    const minYSpacing = Math.max(ySpacing, 100);
+    if (xSpacing !== minXSpacing) {
+      setXSpacing(minXSpacing);
+    }
+    if (ySpacing !== minYSpacing) {
+      setYSpacing(minYSpacing);
+    }
     if (cyRef.current) {
-      beautiflowify(cyRef.current, 150, 330, aniDur * 1000, true);
+      beautiflowify(cyRef.current, minXSpacing, 330, aniDur, true, minYSpacing);
     }
   };
 
@@ -296,7 +313,41 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
           <Col xs={12} className="px-0 py-3 m-0">
             <Form className="px-0 m-0">
               <Row className="pt-2 px-0 m-0 gap-1 justify-content-center">
-                <Col xs={12} className="p-0 pb-2 m-0">
+                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
+                  <Form.Label htmlFor="xSpacing"></Form.Label>
+                  <InputGroup>
+                    <InputGroup.Text id="label" className="bg-dark">
+                      <p className="text-light w-100 text-wrap text-center">
+                        Horizontal
+                        <br /> Spacing
+                      </p>
+                    </InputGroup.Text>
+                    <Form.Control
+                      id="xSpacing"
+                      type="number"
+                      value={xSpacing}
+                      onChange={(e) => onXSpacingChange(e)}
+                    ></Form.Control>
+                  </InputGroup>
+                </Col>
+                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
+                  <Form.Label htmlFor="xSpacing"></Form.Label>
+                  <InputGroup>
+                    <InputGroup.Text id="label" className="bg-dark">
+                      <p className="text-light w-100 text-wrap text-center">
+                        Vertical
+                        <br /> Spacing
+                      </p>
+                    </InputGroup.Text>
+                    <Form.Control
+                      id="ySpacing"
+                      type="number"
+                      value={ySpacing}
+                      onChange={(e) => onYSpacingChange(e)}
+                    ></Form.Control>
+                  </InputGroup>
+                </Col>
+                <Col xs={12} className="p-0 py-4 m-0">
                   <Form.Floating className="">
                     <Form.Label
                       className="text-center"
@@ -305,14 +356,14 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                     >
                       <p className="text-light w-100 text-wrap text-xs-start text-md-center">
                         <small>t: </small>
-                        {aniDur}s
+                        {aniDur}ms
                       </p>
                     </Form.Label>
                     <Form.Range
                       value={aniDur}
                       min={minAnimationDuration}
                       max={maxAnimationDuration}
-                      step={0.001}
+                      step={1}
                       onChange={(e) => onAnimationDurationChange(e)}
                     />
                   </Form.Floating>
