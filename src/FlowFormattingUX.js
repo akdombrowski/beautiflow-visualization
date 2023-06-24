@@ -8,8 +8,10 @@ import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
+import ToggleButton from "react-bootstrap/ToggleButton";
+import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
 import CustomToggle from "./CustomToggle.jsx";
-import { beautiflowify } from "./cy.js";
+import { beautiflowify, beautiflowifyUpdate } from "./cy.js";
 
 const FlowFormattingUX = forwardRef(function FlowFormattingUX(
   { elesForCyInit, loadFlowJSONFromFile, exportToDVJSON, clear, reset },
@@ -24,6 +26,9 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
   const [aniText, setAniText] = useState("Ready!");
   const [xSpacing, setXSpacing] = useState(150);
   const [ySpacing, setYSpacing] = useState(330);
+  const [annosXBuffer, setAnnosXBuffer] = useState(600);
+  const [annosYBuffer, setAnnosYBuffer] = useState(0);
+  const [moveAnnotations, setMoveAnnotations] = useState(false);
 
   const toggleAccordion = () => {
     const currAccState = !isAccordionOpen;
@@ -40,6 +45,20 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
     setYSpacing(Number(e.currentTarget.value));
   };
 
+  const onMoveAnnotationsChange = (move) => {
+    setMoveAnnotations(move);
+  };
+
+  const onAnnosXBufferChange = (e) => {
+    e.preventDefault();
+    setAnnosXBuffer(Number(e.currentTarget.value));
+  };
+
+  const onAnnosYBufferChange = (e) => {
+    e.preventDefault();
+    setAnnosYBuffer(Number(e.currentTarget.value));
+  };
+
   const onAnimationDurationChange = (e) => {
     e.preventDefault();
     setAniDur(Number(e.currentTarget.value));
@@ -54,16 +73,36 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
 
   const watchBeautiflowify = (e) => {
     e.preventDefault();
+
+    // Use min spacing values user-entered value is lower
     const minXSpacing = Math.max(xSpacing, 50);
     const minYSpacing = Math.max(ySpacing, 100);
+
+    // If min x spacing was used, update the state value
     if (xSpacing !== minXSpacing) {
       setXSpacing(minXSpacing);
     }
+
+    // If min y spacing was used, update the state value
     if (ySpacing !== minYSpacing) {
       setYSpacing(minYSpacing);
     }
+
     if (cyRef.current) {
-      beautiflowify(cyRef.current, minXSpacing, 330, aniDur, true, minYSpacing);
+      // beautiflowify(cyRef.current, minXSpacing, 330, aniDur, true, minYSpacing);
+      beautiflowifyUpdate({
+        cy: cyRef.current,
+        xSpacing: minXSpacing,
+        ySpacing: minYSpacing,
+        verticalTolerance: 330,
+        durMillis: aniDur,
+        watchAnimation: true,
+        annotations: {
+          move: moveAnnotations,
+          shiftValX: annosXBuffer,
+          shiftValY: annosYBuffer,
+        },
+      });
     }
   };
 
@@ -314,7 +353,6 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
             <Form className="px-0 m-0">
               <Row className="pt-2 px-0 m-0 gap-1 justify-content-center">
                 <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
-                  <Form.Label htmlFor="xSpacing"></Form.Label>
                   <InputGroup>
                     <InputGroup.Text id="label" className="bg-dark">
                       <p className="text-light w-100 text-wrap text-center">
@@ -331,7 +369,6 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                   </InputGroup>
                 </Col>
                 <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
-                  <Form.Label htmlFor="xSpacing"></Form.Label>
                   <InputGroup>
                     <InputGroup.Text id="label" className="bg-dark">
                       <p className="text-light w-100 text-wrap text-center">
@@ -344,6 +381,53 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                       type="number"
                       value={ySpacing}
                       onChange={(e) => onYSpacingChange(e)}
+                    ></Form.Control>
+                  </InputGroup>
+                </Col>
+                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
+                  <ToggleButtonGroup
+                    type="radio"
+                    name="options"
+                    value={moveAnnotations}
+                    onChange={onMoveAnnotationsChange}
+                  >
+                    <ToggleButton id="toggle-on" value={true}>
+                      On
+                    </ToggleButton>
+                    <ToggleButton id="toggle-off" value={false}>
+                      Off
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Col>
+                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
+                  <InputGroup>
+                    <InputGroup.Text id="label" className="bg-dark">
+                      <p className="text-light w-100 text-wrap text-center">
+                        Annotations
+                        <br /> X Buffer
+                      </p>
+                    </InputGroup.Text>
+                    <Form.Control
+                      id="annosXBuffer"
+                      type="number"
+                      value={annosXBuffer}
+                      onChange={(e) => onAnnosXBufferChange(e)}
+                    ></Form.Control>
+                  </InputGroup>
+                </Col>
+                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
+                  <InputGroup>
+                    <InputGroup.Text id="label" className="bg-dark">
+                      <p className="text-light w-100 text-wrap text-center">
+                        Annotations
+                        <br /> Y Buffer
+                      </p>
+                    </InputGroup.Text>
+                    <Form.Control
+                      id="annosYBuffer"
+                      type="number"
+                      value={annosYBuffer}
+                      onChange={(e) => onAnnosYBufferChange(e)}
                     ></Form.Control>
                   </InputGroup>
                 </Col>
