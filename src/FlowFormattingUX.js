@@ -90,7 +90,7 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
 
     if (cyRef.current) {
       // beautiflowify(cyRef.current, minXSpacing, 330, aniDur, true, minYSpacing);
-      beautiflowifyUpdate({
+      beautiflowify({
         cy: cyRef.current,
         xSpacing: minXSpacing,
         ySpacing: minYSpacing,
