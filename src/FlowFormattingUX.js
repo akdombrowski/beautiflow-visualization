@@ -11,7 +11,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
 import CustomToggle from "./CustomToggle.jsx";
-import { beautiflowify, beautiflowifyUpdate } from "./cy.js";
+import { beautiflowify } from "./cy.js";
 
 const FlowFormattingUX = forwardRef(function FlowFormattingUX(
   { elesForCyInit, loadFlowJSONFromFile, exportToDVJSON, clear, reset },
