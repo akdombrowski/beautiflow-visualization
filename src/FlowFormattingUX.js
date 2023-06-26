@@ -10,6 +10,11 @@ import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
+import Overlay from "react-bootstrap/Overlay";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import Badge from "react-bootstrap/Badge";
+import Container from "react-bootstrap/Container";
 import CustomToggle from "./CustomToggle.jsx";
 import { beautiflowify } from "./cy.js";
 
@@ -63,6 +68,34 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
     e.preventDefault();
     setAniDur(Number(e.currentTarget.value));
   };
+
+  const renderTooltipNodeSpacing = (props) => (
+    <Tooltip id="button-tooltip" className="text-light" {...props}>
+      <p className="text-white">
+        Adjust these values to control the spacing between nodes
+      </p>
+    </Tooltip>
+  );
+
+  const renderTooltipAnnotationsSpacing = (props) => (
+    <Tooltip id="button-tooltip" className="text-light" {...props}>
+      <p className="text-white">
+        Switch the toggle on if you want to make sure that annotations and nodes
+        don't overlap. Additionally, you can control how far they are separated
+        via these values
+      </p>
+    </Tooltip>
+  );
+
+  const renderTooltipAnimationDurationMillis = (props) => (
+    <Tooltip id="button-tooltip" className="text-light" {...props}>
+      <p className="text-white">
+        Greater values will slow down the animation. You can also analyze what's
+        happening while at slower speeds by clicking on <i>Description</i> down
+        below
+      </p>
+    </Tooltip>
+  );
 
   const formatSpacing = (e) => {
     e.preventDefault();
@@ -352,93 +385,216 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
           <Col xs={12} className="px-0 py-3 m-0">
             <Form className="px-0 m-0">
               <Row className="pt-2 px-0 m-0 gap-1 justify-content-center">
-                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
-                  <InputGroup>
-                    <InputGroup.Text id="label" className="bg-dark">
-                      <p className="text-light w-100 text-wrap text-center">
-                        Horizontal
-                        <br /> Spacing
-                      </p>
-                    </InputGroup.Text>
-                    <Form.Control
-                      id="xSpacing"
-                      type="number"
-                      value={xSpacing}
-                      onChange={(e) => onXSpacingChange(e)}
-                    ></Form.Control>
-                  </InputGroup>
+                <Col xs={12} className="p-0 m-0">
+                  <Row className="w-100 h-100 m-0 p-0">
+                    <Col xs={12} className="p-0 m-0 d-flex flex-column">
+                      <InputGroup>
+                        <Row className="w-100 m-0">
+                          <Col xs={6} className="p-0 ">
+                            <InputGroup.Text
+                              id="label"
+                              className="bg-dark p-1 rounded-0 border-secondary"
+                            >
+                              <p className="fs-6 text-light w-100 text-wrap text-center p-0 m-0">
+                                Horizontal
+                                <br />
+                                Spacing{"  "}
+                              </p>
+                            </InputGroup.Text>
+                          </Col>
+                          <Col xs={6} className="p-0 h-100">
+                            <Form.Control
+                              id="xSpacing"
+                              type="number"
+                              value={xSpacing}
+                              onChange={(e) => onXSpacingChange(e)}
+                              className="h-100 fs-6 text-center p-1 m-0 rounded-0 border-secondary"
+                            ></Form.Control>
+                          </Col>
+                        </Row>
+                      </InputGroup>
+                    </Col>
+                    <Col xs={12} className="p-0 m-0 d-flex flex-column">
+                      <InputGroup>
+                        <Row className="w-100 m-0">
+                          <Col xs={6} className="p-0 ">
+                            <InputGroup.Text
+                              id="label"
+                              className="bg-dark p-1 rounded-0 border-secondary"
+                            >
+                              <p className="fs-6 text-light w-100 text-wrap text-center p-0 m-0">
+                                Vertical
+                                <br /> Spacing
+                              </p>
+                            </InputGroup.Text>
+                          </Col>
+                          <Col xs={6} className="p-0 h-100">
+                            <Form.Control
+                              id="ySpacing"
+                              type="number"
+                              value={ySpacing}
+                              onChange={(e) => onYSpacingChange(e)}
+                              className="h-100 fs-6 text-center p-1 m-0 rounded-0 border-secondary"
+                            ></Form.Control>
+                          </Col>
+                        </Row>
+                      </InputGroup>
+                    </Col>
+                    <Col xs={12} className="p-0 m-0 d-flex flex-column">
+                      <Row className="m-0 p-0">
+                        <Col xs={10} className="m-0 p-0"></Col>
+                        <Col
+                          xs={2}
+                          className="m-0 p-0 justify-content-end d-flex"
+                        >
+                          <OverlayTrigger
+                            placement="left"
+                            delay={{ show: 200, hide: 800 }}
+                            overlay={renderTooltipNodeSpacing}
+                          >
+                            {({ ref, ...triggerHandler }) => (
+                              <Button
+                                {...triggerHandler}
+                                className="p-0 m-0 d-inline-flex align-items-center"
+                              >
+                                <Badge
+                                  ref={ref}
+                                  pill
+                                  bg="secondary"
+                                  className="fs-8 text-light"
+                                >
+                                  ?
+                                </Badge>
+                              </Button>
+                            )}
+                          </OverlayTrigger>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
                 </Col>
-                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
-                  <InputGroup>
-                    <InputGroup.Text id="label" className="bg-dark">
-                      <p className="text-light w-100 text-wrap text-center">
-                        Vertical
-                        <br /> Spacing
-                      </p>
-                    </InputGroup.Text>
-                    <Form.Control
-                      id="ySpacing"
-                      type="number"
-                      value={ySpacing}
-                      onChange={(e) => onYSpacingChange(e)}
-                    ></Form.Control>
-                  </InputGroup>
+
+                <Col xs={12} className="p-0 pt-4 m-0">
+                  <Row className="w-100 h-100 m-0 p-0">
+                    <Col xs={12} className="p-0 pb-1 m-0 d-flex flex-column">
+                      <ToggleButtonGroup
+                        type="radio"
+                        name="options"
+                        value={moveAnnotations}
+                        onChange={onMoveAnnotationsChange}
+                      >
+                        <ToggleButton
+                          id="toggle-on"
+                          value={true}
+                          variant="outline-success"
+                          className="rounded-0"
+                        >
+                          On
+                        </ToggleButton>
+                        <ToggleButton
+                          id="toggle-off"
+                          value={false}
+                          variant="outline-danger"
+                          className="rounded-0"
+                        >
+                          Off
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                    </Col>
+                    <Col xs={12} className="p-0 pb-1 m-0 d-flex flex-column">
+                      <InputGroup>
+                        <Row className="w-100 m-0">
+                          <Col xs={7} className="p-0 ">
+                            <InputGroup.Text
+                              id="label"
+                              className="bg-dark p-1 rounded-0 border-secondary"
+                            >
+                              <p className="fs-6 text-light w-100 text-wrap text-center p-0 m-0">
+                                Annotations
+                                <br /> x-Buffer
+                              </p>
+                            </InputGroup.Text>
+                          </Col>
+                          <Col xs={5} className="p-0 h-100">
+                            <Form.Control
+                              id="annosXBuffer"
+                              type="number"
+                              value={annosXBuffer}
+                              onChange={(e) => onAnnosXBufferChange(e)}
+                              className="h-100 fs-6 text-center p-1 m-0 rounded-0 border-secondary"
+                            ></Form.Control>
+                          </Col>
+                        </Row>
+                      </InputGroup>
+                    </Col>
+                    <Col xs={12} className="p-0 m-0 d-flex flex-column">
+                      <InputGroup>
+                        <Row className="w-100 m-0">
+                          <Col xs={7} className="p-0 ">
+                            <InputGroup.Text
+                              id="label"
+                              className="bg-dark p-1 rounded-0 border-secondary"
+                            >
+                              <p className="fs-6 text-light w-100 text-wrap text-center p-0 m-0">
+                                Annotations
+                                <br /> y-Buffer
+                              </p>
+                            </InputGroup.Text>
+                          </Col>
+                          <Col xs={5} className="p-0 h-100">
+                            <Form.Control
+                              id="annosYBuffer"
+                              type="number"
+                              value={annosYBuffer}
+                              onChange={(e) => onAnnosYBufferChange(e)}
+                              className="h-100 fs-6 text-center p-1 m-0 rounded-0 border-secondary"
+                            ></Form.Control>
+                          </Col>
+                        </Row>
+                      </InputGroup>
+                    </Col>
+                    <Col xs={12} className="p-0 m-0 d-flex flex-column">
+                      <Row className="m-0 p-0">
+                        <Col xs={10} className="m-0 p-0"></Col>
+                        <Col
+                          xs={2}
+                          className="m-0 p-0 justify-content-end d-flex"
+                        >
+                          <OverlayTrigger
+                            placement="left"
+                            delay={{ show: 200, hide: 800 }}
+                            overlay={renderTooltipAnnotationsSpacing}
+                          >
+                            {({ ref, ...triggerHandler }) => (
+                              <Button
+                                {...triggerHandler}
+                                className="p-0 m-0 d-inline-flex align-items-center"
+                              >
+                                <Badge
+                                  ref={ref}
+                                  pill
+                                  bg="secondary"
+                                  className="fs-8 text-light"
+                                >
+                                  ?
+                                </Badge>
+                              </Button>
+                            )}
+                          </OverlayTrigger>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
                 </Col>
-                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
-                  <ToggleButtonGroup
-                    type="radio"
-                    name="options"
-                    value={moveAnnotations}
-                    onChange={onMoveAnnotationsChange}
-                  >
-                    <ToggleButton id="toggle-on" value={true}>
-                      On
-                    </ToggleButton>
-                    <ToggleButton id="toggle-off" value={false}>
-                      Off
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </Col>
-                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
-                  <InputGroup>
-                    <InputGroup.Text id="label" className="bg-dark">
-                      <p className="text-light w-100 text-wrap text-center">
-                        Annotations
-                        <br /> X Buffer
-                      </p>
-                    </InputGroup.Text>
-                    <Form.Control
-                      id="annosXBuffer"
-                      type="number"
-                      value={annosXBuffer}
-                      onChange={(e) => onAnnosXBufferChange(e)}
-                    ></Form.Control>
-                  </InputGroup>
-                </Col>
-                <Col xs={12} className="p-0 pb-4 m-0 d-flex flex-column">
-                  <InputGroup>
-                    <InputGroup.Text id="label" className="bg-dark">
-                      <p className="text-light w-100 text-wrap text-center">
-                        Annotations
-                        <br /> Y Buffer
-                      </p>
-                    </InputGroup.Text>
-                    <Form.Control
-                      id="annosYBuffer"
-                      type="number"
-                      value={annosYBuffer}
-                      onChange={(e) => onAnnosYBufferChange(e)}
-                    ></Form.Control>
-                  </InputGroup>
-                </Col>
-                <Col xs={12} className="p-0 py-4 m-0">
-                  <Form.Floating className="">
+
+                <Col xs={12} className="p-0 pt-5 m-0">
+                  <Form.Floating className="p-0">
                     <Form.Label
-                      className="text-center"
+                      className="text-center pt-4"
                       placeholder=".01"
-                      style={{ paddingBottom: "10vh" }}
+                      style={{ paddingBottom: "2.5rem" }}
                     >
-                      <p className="text-light w-100 text-wrap text-xs-start text-md-center">
+                      <p className="p-0 m-0 text-light w-100 text-wrap text-xs-start text-md-center">
                         <small>t: </small>
                         {aniDur}ms
                       </p>
@@ -452,14 +608,43 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                     />
                   </Form.Floating>
                 </Col>
-                <Col xs={12} className="p-0  m-0 ">
+                <Col xs={12} className="p-0 pb-5 m-0 d-flex flex-column">
+                  <Row className="m-0 p-0">
+                    <Col xs={10} className="m-0 p-0"></Col>
+                    <Col xs={2} className="m-0 p-0 justify-content-end d-flex">
+                      <OverlayTrigger
+                        placement="left"
+                        delay={{ show: 200, hide: 800 }}
+                        overlay={renderTooltipAnimationDurationMillis}
+                      >
+                        {({ ref, ...triggerHandler }) => (
+                          <Button
+                            {...triggerHandler}
+                            className="p-0 m-0 d-inline-flex align-items-center"
+                          >
+                            <Badge
+                              ref={ref}
+                              pill
+                              bg="secondary"
+                              className="fs-8 text-light"
+                            >
+                              ?
+                            </Badge>
+                          </Button>
+                        )}
+                      </OverlayTrigger>
+                    </Col>
+                  </Row>
+                </Col>
+
+                <Col xs={12} className="p-0 m-0">
                   <div className="d-grid w-100 p-0 m-0">
                     <Button
-                      variant="outline-light"
+                      variant="light"
                       size="sm"
                       onClick={(e) => watchBeautiflowify(e)}
                     >
-                      Beautiflowify
+                      <p className="p-0 py-2 m-0 fs-5 fw-bold">Beautiflowify</p>
                     </Button>
                   </div>
                 </Col>
@@ -509,20 +694,17 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
             </Form>
           </Col>
         </Row>
-        <Row className="p-0 m-0" style={{ minHeight: "50vh" }}>
+        <Row className="p-0 m-0">
           <Col
             xs={12}
             className="p-0 m-0 justify-content-end align-content-end"
           >
             <Accordion
               flush
-              className="h-100 px-0 m-0 text-light bs-headings-color-light"
+              className="h-100 px-0 m-0"
               onSelect={(eKey) => toggleAccordion(eKey)}
             >
-              <Accordion.Item
-                eventKey="0"
-                className="h-100 px-0 m-0 bs-text-light bs-headings-color-light"
-              >
+              <Accordion.Item eventKey="0" className="h-100 px-0 m-0">
                 <Card className="h-100 bg-dark px-0 m-0">
                   <Card.Header className="p-0 m-0">
                     <CustomToggle
@@ -530,15 +712,12 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                       eventKey="0"
                       setAccordionCollapsedState={toggleAccordion}
                     >
-                      Description of Animation - Expand/Collapse
+                      <p className="p-0 m-0 text-info">Description</p>
                     </CustomToggle>
                   </Card.Header>
                   <Accordion.Collapse eventKey="0">
                     <Card.Body>
-                      <Stack
-                        className=""
-                        style={{ minHeight: "8vh", height: "100%" }}
-                      >
+                      <Stack style={{ minHeight: "8vh", height: "100%" }}>
                         <h1 className="display-6 fs-4 text-light text-center">
                           {aniText}
                         </h1>
@@ -555,8 +734,8 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
         </Row>
         <Row className="align-content-end align-self-end">
           <Col xs={12}>
-            <p className="text-light text-end fixed-bottom pe-3 mb-1">
-              <small>*work in progress</small>
+            <p className="text-info text-end fixed-bottom pe-5 mb-1">
+              <small>@dombrowski</small>
             </p>
           </Col>
         </Row>

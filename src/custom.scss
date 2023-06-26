@@ -25,6 +25,10 @@ $form-label-color: $primary;
 $form-file-button-color: $primary;
 $form-file-button-bg: $light;
 $form-file-button-hover-bg: $success;
+$form-range-track-bg: $info;
+$form-range-thumb-width: 1rem;
+$form-range-thumb-height: 1.25rem;
+$form-range-thumb-bg: $secondary;
 $font-size-base: 1rem;
 $h1-font-size: $font-size-base * 2.5;
 $h2-font-size: $font-size-base * 2;
@@ -35,7 +39,7 @@ $h6-font-size: $font-size-base;
 
 $table-cell-padding-y-sm: 0;
 $table-cell-padding-x-sm: 1rem;
-$table-hover-bg-factor: 0.010;
+$table-hover-bg-factor: 0.01;
 
 $my-display-font-sizes: (
   7: 2rem,

@@ -1,6 +1,6 @@
 {
   "name": "beautiflow-visualization",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "homepage": "https://akdombrowski.github.io/beautiflow-visualization",
   "private": true,
   "dependencies": {
