@@ -317,22 +317,23 @@ function App() {
                 className="justify-content-center flex-fill"
               >
                 <Col xs={12}>
-                  <Row className="justify-content-center pb-2">
-                    <Col xs={12}>
-                      <p className="fs-5 p-0 text-light text-center font-monospace text-break">
-                        Okay, so beauty is in the eye of the beholder...
-                      </p>
-                    </Col>
-                  </Row>
                   <Row className="pb-1">
                     <Col xs={12}>
                       <p className="fs-6 p-0 text-light text-center font-monospace fw-lighter text-break">
-                        This will 🤞 <i>attempt</i> to space nodes out nicely{" "}
-                        <i>(ignoring annotations)</i> in DaVinci flows while
-                        trying to preserve the relative ordering of nodes. Then,
-                        you can export from here and import that into DV and
-                        have a nicely spaced flow. However, there are some
-                        caveats and there will be bugs.
+                        This tool will 🤞 <i>attempt</i> to space DaVinci Flow
+                        nodes out beautifully <i>(ignoring annotations)</i>
+                        <br />
+                        Tries to preserve the relative ordering of nodes, a.k.a.
+                        the "flow".
+                        <br /> Then, you can export from here and import into DV
+                        and have a beautifully spaced flow.
+                      </p>
+                    </Col>
+                  </Row>
+                  <Row className="justify-content-center">
+                    <Col xs={10}>
+                      <p className="fs-5 p-0 text-warning text-start font-monospace fw-bolder text-break">
+                        Tips
                       </p>
                     </Col>
                   </Row>
@@ -341,18 +342,16 @@ function App() {
                       <ul>
                         <li>
                           <p className="fs-6 p-0 text-warning text-start font-monospace fw-lighter text-break">
-                            Only import flows that do <b>not</b> contain any
-                            subflows. i.e., don't include subflows when
-                            downloading a flow JSON from DV. Instead, download
-                            them separately and run each one through here.
+                            Export flows individually (without subflows) if
+                            using this tool. It won't blow up or anything, but
+                            you'll be sad.
                           </p>
                         </li>
                         <li>
                           <p className="fs-6 p-0 text-warning text-start font-monospace fw-lighter text-break">
-                            It's recommended to run this in between building
-                            your flow and adding annotations since this leaves
-                            annotations in their original positions. But, hey,
-                            go wild. Do whatever you want.
+                            Run this before adding annotations since this leaves
+                            annotations in their original positions. Or not. Do
+                            what you gotta do.
                           </p>
                         </li>
                       </ul>
@@ -373,8 +372,7 @@ function App() {
 
                     <td className="col-lg-9 col-md-8 col-sm-8 col-7 align-middle">
                       <p className="fs-5 m-0 text-info text-start font-monospace  text-wrap">
-                        Attempts to space nodes out nicely according to
-                        standardized spacing.
+                        Space out nodes <i>beautifully</i>.
                       </p>
                     </td>
                   </tr>
@@ -387,8 +385,15 @@ function App() {
                     </td>
                     <td className="col-lg-9 col-md-8 col-6 align-middle">
                       <p className="fs-6 m-0 text-info text-start font-monospace text-wrap">
-                        Exports an updated JSON file that you can upload to
-                        DaVinci.
+                        Exports an updated JSON file that you can upload to{" "}
+                        <a
+                          href="http://pingidentity.com/signon"
+                          target="_blank"
+                          style={{ color: "var(--bs-light)" }}
+                        >
+                          DaVinci
+                        </a>
+                        .
                       </p>
                     </td>
                   </tr>
@@ -414,7 +419,7 @@ function App() {
                     </td>
                     <td className="col-lg-9 col-md-8 col-6 align-middle">
                       <p className="fs-6 m-0 text-info text-start font-monospace  text-wrap">
-                        Reset attempts to set nodes at their original positions.
+                        Return nodes to their original positions.
                         <br />
                         Warning: animations might continue to run in the
                         background.

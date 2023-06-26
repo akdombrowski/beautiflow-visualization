@@ -407,7 +407,7 @@ export const getMinYNode = (nodes) => {
 };
 
 export const getMinXCyNode = (cyNodes) => {
-  const minXCyNode = cyNodes.min((ele, i, eles) => ele.position("y")).ele;
+  const minXCyNode = cyNodes.min((ele, i, eles) => ele.position("x")).ele;
 
   return minXCyNode;
 };
@@ -416,6 +416,42 @@ export const getMinYCyNode = (cyNodes) => {
   const minYCyNode = cyNodes.min((ele, i, eles) => ele.position("y")).ele;
 
   return minYCyNode;
+};
+
+export const getMinXCyNodePos = (cyNodes) => {
+  const minXCyNodePos = getMinXCyNode(cyNodes).position("x");
+
+  return minXCyNodePos;
+};
+
+export const getMinYCyNodePos = (cyNodes) => {
+  const minYCyNodePos = getMinYCyNode(cyNodes).position("y");
+
+  return minYCyNodePos;
+};
+
+export const getMaxXCyNode = (cyNodes) => {
+  const minXCyNode = cyNodes.max((ele, i, eles) => ele.position("x")).ele;
+
+  return minXCyNode;
+};
+
+export const getMaxYCyNode = (cyNodes) => {
+  const minYCyNode = cyNodes.max((ele, i, eles) => ele.position("y")).ele;
+
+  return minYCyNode;
+};
+
+export const getMaxXCyNodePos = (cyNodes) => {
+  const maxXCyNodePos = getMaxXCyNode(cyNodes).position("x");
+
+  return maxXCyNodePos;
+};
+
+export const getMaxYCyNodePos = (cyNodes) => {
+  const maxYCyNodePos = getMaxYCyNode(cyNodes).position("y");
+
+  return maxYCyNodePos;
 };
 
 export const isEleYPosWithinToleranceOfY = (ele, y, tolerance) => {
@@ -530,11 +566,15 @@ export const normalizeCyNodePos = (nodes) => {
 
   nodes.shift({ x: xShift, y: yShift });
 
-  return nodes;
+  return { nodes, shift: { xShift, yShift } };
 };
 
 export const lockAnnotationPositions = (cy) => {
   cy.nodes('[nodeType = "ANNOTATION"]').lock();
+};
+
+export const unlockAnnotationPositions = (cy) => {
+  cy.nodes('[nodeType = "ANNOTATION"]').unlock();
 };
 
 export const spaceHorizontallyUsingCyGridLayout = (
@@ -559,6 +599,39 @@ export const spaceHorizontallyUsingCyGridLayout = (
 };
 
 export const sortNodes = (nodes, verticalTolerance) => {
+  const nodesSorted = nodes.sort((ele1, ele2) => {
+    const ele1X = ele1.position("x");
+    const ele1Y = ele1.position("y");
+    const ele2X = ele2.position("x");
+    const ele2Y = ele2.position("y");
+
+    if (ele1Y < ele2Y - verticalTolerance) {
+      return -1;
+    }
+
+    if (ele2Y < ele1Y - verticalTolerance) {
+      return 1;
+    }
+
+    if (ele2Y > ele1Y + verticalTolerance) {
+      return -1;
+    }
+
+    if (ele1Y > ele2Y + verticalTolerance) {
+      return 1;
+    }
+
+    if (ele1X < ele2X) {
+      return -1;
+    }
+
+    return 1;
+  });
+
+  return nodesSorted;
+};
+
+export const sortNodesAnnosFirst = (nodes, verticalTolerance) => {
   const nodesSorted = nodes.sort((ele1, ele2) => {
     const ele1X = ele1.position("x");
     const ele1Y = ele1.position("y");
@@ -1086,25 +1159,54 @@ export const getAnnieClosestToNode = (
   return closest;
 };
 
-export const beautiflowify = async (
+export const handleAnnos = async (cy, shiftValX, shiftValY) => {
+  unlockAnnotationPositions(cy);
+
+  const nodesAfterFormatWOAnnos = cy.nodes('[nodeType != "ANNOTATION"]');
+  const annos = cy.nodes('[nodeType = "ANNOTATION"]');
+  const maxXPos = getMaxXCyNodePos(nodesAfterFormatWOAnnos);
+  const maxYPos = getMaxYCyNodePos(nodesAfterFormatWOAnnos);
+  const buffX = shiftValX || 600;
+  const buffY = shiftValY || 0;
+  const sortedAnnos = sortNodes(annos);
+  const annosMinX = getMinXCyNodePos(sortedAnnos);
+  const annosMinY = getMinYCyNodePos(sortedAnnos);
+  const shiftValueX = buffX ? maxXPos - annosMinX + buffX : 0;
+  const shiftValueY = buffY ? maxYPos - annosMinY + buffY : 0;
+
+  annos.shift({ x: shiftValueX, y: shiftValueY });
+
+  return annos;
+};
+
+export const beautiflowify = async ({
   cy,
-  spacing,
+  xSpacing,
+  ySpacing,
   verticalTolerance,
-  dur,
-  watchAnimation
-) => {
+  durMillis,
+  watchAnimation,
+  annotations,
+}) => {
   const cyBeforeRepositioning = await createCytoscapeGraphFromEles(
     cy.$("*").clone().jsons()
   );
 
+  // Get the nodes in the flow/graph
   const nodes = cy.nodes();
+  // Make a backup. Just in case.
   const nodesOG = nodes.clone();
-  const nodesSorted = sortNodes(nodes, verticalTolerance);
-  const normalizedNodes = normalizeCyNodePos(nodesSorted);
+
+  // Sorts nodes top to bottom and left to right
+  const nodesSorted = sortNodesAnnosFirst(nodes, verticalTolerance);
+  // Set origin point
+  const { nodes: normalizedNodes, shift: normalizationShift } =
+    normalizeCyNodePos(nodesSorted);
   const normalizedNodesUntouched = normalizedNodes.clone();
   const normalizedNodesWOAnnotations = normalizedNodes.filter(
     '[nodeType != "ANNOTATION"]'
   );
+
   const collWithNormalizedNodePos = cy.edges().union(normalizedNodes);
   cy.json(collWithNormalizedNodePos.jsons());
 
@@ -1123,13 +1225,13 @@ export const beautiflowify = async (
   const rowStartPosX = 0;
   // the y value for the starting row
   const firstRowStartPosY = 180;
-  // the spacing for nodes in the same row-section, aka when a row has multiple
+  // the xSpacing for nodes in the same row-section, aka when a row has multiple
   // vertical levels
-  const sameRowDiffHeightSpacingY = 240;
+  const sameRowDiffHeightSpacingY = ySpacing;
   // before calculations, the y value for nodes in top level of each row
   const sectionBaselinePosY = [];
-  // spacing between row sections
-  const rowSpacingY = 300;
+  // xSpacing between row sections
+  const rowSpacingY = ySpacing + 60;
   // the y pos value of the visually lowest node (highest y pos value)
   const highestYPosValueInSection = [];
   // fit whole graph (minus annotations before beginning)
@@ -1150,7 +1252,7 @@ export const beautiflowify = async (
      * nodes along that same horizontal line
      *
      * if row > 0,
-     * take the lowest y value of the previous section and add our row spacing
+     * take the lowest y value of the previous section and add our row xSpacing
      *  to it
      * else,
      * use the first row y pos (firstRowStartPosY)
@@ -1261,7 +1363,7 @@ export const beautiflowify = async (
               // count the number of unvisited nodes up to that point
               // unvisited nodes up to that point will be that first already
               // visited nodes unvisited predecessors that are in this row
-              // multiply that count by the horizontal spacing
+              // multiply that count by the horizontal xSpacing
               // that should be this root's x pos
               const visitedVSuccessors = visitedNodes.intersection(vSuccessors);
               const visitedVSuccessorsSortedX = visitedVSuccessors.sort(
@@ -1280,7 +1382,7 @@ export const beautiflowify = async (
               const count =
                 currRowNodesLeadingIntoFirstVisitedVSuccessor.size();
               const xDisFromRootNewPosToFirstVisitedVSuccessor =
-                count * spacing;
+                count * xSpacing;
               const firstVisitedVSuccessorPosX =
                 firstVisitedVSuccessor.position("x");
               const rootNewPosX =
@@ -1324,7 +1426,7 @@ export const beautiflowify = async (
                   style: { backgroundColor: "brown" },
                 },
                 {
-                  duration: dur / 2,
+                  duration: durMillis / 2,
                   complete: () => {
                     resolve("animating root " + vID);
                   },
@@ -1339,7 +1441,7 @@ export const beautiflowify = async (
                   position: pos,
                 },
                 {
-                  duration: dur,
+                  duration: durMillis,
                   complete: () => {
                     resolve("animating root " + vID);
                   },
@@ -1360,7 +1462,7 @@ export const beautiflowify = async (
               currStepAnimations.newRootPos = pos;
               animations.push(currStepAnimations);
             } else {
-              v.delayAnimation(row * 10 + dur + 15);
+              v.delayAnimation(row * 10 + durMillis + 15);
               rootAni.play();
             }
             /**
@@ -1380,7 +1482,7 @@ export const beautiflowify = async (
             const prevNewPosY = updatedPos[prevID].y;
             const prevOutgoerNodes = prev.outgoers("node");
             // New x pos variable
-            const posX = spacing + prevNewPosX;
+            const posX = xSpacing + prevNewPosX;
 
             if (watchAnimation) {
               const prevOutgoersUnvisited =
@@ -1476,7 +1578,7 @@ export const beautiflowify = async (
               // of the previous node's outgoers
               // find which nodes have already been visited,
               // find the max y value out of those nodes,
-              // then add same row vertical spacing
+              // then add same row vertical xSpacing
               //
               // preserving vertical order:
               // A - B
@@ -1534,7 +1636,7 @@ export const beautiflowify = async (
                   startY = areAnyVisitedNodesInTheWay
                     ? visitedMaxYVal + sameRowDiffHeightSpacingY
                     : prevNewPosY;
-                  // need to add spacing if, in their og positions, there
+                  // need to add xSpacing if, in their og positions, there
                   // are unvisited nodes in between the current node and the
                   // visually lowest visited node
                   const unvisitedBetween = unvisited.filter((ele, i, eles) => {
@@ -1566,7 +1668,7 @@ export const beautiflowify = async (
                 // current node or the number of unvisited nodes that will be
                 // positioned above the current node
                 // multiplied by
-                // the same row-section row-height-spacing]
+                // the same row-section row-height-xSpacing]
               } else {
                 pos.y = prevNewPosY;
               }
@@ -1596,7 +1698,7 @@ export const beautiflowify = async (
                   style: { backgroundColor: "purple" },
                 },
                 {
-                  duration: dur / 2,
+                  duration: durMillis / 2,
                   complete: () => {
                     resolve("animating " + vID + "'s color to purple");
                   },
@@ -1614,13 +1716,13 @@ export const beautiflowify = async (
                   position: pos,
                 },
                 {
-                  duration: dur,
+                  duration: durMillis,
                   complete: () => {
                     resolve(
                       "animating " +
-                      vID +
-                      "'s position to " +
-                      JSON.stringify(pos)
+                        vID +
+                        "'s position to " +
+                        JSON.stringify(pos)
                     );
                   },
                 }
@@ -1637,9 +1739,9 @@ export const beautiflowify = async (
               // Curr animations object to collective animations holder
               animations.push(currStepAnimations);
             } else {
-              v.delayAnimation(row * 10 + dur + 25);
+              v.delayAnimation(row * 10 + durMillis + 25);
               vColorAni.play();
-              v.delayAnimation(row * 10 + dur + 30);
+              v.delayAnimation(row * 10 + durMillis + 30);
               vMoveAni.play();
             }
             /**
@@ -1680,7 +1782,7 @@ export const beautiflowify = async (
      *
      */
     if (watchAnimation) {
-      await playNodeAnimationsOneByOne(cy, animations, dur, spacing);
+      await playNodeAnimationsOneByOne(cy, animations, durMillis, xSpacing);
     }
 
     // Emit event to update animation description to complete
@@ -1696,6 +1798,13 @@ export const beautiflowify = async (
      *
      *
      */
+  }
+
+  const { move, shiftValX, shiftValY } = annotations;
+  if (move) {
+    // Move annotations off to the side so nodes don't overlap any of them
+    // Get the nodes in the flow/graph
+    const _shiftedAnnos = await handleAnnos(cy, shiftValX, shiftValY);
   }
 
   /**
@@ -1736,8 +1845,7 @@ export const getCyJSON = (cy) => {
 export const getDateTime = () => {
   const date = new Date();
   const month = date.getMonth() + 1;
-  const monthDateYear =
-    month + "-" + date.getDate() + "-" + date.getFullYear();
+  const monthDateYear = month + "-" + date.getDate() + "-" + date.getFullYear();
   const hours24 = date.getHours();
   const meridiem = hours24 < 12 ? "am" : "pm";
   const h = hours24 % 12;

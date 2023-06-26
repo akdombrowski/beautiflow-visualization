@@ -2,13 +2,13 @@
 
 ## Make PingOne <strong>DaVinci</strong> flows <i>beautiflow</i>
 
-Upload a DaVinci flow JSON export file and hit BFS to transform that pumpkin of a flow into a beautiflow one
+Upload a DaVinci flow JSON export file and hit **Beautiflowify** to transform that pumpkin of a flow into a beautiflow one
 
 ### Beautiflowify
 
 Makes a flow beautiflow.
 
-Okay, so beauty is in the eye of the beholder. It spaces nodes out nicely (skipping annotations) and only works for simple flows... for now.
+It spaces nodes out beautifully (okay, it tries it's best) and !!!**annotations can now be shoved aside so there's no overlapping**!!!.
 
 ### Animation Duration
 

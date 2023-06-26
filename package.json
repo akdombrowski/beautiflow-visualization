@@ -1,6 +1,6 @@
 {
   "name": "beautiflow-visualization",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "homepage": "https://akdombrowski.github.io/beautiflow-visualization",
   "private": true,
   "dependencies": {
@@ -9,12 +9,12 @@
     "clipboardy": "^3.0.0",
     "cytoscape": "^3.25.0",
     "react": "^18.2.0",
-    "react-bootstrap": "^2.7.4",
+    "react-bootstrap": "^2.8.0",
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^4.0.10",
     "react-scripts": "^5.0.1",
-    "sass": "^1.63.4",
+    "sass": "^1.63.6",
     "web-vitals": "^3.3.2"
   },
   "scripts": {
