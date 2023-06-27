@@ -761,6 +761,7 @@ export const animateNodesAndWait = async (cy, nodes, dur, color) => {
           },
           {
             duration: dur,
+            easing: "ease-out-quart",
             complete: () => {
               // console.log("animated " + ele.id());
               emitStyleEventForExplainerText(cy, "", msg, false, true);
@@ -792,6 +793,7 @@ export const animateElesAndWait = async (cy, els, dur, color) => {
           },
           {
             duration: dur,
+            easing: "ease-out-quart",
             complete: () => {
               // console.log("animated " + ele.id());
               emitStyleEventForExplainerText(cy, "", msg, false, true);
@@ -814,6 +816,7 @@ export const animateNodes = (nodes, dur, color) => {
       },
       {
         duration: dur,
+        easing: "ease-out-quart",
         complete: () => {
           // console.log(ele.id() + " animated");
           return;
@@ -833,6 +836,7 @@ export const getAnimationPromiseForEle = (ele, dur, color) => {
       },
       {
         duration: dur,
+        easing: "ease-out-quart",
         complete: () => {
           // console.log(ele.id() + " animated");
           resolve("animated " + ele.id());
@@ -852,6 +856,7 @@ export const animateElePosAndPlay = (cy, ele, dur, color, pos) => {
       },
       {
         duration: dur,
+        easing: "ease-out-quart",
         complete: () => {
           // console.log(ele.id() + " animated");
           emitStyleEventForExplainerText(cy, "", msg, false, true);
@@ -1427,6 +1432,7 @@ export const beautiflowify = async ({
                 },
                 {
                   duration: durMillis / 2,
+                  easing: "ease-out-quart",
                   complete: () => {
                     resolve("animating root " + vID);
                   },
@@ -1699,6 +1705,7 @@ export const beautiflowify = async ({
                 },
                 {
                   duration: durMillis / 2,
+                  easing: "ease-out-quart",
                   complete: () => {
                     resolve("animating " + vID + "'s color to purple");
                   },
@@ -1717,6 +1724,7 @@ export const beautiflowify = async ({
                 },
                 {
                   duration: durMillis,
+                  easing: "ease-out-quart",
                   complete: () => {
                     resolve(
                       "animating " +

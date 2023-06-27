@@ -100,7 +100,19 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
   const formatSpacing = (e) => {
     e.preventDefault();
     if (cyRef.current) {
-      beautiflowify(cyRef.current, 150, 0, aniDur, false);
+      beautiflowify({
+        cy: cyRef.current,
+        xSpacing: minXSpacing,
+        ySpacing: minYSpacing,
+        verticalTolerance: 330,
+        durMillis: aniDur,
+        watchAnimation: true,
+        annotations: {
+          move: moveAnnotations,
+          shiftValX: annosXBuffer,
+          shiftValY: annosYBuffer,
+        },
+      });
     }
   };
 
