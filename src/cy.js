@@ -1190,7 +1190,7 @@ export const beautiflowify = async ({
   ySpacing,
   verticalTolerance,
   durMillis,
-  watchAnimation,
+  isInstant,
   annotations,
 }) => {
   const cyBeforeRepositioning = await createCytoscapeGraphFromEles(
@@ -1414,50 +1414,56 @@ export const beautiflowify = async ({
              *
              */
 
-            /**
-             * =====================
-             *  Root Node Animation
-             * =====================
-             *
-             * color - white
-             *  and
-             * new position
-             *
-             */
             let rootColorAni;
-            const rootColorAniProm = new Promise((resolve, reject) => {
-              rootColorAni = v.animation(
-                {
-                  style: { backgroundColor: "brown" },
-                },
-                {
-                  duration: durMillis / 2,
-                  easing: "ease-out-quart",
-                  complete: () => {
-                    resolve("animating root " + vID);
-                  },
-                }
-              );
-            });
-
+            let rootColorAniProm;
             let rootAni;
-            const rootAniProm = new Promise((resolve, reject) => {
-              rootAni = v.animation(
-                {
-                  position: pos,
-                },
-                {
-                  duration: durMillis,
-                  complete: () => {
-                    resolve("animating root " + vID);
+            let rootAniProm;
+            if (isInstant) {
+              v.position(pos);
+            } else {
+              /**
+               * =====================
+               *  Root Node Animation
+               * =====================
+               *
+               * color - white
+               *  and
+               * new position
+               *
+               */
+              rootColorAniProm = new Promise((resolve, reject) => {
+                rootColorAni = v.animation(
+                  {
+                    style: { backgroundColor: "brown" },
                   },
-                }
-              );
-            });
+                  {
+                    duration: durMillis / 2,
+                    easing: "ease-out-quart",
+                    complete: () => {
+                      resolve("animating root " + vID);
+                    },
+                  }
+                );
+              });
+
+              rootAniProm = new Promise((resolve, reject) => {
+                rootAni = v.animation(
+                  {
+                    position: pos,
+                  },
+                  {
+                    duration: durMillis,
+                    complete: () => {
+                      resolve("animating root " + vID);
+                    },
+                  }
+                );
+              });
+            }
 
             updatedPos[vID] = pos;
 
-            if (watchAnimation) {
+            if (!isInstant) {
               currStepAnimations.rootID = vID;
               currStepAnimations.currID = vID;
               currStepAnimations.currIDDone = vID;
@@ -1467,10 +1473,11 @@ export const beautiflowify = async ({
               currStepAnimations.rootAni = rootAni;
               currStepAnimations.newRootPos = pos;
               animations.push(currStepAnimations);
-            } else {
-              v.delayAnimation(row * 10 + durMillis + 15);
-              rootAni.play();
             }
+            // else {
+            //   v.delayAnimation(row * 10 + durMillis + 15);
+            //   rootAni.play();
+            // }
             /**
              *
              *
@@ -1490,7 +1497,7 @@ export const beautiflowify = async ({
             // New x pos variable
             const posX = xSpacing + prevNewPosX;
 
-            if (watchAnimation) {
+            if (!isInstant) {
               const prevOutgoersUnvisited =
                 prevOutgoerNodes.difference(visitedNodes);
               const isPrevProcessingComplete = prevOutgoersUnvisited.size() > 1;
@@ -1694,50 +1701,51 @@ export const beautiflowify = async ({
 
             updatedPos[vID] = pos;
 
-            /**
-             * Color animation
-             */
-            let vColorAni;
-            const vColorAniProm = new Promise((resolve, reject) => {
-              vColorAni = v.animation(
-                {
-                  style: { backgroundColor: "purple" },
-                },
-                {
-                  duration: durMillis / 2,
-                  easing: "ease-out-quart",
-                  complete: () => {
-                    resolve("animating " + vID + "'s color to purple");
+            if (isInstant) {
+              v.position(pos);
+            } else {
+              /**
+               * Color animation
+               */
+              let vColorAni;
+              const vColorAniProm = new Promise((resolve, reject) => {
+                vColorAni = v.animation(
+                  {
+                    style: { backgroundColor: "purple" },
                   },
-                }
-              );
-            });
+                  {
+                    duration: durMillis / 2,
+                    easing: "ease-out-quart",
+                    complete: () => {
+                      resolve("animating " + vID + "'s color to purple");
+                    },
+                  }
+                );
+              });
 
-            /**
-             * Move animation
-             */
-            let vMoveAni;
-            const vMoveAniProm = new Promise((resolve, reject) => {
-              vMoveAni = v.animation(
-                {
-                  position: pos,
-                },
-                {
-                  duration: durMillis,
-                  easing: "ease-out-quart",
-                  complete: () => {
-                    resolve(
-                      "animating " +
-                        vID +
-                        "'s position to " +
-                        JSON.stringify(pos)
-                    );
+              /**
+               * Move animation
+               */
+              let vMoveAni;
+              const vMoveAniProm = new Promise((resolve, reject) => {
+                vMoveAni = v.animation(
+                  {
+                    position: pos,
                   },
-                }
-              );
-            });
-
-            if (watchAnimation) {
+                  {
+                    duration: durMillis,
+                    easing: "ease-out-quart",
+                    complete: () => {
+                      resolve(
+                        "animating " +
+                          vID +
+                          "'s position to " +
+                          JSON.stringify(pos)
+                      );
+                    },
+                  }
+                );
+              });
               // Add v's movement animation to current animations object
               currStepAnimations.vColorAniProm = vColorAniProm;
               currStepAnimations.vColorAni = vColorAni;
@@ -1746,12 +1754,13 @@ export const beautiflowify = async ({
               currStepAnimations.vMoveAni = vMoveAni;
               // Curr animations object to collective animations holder
               animations.push(currStepAnimations);
-            } else {
-              v.delayAnimation(row * 10 + durMillis + 25);
-              vColorAni.play();
-              v.delayAnimation(row * 10 + durMillis + 30);
-              vMoveAni.play();
             }
+            // } else {
+            //   v.delayAnimation(row * 10 + durMillis + 25);
+            //   vColorAni.play();
+            //   v.delayAnimation(row * 10 + durMillis + 30);
+            //   vMoveAni.play();
+            // }
             /**
              *
              */
@@ -1789,12 +1798,12 @@ export const beautiflowify = async ({
      *  Play animations one-by-one
      *
      */
-    if (watchAnimation) {
+    if (!isInstant) {
       await playNodeAnimationsOneByOne(cy, animations, durMillis, xSpacing);
-    }
 
-    // Emit event to update animation description to complete
-    emitStyleEventForExplainerText(cy, "Beautiflowifying", "", false, true);
+      // Emit event to update animation description to complete
+      emitStyleEventForExplainerText(cy, "Beautiflowifying", "", false, true);
+    }
     /**
      *
      *

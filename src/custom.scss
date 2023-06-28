@@ -20,16 +20,25 @@ $input-padding-x-lg: $input-btn-padding-x-lg;
 $input-btn-font-size-lg: 1.5rem;
 $input-font-size-lg: $input-btn-font-size-lg;
 $input-height-border: 0rem;
+
+$btn-font-size-sm: 0.5rem;
+$btn-padding-x: 0;
+$btn-padding-y: 0;
+
 $form-text-color: $primary;
 $form-label-color: $primary;
+
 $form-file-button-color: $primary;
 $form-file-button-bg: $light;
 $form-file-button-hover-bg: $success;
+
 $form-range-track-bg: $info;
 $form-range-thumb-width: 1rem;
 $form-range-thumb-height: 1.25rem;
 $form-range-thumb-bg: $secondary;
+
 $font-size-base: 1rem;
+
 $h1-font-size: $font-size-base * 2.5;
 $h2-font-size: $font-size-base * 2;
 $h3-font-size: $font-size-base * 1.75;

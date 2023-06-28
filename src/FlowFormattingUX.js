@@ -14,7 +14,6 @@ import Overlay from "react-bootstrap/Overlay";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import Badge from "react-bootstrap/Badge";
-import Container from "react-bootstrap/Container";
 import CustomToggle from "./CustomToggle.jsx";
 import { beautiflowify } from "./cy.js";
 
@@ -31,9 +30,10 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
   const [aniText, setAniText] = useState("Ready!");
   const [xSpacing, setXSpacing] = useState(150);
   const [ySpacing, setYSpacing] = useState(330);
-  const [annosXBuffer, setAnnosXBuffer] = useState(600);
-  const [annosYBuffer, setAnnosYBuffer] = useState(0);
+  const [annosXXtraShift, setAnnosXXtraShift] = useState(600);
+  const [annosYXtraShift, setAnnosYXtraShift] = useState(0);
   const [moveAnnotations, setMoveAnnotations] = useState(false);
+  const [isInstant, setIsInstant] = useState(false);
 
   const toggleAccordion = () => {
     const currAccState = !isAccordionOpen;
@@ -54,14 +54,18 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
     setMoveAnnotations(move);
   };
 
+  const onInstantToggleChange = (isInstant) => {
+    setIsInstant(isInstant);
+  };
+
   const onAnnosXBufferChange = (e) => {
     e.preventDefault();
-    setAnnosXBuffer(Number(e.currentTarget.value));
+    setAnnosXXtraShift(Number(e.currentTarget.value));
   };
 
   const onAnnosYBufferChange = (e) => {
     e.preventDefault();
-    setAnnosYBuffer(Number(e.currentTarget.value));
+    setAnnosYXtraShift(Number(e.currentTarget.value));
   };
 
   const onAnimationDurationChange = (e) => {
@@ -81,8 +85,8 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
     <Tooltip id="button-tooltip" className="text-light" {...props}>
       <p className="text-white">
         Switch the toggle on if you want to make sure that annotations and nodes
-        don't overlap. Additionally, you can control how far they are separated
-        via these values
+        don't overlap. Additionally, you can control an extra amount to shift
+        them (can even use negative numbers)
       </p>
     </Tooltip>
   );
@@ -109,14 +113,14 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
         watchAnimation: true,
         annotations: {
           move: moveAnnotations,
-          shiftValX: annosXBuffer,
-          shiftValY: annosYBuffer,
+          shiftValX: annosXXtraShift,
+          shiftValY: annosYXtraShift,
         },
       });
     }
   };
 
-  const watchBeautiflowify = (e) => {
+  const runBeautiflowify = (e) => {
     e.preventDefault();
 
     // Use min spacing values user-entered value is lower
@@ -134,20 +138,35 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
     }
 
     if (cyRef.current) {
-      // beautiflowify(cyRef.current, minXSpacing, 330, aniDur, true, minYSpacing);
       beautiflowify({
         cy: cyRef.current,
         xSpacing: minXSpacing,
         ySpacing: minYSpacing,
         verticalTolerance: 330,
         durMillis: aniDur,
-        watchAnimation: true,
+        isInstant,
         annotations: {
           move: moveAnnotations,
-          shiftValX: annosXBuffer,
-          shiftValY: annosYBuffer,
+          shiftValX: annosXXtraShift,
+          shiftValY: annosYXtraShift,
         },
       });
+      // if (isInstant) {
+      //   instaBeautiflowify({
+      //     cy: cyRef.current,
+      //     xSpacing: minXSpacing,
+      //     ySpacing: minYSpacing,
+      //     verticalTolerance: 330,
+      //     durMillis: aniDur,
+      //     watchAnimation: true,
+      //     annotations: {
+      //       move: moveAnnotations,
+      //       shiftValX: annosXBuffer,
+      //       shiftValY: annosYBuffer,
+      //     },
+      //   });
+      // } else {
+      // }
     }
   };
 
@@ -177,7 +196,7 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
 
   return (
     <Row className="h-100 p-0  m-0 ">
-      <Col className="h-100 p-1 m-0" xs={9} lg={10} id="cyContainerCol">
+      <Col className="h-100 p-1 m-0" xs={9} md={9} xl={10} id="cyContainerCol">
         <CytoscapeComponent
           id="cy"
           elements={elesForCyInit}
@@ -392,61 +411,73 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
           ]}
         />
       </Col>
-      <Col xs={3} lg={2} className="p-0 m-0">
-        <Row className="py-1 px-0 m-0">
-          <Col xs={12} className="px-0 py-3 m-0">
-            <Form className="px-0 m-0">
-              <Row className="pt-2 px-0 m-0 gap-1 justify-content-center">
-                <Col xs={12} className="p-0 m-0">
-                  <Row className="w-100 h-100 m-0 p-0">
-                    <Col xs={12} className="p-0 m-0 d-flex flex-column">
-                      <InputGroup>
-                        <Row className="w-100 m-0">
-                          <Col xs={6} className="p-0 ">
+
+      <Col id="mainSidebarConfigCol" xs={3} md={3} xl={2} className="p-0 m-0">
+        <Row id="formParentRow" className="p-0 m-0">
+          <Col id="formParentCol" xs={12} className="p-0 m-0">
+            <Form className="p-0 m-0">
+              <Row
+                id="innerFormRow"
+                className="p-0 m-0 gap-1 justify-content-center"
+              >
+                <Col id="nodeSpacingCol" xs={12} className="p-0 pt-3 m-0">
+                  <Row id="nodeSpacingInputGroupRow" className="w-100 m-0 p-0">
+                    <Col
+                      id="nodeXSpacingInputGroupCol"
+                      xs={12}
+                      className="p-0 m-0 d-flex"
+                    >
+                      <InputGroup
+                        id="nodeSpacingInputGroup"
+                        className="p-0 m-0"
+                      >
+                        <Row className="w-100 p-0 m-0">
+                          <Col xs={6} className="p-0 m-0">
                             <InputGroup.Text
                               id="label"
-                              className="bg-dark p-1 rounded-0 border-secondary"
+                              className="bg-dark p-0 m-0 rounded-0 border-secondary"
                             >
-                              <p className="fs-6 text-light w-100 text-wrap text-center p-0 m-0">
-                                Horizontal
-                                <br />
-                                Spacing{"  "}
+                              <p className="fs-7 text-light w-100 text-wrap text-center p-0 m-0">
+                                x-spacing
                               </p>
                             </InputGroup.Text>
                           </Col>
-                          <Col xs={6} className="p-0 h-100">
+                          <Col xs={6} className="p-0 m-0 h-100">
                             <Form.Control
                               id="xSpacing"
                               type="number"
                               value={xSpacing}
                               onChange={(e) => onXSpacingChange(e)}
-                              className="h-100 fs-6 text-center p-1 m-0 rounded-0 border-secondary"
+                              className="h-100 fs-6 text-center p-0 m-0 rounded-0 border-secondary"
                             ></Form.Control>
                           </Col>
                         </Row>
                       </InputGroup>
                     </Col>
-                    <Col xs={12} className="p-0 m-0 d-flex flex-column">
-                      <InputGroup>
-                        <Row className="w-100 m-0">
-                          <Col xs={6} className="p-0 ">
+                    <Col
+                      id="nodeYSpacingInputGroupCol"
+                      xs={12}
+                      className="p-0 m-0 d-flex"
+                    >
+                      <InputGroup className="p-0 m-0">
+                        <Row className="w-100 p-0 m-0">
+                          <Col xs={6} className="p-0 m-0">
                             <InputGroup.Text
                               id="label"
-                              className="bg-dark p-1 rounded-0 border-secondary"
+                              className="bg-dark p-0 m-0 rounded-0 border-secondary"
                             >
-                              <p className="fs-6 text-light w-100 text-wrap text-center p-0 m-0">
-                                Vertical
-                                <br /> Spacing
+                              <p className="fs-7 text-light w-100 text-wrap text-center p-0 m-0">
+                                y-spacing
                               </p>
                             </InputGroup.Text>
                           </Col>
-                          <Col xs={6} className="p-0 h-100">
+                          <Col xs={6} className="p-0 m-0 h-100">
                             <Form.Control
                               id="ySpacing"
                               type="number"
                               value={ySpacing}
                               onChange={(e) => onYSpacingChange(e)}
-                              className="h-100 fs-6 text-center p-1 m-0 rounded-0 border-secondary"
+                              className="h-100 fs-6 text-center p-0 m-0 rounded-0 border-secondary"
                             ></Form.Control>
                           </Col>
                         </Row>
@@ -467,7 +498,7 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                             {({ ref, ...triggerHandler }) => (
                               <Button
                                 {...triggerHandler}
-                                className="p-0 m-0 d-inline-flex align-items-center"
+                                className="p-0 m-0 d-inline-flex align-items-center rounded-5 border-0"
                               >
                                 <Badge
                                   ref={ref}
@@ -486,54 +517,63 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                   </Row>
                 </Col>
 
-                <Col xs={12} className="p-0 pt-4 m-0">
+                <Col id="moveAnnotationsCol" xs={12} className="p-0 m-0">
                   <Row className="w-100 h-100 m-0 p-0">
-                    <Col xs={12} className="p-0 pb-1 m-0 d-flex flex-column">
+                    <Col xs={12} className="p-0 m-0 d-flex flex-column">
+                      <Form.Text id="moveAnnotationsText" className="text-info">
+                        Move Annotations?
+                      </Form.Text>
                       <ToggleButtonGroup
                         type="radio"
                         name="options"
                         value={moveAnnotations}
                         onChange={onMoveAnnotationsChange}
+                        className="p-0 m-0"
+                        style={{ height: "1.5rem" }}
                       >
                         <ToggleButton
-                          id="toggle-on"
+                          id="moveAnnosToggleOn"
                           value={true}
                           variant="outline-success"
-                          className="rounded-0"
+                          className="rounded-0 p-0 m-0"
                         >
-                          On
+                          <p className="fs-10 text-light w-100 text-nowrap text-center p-0 m-0">
+                            On
+                          </p>
                         </ToggleButton>
                         <ToggleButton
-                          id="toggle-off"
+                          id="moveAnnosToggleOff"
                           value={false}
                           variant="outline-danger"
-                          className="rounded-0"
+                          className="rounded-0 fs-10 text-center p-0 m-0"
                         >
-                          Off
+                          <p className="fs-10 text-light w-100 text-nowrap text-center p-0 m-0">
+                            Off
+                          </p>
                         </ToggleButton>
                       </ToggleButtonGroup>
                     </Col>
-                    <Col xs={12} className="p-0 pb-1 m-0 d-flex flex-column">
+                    <Col xs={12} className="p-0 m-0 d-flex flex-column">
                       <InputGroup>
                         <Row className="w-100 m-0">
                           <Col xs={7} className="p-0 ">
                             <InputGroup.Text
                               id="label"
-                              className="bg-dark p-1 rounded-0 border-secondary"
+                              className="bg-dark p-0 rounded-0 border-secondary"
                             >
-                              <p className="fs-6 text-light w-100 text-wrap text-center p-0 m-0">
+                              <p className="fs-10 text-light w-100 text-nowrap text-center p-0 m-0">
                                 Annotations
-                                <br /> x-Buffer
+                                <br /> x-shift
                               </p>
                             </InputGroup.Text>
                           </Col>
                           <Col xs={5} className="p-0 h-100">
                             <Form.Control
-                              id="annosXBuffer"
+                              id="annosXExtraShiftValue"
                               type="number"
-                              value={annosXBuffer}
+                              value={annosXXtraShift}
                               onChange={(e) => onAnnosXBufferChange(e)}
-                              className="h-100 fs-6 text-center p-1 m-0 rounded-0 border-secondary"
+                              className="h-100 fs-6 text-center p-0 m-0 rounded-0 border-secondary"
                             ></Form.Control>
                           </Col>
                         </Row>
@@ -542,24 +582,24 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                     <Col xs={12} className="p-0 m-0 d-flex flex-column">
                       <InputGroup>
                         <Row className="w-100 m-0">
-                          <Col xs={7} className="p-0 ">
+                          <Col xs={7} className="p-0 m-0">
                             <InputGroup.Text
                               id="label"
-                              className="bg-dark p-1 rounded-0 border-secondary"
+                              className="bg-dark p-0 m-0 rounded-0 border-secondary"
                             >
-                              <p className="fs-6 text-light w-100 text-wrap text-center p-0 m-0">
+                              <p className="fs-10 text-light w-100 text-nowrap text-center p-0 m-0">
                                 Annotations
-                                <br /> y-Buffer
+                                <br /> y-shift
                               </p>
                             </InputGroup.Text>
                           </Col>
-                          <Col xs={5} className="p-0 h-100">
+                          <Col xs={5} className="p-0 m-0 h-100">
                             <Form.Control
-                              id="annosYBuffer"
+                              id="annosYExtraShiftValue"
                               type="number"
-                              value={annosYBuffer}
+                              value={annosYXtraShift}
                               onChange={(e) => onAnnosYBufferChange(e)}
-                              className="h-100 fs-6 text-center p-1 m-0 rounded-0 border-secondary"
+                              className="h-100 fs-6 text-center p-0 m-0 rounded-0 border-secondary"
                             ></Form.Control>
                           </Col>
                         </Row>
@@ -580,7 +620,7 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                             {({ ref, ...triggerHandler }) => (
                               <Button
                                 {...triggerHandler}
-                                className="p-0 m-0 d-inline-flex align-items-center"
+                                className="p-0 m-0 d-inline-flex align-items-center rounded-5 border-0"
                               >
                                 <Badge
                                   ref={ref}
@@ -599,7 +639,41 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                   </Row>
                 </Col>
 
-                <Col xs={12} className="p-0 pt-5 m-0">
+                <Col
+                  id="animationConfigCol"
+                  xs={12}
+                  className="p-0 m-0 d-flex flex-column"
+                >
+                  <Form.Text id="isInstantText" className="text-info">
+                    Instant?
+                  </Form.Text>
+                  <ToggleButtonGroup
+                    type="radio"
+                    name="isInstantToggleGroup"
+                    value={isInstant}
+                    onChange={setIsInstant}
+                    className="p-0 m-0"
+                    style={{ height: "1.5rem" }}
+                  >
+                    <ToggleButton
+                      id="instantToggleOn"
+                      value={true}
+                      variant="outline-success"
+                      className="rounded-0 fs-7 text-center p-0 m-0"
+                    >
+                      On
+                    </ToggleButton>
+                    <ToggleButton
+                      id="instantToggleOff"
+                      value={false}
+                      variant="outline-danger"
+                      className="rounded-0 fs-7 text-center p-0 m-0"
+                    >
+                      Off
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Col>
+                <Col xs={12} className="p-0 m-0">
                   <Form.Floating className="p-0">
                     <Form.Label
                       className="text-center pt-4"
@@ -620,7 +694,7 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                     />
                   </Form.Floating>
                 </Col>
-                <Col xs={12} className="p-0 pb-5 m-0 d-flex flex-column">
+                <Col xs={12} className="p-0 pb-3 m-0 d-flex flex-column">
                   <Row className="m-0 p-0">
                     <Col xs={10} className="m-0 p-0"></Col>
                     <Col xs={2} className="m-0 p-0 justify-content-end d-flex">
@@ -632,7 +706,7 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                         {({ ref, ...triggerHandler }) => (
                           <Button
                             {...triggerHandler}
-                            className="p-0 m-0 d-inline-flex align-items-center"
+                            className="p-0 m-0 d-inline-flex align-items-center rounded-5 border-0"
                           >
                             <Badge
                               ref={ref}
@@ -652,53 +726,64 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                 <Col xs={12} className="p-0 m-0">
                   <div className="d-grid w-100 p-0 m-0">
                     <Button
-                      variant="light"
+                      variant="secondary"
                       size="sm"
-                      onClick={(e) => watchBeautiflowify(e)}
+                      className="p-0 m-0 border-2 border-white"
+                      onClick={(e) => runBeautiflowify(e)}
                     >
-                      <p className="p-0 py-2 m-0 fs-5 fw-bold">Beautiflowify</p>
+                      <p className="p-0 py-1 m-0 display-8 text-body fw-bold fst-italic">
+                        Beautiflowify
+                      </p>
                     </Button>
                   </div>
                 </Col>
-                <Col xs={12} className="py-5 px-0">
+
+                <Col xs={12} className="p-0 m-0">
+                  <div className="d-grid">
+                    <Button
+                      variant="success"
+                      size="sm"
+                      className="p-0 m-0 border-2 border-black"
+                      onClick={(e) => exportToDVJSON(e)}
+                    >
+                      <p className="p-0 m-0 fs-5 fw-semibold text-center">
+                        Export
+                      </p>
+                    </Button>
+                  </div>
+                </Col>
+
+                <Col xs={12} className="p-0 pt-3 px-0">
                   <Form.Group controlId="formFileLg" className="">
                     <Form.Label className="text-light small m-0">
-                      Upload JSON
+                      Upload Different JSON
                     </Form.Label>
                     <Form.Control
                       type="file"
                       size="sm"
-                      style={{ backgroundColor: "var(--bs-dark)" }}
+                      className="dark"
                       onChange={(e) => loadFlowJSONFromFile(e)}
                     />
                   </Form.Group>
                 </Col>
-                <Col xs={12} className="pb-3 px-0">
+
+                <Col xs={12} className="p-0 pt-3 m-0">
                   <div className="d-grid gap-1">
                     <Button
-                      variant="outline-light"
+                      variant="danger"
                       size="sm"
-                      onClick={(e) => exportToDVJSON(e)}
-                    >
-                      Export
-                    </Button>
-                  </div>
-                </Col>
-                <Col xs={12} className="p-0">
-                  <div className="d-grid gap-1">
-                    <Button
-                      variant="outline-light"
-                      size="sm"
+                      className="p-0 m-0 opacity-75"
                       onClick={(e) => clear(e)}
                     >
-                      Clear
+                      <p className="p-0 m-0 fs-7 fw-semibold">Clear</p>
                     </Button>
                     <Button
-                      variant="outline-light"
+                      variant="warning"
                       size="sm"
+                      className="p-0 m-0 opacity-75"
                       onClick={(e) => reset(e)}
                     >
-                      Reset
+                      <p className="p-0 m-0 fs-7 fw-semibold">Reset</p>
                     </Button>
                   </div>
                 </Col>
@@ -706,7 +791,8 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
             </Form>
           </Col>
         </Row>
-        <Row className="p-0 m-0">
+
+        <Row className="p-0 pt-3 m-0">
           <Col
             xs={12}
             className="p-0 m-0 justify-content-end align-content-end"
@@ -744,13 +830,10 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
             </Accordion>
           </Col>
         </Row>
-        <Row className="align-content-end align-self-end">
-          <Col xs={12}>
-            <p className="text-info text-end fixed-bottom pe-5 mb-1">
-              <small>@dombrowski</small>
-            </p>
-          </Col>
-        </Row>
+
+        <p className="text-info text-end fixed-bottom pe-5 mb-1">
+          <small>@dombrowski</small>
+        </p>
       </Col>
     </Row>
   );
