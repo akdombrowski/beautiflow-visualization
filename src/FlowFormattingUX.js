@@ -435,7 +435,7 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                           <Col xs={6} className="p-0 m-0">
                             <InputGroup.Text
                               id="label"
-                              className="bg-dark p-0 m-0 rounded-0 border-secondary"
+                              className="bg-dark h-100 p-0 m-0 rounded-0 border-secondary"
                             >
                               <p className="fs-7 text-light w-100 text-wrap text-center p-0 m-0">
                                 x-spacing
@@ -464,7 +464,7 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                           <Col xs={6} className="p-0 m-0">
                             <InputGroup.Text
                               id="label"
-                              className="bg-dark p-0 m-0 rounded-0 border-secondary"
+                              className="bg-dark h-100 p-0 m-0 rounded-0 border-secondary"
                             >
                               <p className="fs-7 text-light w-100 text-wrap text-center p-0 m-0">
                                 y-spacing
@@ -537,7 +537,7 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                           variant="outline-success"
                           className="rounded-0 p-0 m-0"
                         >
-                          <p className="fs-10 text-light w-100 text-nowrap text-center p-0 m-0">
+                          <p className="fs-7 text-light w-100 text-nowrap text-center p-0 m-0">
                             On
                           </p>
                         </ToggleButton>
@@ -545,9 +545,9 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                           id="moveAnnosToggleOff"
                           value={false}
                           variant="outline-danger"
-                          className="rounded-0 fs-10 text-center p-0 m-0"
+                          className="rounded-0 text-center p-0 m-0"
                         >
-                          <p className="fs-10 text-light w-100 text-nowrap text-center p-0 m-0">
+                          <p className="fs-7 text-light w-100 text-nowrap text-center p-0 m-0">
                             Off
                           </p>
                         </ToggleButton>
@@ -559,9 +559,9 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                           <Col xs={7} className="p-0 ">
                             <InputGroup.Text
                               id="label"
-                              className="bg-dark p-0 rounded-0 border-secondary"
+                              className="bg-dark h-100 p-0 m-0 rounded-0 border-secondary"
                             >
-                              <p className="fs-10 text-light w-100 text-nowrap text-center p-0 m-0">
+                              <p className="fs-7 text-light w-100 text-nowrap text-center p-0 m-0">
                                 Annotations
                                 <br /> x-shift
                               </p>
@@ -585,9 +585,9 @@ const FlowFormattingUX = forwardRef(function FlowFormattingUX(
                           <Col xs={7} className="p-0 m-0">
                             <InputGroup.Text
                               id="label"
-                              className="bg-dark p-0 m-0 rounded-0 border-secondary"
+                              className="bg-dark h-100 p-0 m-0  rounded-0 border-secondary"
                             >
-                              <p className="fs-10 text-light w-100 text-nowrap text-center p-0 m-0">
+                              <p className="fs-7 text-light w-100 text-nowrap text-center p-0 m-0">
                                 Annotations
                                 <br /> y-shift
                               </p>
