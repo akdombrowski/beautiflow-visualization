@@ -407,48 +407,81 @@ export const getMinYNode = (nodes) => {
 };
 
 export const getMinXCyNode = (cyNodes) => {
-  const minXCyNode = cyNodes.min((ele, i, eles) => ele.position("x")).ele;
+  if (!cyNodes || !cyNodes.size()) {
+    return null;
+  }
+
+  const minX = cyNodes.min((ele, i, eles) => ele.position("x"));
+  const minXCyNode = minX.ele;
 
   return minXCyNode;
 };
 
 export const getMinYCyNode = (cyNodes) => {
+  if (!cyNodes || !cyNodes.size()) {
+    return null;
+  }
+
   const minYCyNode = cyNodes.min((ele, i, eles) => ele.position("y")).ele;
 
   return minYCyNode;
 };
 
 export const getMinXCyNodePos = (cyNodes) => {
+  if (!cyNodes || !cyNodes.size()) {
+    return null;
+  }
+
   const minXCyNodePos = getMinXCyNode(cyNodes).position("x");
 
   return minXCyNodePos;
 };
 
 export const getMinYCyNodePos = (cyNodes) => {
+  if (!cyNodes || !cyNodes.size()) {
+    return null;
+  }
+
   const minYCyNodePos = getMinYCyNode(cyNodes).position("y");
 
   return minYCyNodePos;
 };
 
 export const getMaxXCyNode = (cyNodes) => {
+  if (!cyNodes || !cyNodes.size()) {
+    return null;
+  }
+
   const minXCyNode = cyNodes.max((ele, i, eles) => ele.position("x")).ele;
 
   return minXCyNode;
 };
 
 export const getMaxYCyNode = (cyNodes) => {
+  if (!cyNodes || !cyNodes.size()) {
+    return null;
+  }
+
   const minYCyNode = cyNodes.max((ele, i, eles) => ele.position("y")).ele;
 
   return minYCyNode;
 };
 
 export const getMaxXCyNodePos = (cyNodes) => {
+  if (!cyNodes || !cyNodes.size()) {
+    return null;
+  }
+
   const maxXCyNodePos = getMaxXCyNode(cyNodes).position("x");
 
   return maxXCyNodePos;
 };
 
 export const getMaxYCyNodePos = (cyNodes) => {
+  if (!cyNodes || !cyNodes.size()) {
+    return null;
+  }
+
   const maxYCyNodePos = getMaxYCyNode(cyNodes).position("y");
 
   return maxYCyNodePos;
@@ -1173,11 +1206,19 @@ export const handleAnnos = async (cy, shiftValX, shiftValY) => {
   const maxYPos = getMaxYCyNodePos(nodesAfterFormatWOAnnos);
   const buffX = shiftValX || 600;
   const buffY = shiftValY || 0;
-  const sortedAnnos = sortNodes(annos);
-  const annosMinX = getMinXCyNodePos(sortedAnnos);
-  const annosMinY = getMinYCyNodePos(sortedAnnos);
-  const shiftValueX = buffX ? maxXPos - annosMinX + buffX : 0;
-  const shiftValueY = buffY ? maxYPos - annosMinY + buffY : 0;
+
+  let shiftValueX;
+  let shiftValueY;
+  if (annos) {
+    const sortedAnnos = sortNodes(annos);
+    const annosMinX = getMinXCyNodePos(sortedAnnos);
+    const annosMinY = getMinYCyNodePos(sortedAnnos);
+    shiftValueX = buffX ? maxXPos - annosMinX + buffX : 0;
+    shiftValueY = buffY ? maxYPos - annosMinY + buffY : 0;
+  } else {
+    shiftValueX = buffX;
+    shiftValueY = buffY;
+  }
 
   annos.shift({ x: shiftValueX, y: shiftValueY });
 
