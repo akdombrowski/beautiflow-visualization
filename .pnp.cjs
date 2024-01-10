@@ -38,9 +38,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-dom", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:18.2.0"],\
             ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:4.0.10"],\
             ["react-scripts", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.0.1"],\
-            ["sass", "npm:1.64.0"],\
+            ["sass", "npm:1.63.6"],\
             ["source-map-explorer", "npm:2.5.3"],\
-            ["web-vitals", "npm:3.4.0"]\
+            ["web-vitals", "npm:3.3.2"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -137,7 +137,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["debug", "virtual:ac3d8e680759ce54399273724d44e041d6c9b73454d191d411a8c44bb27e22f02aaf6ed9d3ad0ac1c298eac4833cff369c9c7b84c573016112c4f84be2cd8543#npm:4.3.4"],\
             ["gensync", "npm:1.0.0-beta.2"],\
             ["json5", "npm:2.2.3"],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -160,7 +160,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/eslint", null],\
             ["eslint", "npm:8.43.0"],\
             ["eslint-visitor-keys", "npm:2.1.0"],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "packagePeers": [\
             "@babel/core",\
@@ -222,7 +222,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/babel__core", null],\
             ["browserslist", "npm:4.21.9"],\
             ["lru-cache", "npm:5.1.1"],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "packagePeers": [\
             "@babel/core",\
@@ -306,7 +306,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["debug", "virtual:ac3d8e680759ce54399273724d44e041d6c9b73454d191d411a8c44bb27e22f02aaf6ed9d3ad0ac1c298eac4833cff369c9c7b84c573016112c4f84be2cd8543#npm:4.3.4"],\
             ["lodash.debounce", "npm:4.0.8"],\
             ["resolve", "patch:resolve@npm%3A1.22.3#~builtin<compat/resolve>::version=1.22.3&hash=c3c19d"],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "packagePeers": [\
             "@babel/core",\
@@ -2618,7 +2618,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["babel-plugin-polyfill-corejs2", "virtual:db6ed3fc91f226078b7e43ac861c252f12bee5477326e82b4b62bec53c09e53ceef865f60a2e6b5ca8006e98ee8556ed95cfc29906567e10f21eaef8f4c833aa#npm:0.4.3"],\
             ["babel-plugin-polyfill-corejs3", "virtual:db6ed3fc91f226078b7e43ac861c252f12bee5477326e82b4b62bec53c09e53ceef865f60a2e6b5ca8006e98ee8556ed95cfc29906567e10f21eaef8f4c833aa#npm:0.8.1"],\
             ["babel-plugin-polyfill-regenerator", "virtual:db6ed3fc91f226078b7e43ac861c252f12bee5477326e82b4b62bec53c09e53ceef865f60a2e6b5ca8006e98ee8556ed95cfc29906567e10f21eaef8f4c833aa#npm:0.5.0"],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "packagePeers": [\
             "@babel/core",\
@@ -2957,7 +2957,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["babel-plugin-polyfill-corejs3", "virtual:db6ed3fc91f226078b7e43ac861c252f12bee5477326e82b4b62bec53c09e53ceef865f60a2e6b5ca8006e98ee8556ed95cfc29906567e10f21eaef8f4c833aa#npm:0.8.1"],\
             ["babel-plugin-polyfill-regenerator", "virtual:db6ed3fc91f226078b7e43ac861c252f12bee5477326e82b4b62bec53c09e53ceef865f60a2e6b5ca8006e98ee8556ed95cfc29906567e10f21eaef8f4c833aa#npm:0.5.0"],\
             ["core-js-compat", "npm:3.31.0"],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "packagePeers": [\
             "@babel/core",\
@@ -6139,7 +6139,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.22.5"],\
             ["@babel/helper-define-polyfill-provider", "virtual:c2778d7f9bed258fc8e4e51d99d3a9f46b05b61aefbda2b322ccb4f6ed81d533edd7f0d0a24a745925b8bc53f67d537c120e952ea5081eadcb65eb1fb92a30bc#npm:0.4.0"],\
             ["@types/babel__core", null],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "packagePeers": [\
             "@babel/core",\
@@ -6346,9 +6346,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-dom", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:18.2.0"],\
             ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:4.0.10"],\
             ["react-scripts", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.0.1"],\
-            ["sass", "npm:1.64.0"],\
+            ["sass", "npm:1.63.6"],\
             ["source-map-explorer", "npm:2.5.3"],\
-            ["web-vitals", "npm:3.4.0"]\
+            ["web-vitals", "npm:3.3.2"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -8526,7 +8526,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["minimatch", "npm:3.1.2"],\
             ["object.values", "npm:1.1.6"],\
             ["resolve", "patch:resolve@npm%3A1.22.3#~builtin<compat/resolve>::version=1.22.3&hash=c3c19d"],\
-            ["semver", "npm:6.3.1"],\
+            ["semver", "npm:6.3.0"],\
             ["tsconfig-paths", "npm:3.14.2"]\
           ],\
           "packagePeers": [\
@@ -8598,7 +8598,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["minimatch", "npm:3.1.2"],\
             ["object.entries", "npm:1.1.6"],\
             ["object.fromentries", "npm:2.0.6"],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "packagePeers": [\
             "@types/eslint",\
@@ -8634,7 +8634,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["object.values", "npm:1.1.6"],\
             ["prop-types", "npm:15.8.1"],\
             ["resolve", "patch:resolve@npm%3A2.0.0-next.4#~builtin<compat/resolve>::version=2.0.0-next.4&hash=c3c19d"],\
-            ["semver", "npm:6.3.1"],\
+            ["semver", "npm:6.3.0"],\
             ["string.prototype.matchall", "npm:4.0.8"]\
           ],\
           "packagePeers": [\
@@ -9156,17 +9156,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["follow-redirects", [\
-        ["npm:1.15.2", {\
-          "packageLocation": "./.yarn/cache/follow-redirects-npm-1.15.2-1ec1dd82be-faa66059b6.zip/node_modules/follow-redirects/",\
+        ["npm:1.15.4", {\
+          "packageLocation": "./.yarn/cache/follow-redirects-npm-1.15.4-3384d6a415-e178d1deff.zip/node_modules/follow-redirects/",\
           "packageDependencies": [\
-            ["follow-redirects", "npm:1.15.2"]\
+            ["follow-redirects", "npm:1.15.4"]\
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:a313c479c5c7e54d9ec8fbeeea69ff640f56b8989ea2dff42351a3fa5c4061fb80a52d8ede0f0826a181a216820c2d2c3f15da881e7fdf31cef1c446e42f0c45#npm:1.15.2", {\
-          "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-2696a91c1b/0/cache/follow-redirects-npm-1.15.2-1ec1dd82be-faa66059b6.zip/node_modules/follow-redirects/",\
+        ["virtual:a313c479c5c7e54d9ec8fbeeea69ff640f56b8989ea2dff42351a3fa5c4061fb80a52d8ede0f0826a181a216820c2d2c3f15da881e7fdf31cef1c446e42f0c45#npm:1.15.4", {\
+          "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-035839a7fb/0/cache/follow-redirects-npm-1.15.4-3384d6a415-e178d1deff.zip/node_modules/follow-redirects/",\
           "packageDependencies": [\
-            ["follow-redirects", "virtual:a313c479c5c7e54d9ec8fbeeea69ff640f56b8989ea2dff42351a3fa5c4061fb80a52d8ede0f0826a181a216820c2d2c3f15da881e7fdf31cef1c446e42f0c45#npm:1.15.2"],\
+            ["follow-redirects", "virtual:a313c479c5c7e54d9ec8fbeeea69ff640f56b8989ea2dff42351a3fa5c4061fb80a52d8ede0f0826a181a216820c2d2c3f15da881e7fdf31cef1c446e42f0c45#npm:1.15.4"],\
             ["@types/debug", null],\
             ["debug", null]\
           ],\
@@ -9930,7 +9930,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["http-proxy", "npm:1.18.1"],\
             ["eventemitter3", "npm:4.0.7"],\
-            ["follow-redirects", "virtual:a313c479c5c7e54d9ec8fbeeea69ff640f56b8989ea2dff42351a3fa5c4061fb80a52d8ede0f0826a181a216820c2d2c3f15da881e7fdf31cef1c446e42f0c45#npm:1.15.2"],\
+            ["follow-redirects", "virtual:a313c479c5c7e54d9ec8fbeeea69ff640f56b8989ea2dff42351a3fa5c4061fb80a52d8ede0f0826a181a216820c2d2c3f15da881e7fdf31cef1c446e42f0c45#npm:1.15.4"],\
             ["requires-port", "npm:1.0.0"]\
           ],\
           "linkType": "HARD"\
@@ -10585,7 +10585,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/parser", "npm:7.22.5"],\
             ["@istanbuljs/schema", "npm:0.1.3"],\
             ["istanbul-lib-coverage", "npm:3.2.0"],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -11770,7 +11770,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/make-dir-npm-3.1.0-d1d7505142-484200020a.zip/node_modules/make-dir/",\
           "packageDependencies": [\
             ["make-dir", "npm:3.1.0"],\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -12525,7 +12525,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["levn", "npm:0.3.0"],\
             ["prelude-ls", "npm:1.1.2"],\
             ["type-check", "npm:0.3.2"],\
-            ["word-wrap", "npm:1.2.4"]\
+            ["word-wrap", "npm:1.2.3"]\
           ],\
           "linkType": "HARD"\
         }],\
@@ -15521,10 +15521,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["sass", [\
-        ["npm:1.64.0", {\
-          "packageLocation": "./.yarn/cache/sass-npm-1.64.0-637fa4382e-b4eb9b1bde.zip/node_modules/sass/",\
+        ["npm:1.63.6", {\
+          "packageLocation": "./.yarn/cache/sass-npm-1.63.6-f415fe5e15-3372319904.zip/node_modules/sass/",\
           "packageDependencies": [\
-            ["sass", "npm:1.64.0"],\
+            ["sass", "npm:1.63.6"],\
             ["chokidar", "npm:3.5.3"],\
             ["immutable", "npm:4.3.0"],\
             ["source-map-js", "npm:1.0.2"]\
@@ -15664,10 +15664,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["semver", [\
-        ["npm:6.3.1", {\
-          "packageLocation": "./.yarn/cache/semver-npm-6.3.1-bcba31fdbe-ae47d06de2.zip/node_modules/semver/",\
+        ["npm:6.3.0", {\
+          "packageLocation": "./.yarn/cache/semver-npm-6.3.0-b3eace8bfd-1b26ecf6db.zip/node_modules/semver/",\
           "packageDependencies": [\
-            ["semver", "npm:6.3.1"]\
+            ["semver", "npm:6.3.0"]\
           ],\
           "linkType": "HARD"\
         }],\
@@ -17240,10 +17240,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["web-vitals", [\
-        ["npm:3.4.0", {\
-          "packageLocation": "./.yarn/cache/web-vitals-npm-3.4.0-714b95cdb9-6baac51503.zip/node_modules/web-vitals/",\
+        ["npm:3.3.2", {\
+          "packageLocation": "./.yarn/cache/web-vitals-npm-3.3.2-0c12b7c63d-76e832341d.zip/node_modules/web-vitals/",\
           "packageDependencies": [\
-            ["web-vitals", "npm:3.4.0"]\
+            ["web-vitals", "npm:3.3.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -17580,10 +17580,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["word-wrap", [\
-        ["npm:1.2.4", {\
-          "packageLocation": "./.yarn/cache/word-wrap-npm-1.2.4-7a75a0d62c-8f1f2e0a39.zip/node_modules/word-wrap/",\
+        ["npm:1.2.3", {\
+          "packageLocation": "./.yarn/cache/word-wrap-npm-1.2.3-7fb15ab002-30b48f91fc.zip/node_modules/word-wrap/",\
           "packageDependencies": [\
-            ["word-wrap", "npm:1.2.4"]\
+            ["word-wrap", "npm:1.2.3"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -26691,7 +26691,6 @@ function reportRequiredFilesToWatchMode(files) {
 }
 
 function applyPatch(pnpapi, opts) {
-  const defaultCache = {};
   let enableNativeHooks = true;
   process.versions.pnp = String(pnpapi.VERSIONS.std);
   const moduleExports = require$$0__default.default;
@@ -26711,62 +26710,13 @@ function applyPatch(pnpapi, opts) {
   }
   const originalModuleLoad = require$$0.Module._load;
   require$$0.Module._load = function(request, parent, isMain) {
-    if (!enableNativeHooks)
-      return originalModuleLoad.call(require$$0.Module, request, parent, isMain);
-    if (isBuiltinModule(request)) {
-      try {
-        enableNativeHooks = false;
-        return originalModuleLoad.call(require$$0.Module, request, parent, isMain);
-      } finally {
-        enableNativeHooks = true;
+    if (request === `pnpapi`) {
+      const parentApiPath = opts.manager.getApiPathFromParent(parent);
+      if (parentApiPath) {
+        return opts.manager.getApiEntry(parentApiPath, true).instance;
       }
     }
-    const parentApiPath = opts.manager.getApiPathFromParent(parent);
-    const parentApi = parentApiPath !== null ? opts.manager.getApiEntry(parentApiPath, true).instance : null;
-    if (parentApi === null)
-      return originalModuleLoad(request, parent, isMain);
-    if (request === `pnpapi`)
-      return parentApi;
-    const modulePath = require$$0.Module._resolveFilename(request, parent, isMain);
-    const isOwnedByRuntime = parentApi !== null ? parentApi.findPackageLocator(modulePath) !== null : false;
-    const moduleApiPath = isOwnedByRuntime ? parentApiPath : opts.manager.findApiPathFor(npath.dirname(modulePath));
-    const entry = moduleApiPath !== null ? opts.manager.getApiEntry(moduleApiPath) : { instance: null, cache: defaultCache };
-    const cacheEntry = entry.cache[modulePath];
-    if (cacheEntry) {
-      if (cacheEntry.loaded === false && cacheEntry.isLoading !== true) {
-        try {
-          cacheEntry.isLoading = true;
-          if (isMain) {
-            process.mainModule = cacheEntry;
-            cacheEntry.id = `.`;
-          }
-          cacheEntry.load(modulePath);
-        } finally {
-          cacheEntry.isLoading = false;
-        }
-      }
-      return cacheEntry.exports;
-    }
-    const module = new require$$0.Module(modulePath, parent != null ? parent : void 0);
-    module.pnpApiPath = moduleApiPath;
-    reportRequiredFilesToWatchMode([modulePath]);
-    entry.cache[modulePath] = module;
-    if (isMain) {
-      process.mainModule = module;
-      module.id = `.`;
-    }
-    let hasThrown = true;
-    try {
-      module.isLoading = true;
-      module.load(modulePath);
-      hasThrown = false;
-    } finally {
-      module.isLoading = false;
-      if (hasThrown) {
-        delete require$$0.Module._cache[modulePath];
-      }
-    }
-    return module.exports;
+    return originalModuleLoad.call(require$$0.Module, request, parent, isMain);
   };
   function getIssuerSpecsFromPaths(paths) {
     return paths.map((path) => ({
@@ -26834,7 +26784,7 @@ function applyPatch(pnpapi, opts) {
       const parentDirectory = (parent == null ? void 0 : parent.filename) != null ? npath.dirname(parent.filename) : null;
       const absoluteRequest = npath.isAbsolute(request) ? request : parentDirectory !== null ? npath.resolve(parentDirectory, request) : null;
       if (absoluteRequest !== null) {
-        const apiPath = parentDirectory === npath.dirname(absoluteRequest) && (parent == null ? void 0 : parent.pnpApiPath) ? parent.pnpApiPath : opts.manager.findApiPathFor(absoluteRequest);
+        const apiPath = parent && parentDirectory === npath.dirname(absoluteRequest) ? opts.manager.getApiPathFromParent(parent) : opts.manager.findApiPathFor(absoluteRequest);
         if (apiPath !== null) {
           issuerSpecs.unshift({
             apiPath,
@@ -28555,7 +28505,6 @@ function makeManager(pnpapi, opts) {
   const initialApiStats = opts.fakeFs.statSync(npath.toPortablePath(initialApiPath));
   const apiMetadata = /* @__PURE__ */ new Map([
     [initialApiPath, {
-      cache: require$$0.Module._cache,
       instance: pnpapi,
       stats: initialApiStats,
       lastRefreshCheck: Date.now()
@@ -28587,7 +28536,6 @@ function makeManager(pnpapi, opts) {
       }
     } else {
       apiMetadata.set(pnpApiPath, apiEntry = {
-        cache: {},
         instance: loadApiInstance(pnpApiPath),
         stats: opts.fakeFs.statSync(pnpApiPath),
         lastRefreshCheck: Date.now()
@@ -28657,19 +28605,16 @@ ${controlSegment}
     } while (curr !== PortablePath.root);
     return addToCacheAndReturn(start, curr, null);
   }
+  const moduleToApiPathCache = /* @__PURE__ */ new WeakMap();
   function getApiPathFromParent(parent) {
     if (parent == null)
       return initialApiPath;
-    if (typeof parent.pnpApiPath === `undefined`) {
-      if (parent.filename !== null) {
-        return parent.pnpApiPath = findApiPathFor(parent.filename);
-      } else {
-        return initialApiPath;
-      }
-    }
-    if (parent.pnpApiPath !== null)
-      return parent.pnpApiPath;
-    return null;
+    let apiPath = moduleToApiPathCache.get(parent);
+    if (typeof apiPath !== `undefined`)
+      return apiPath;
+    apiPath = parent.filename ? findApiPathFor(parent.filename) : null;
+    moduleToApiPathCache.set(parent, apiPath);
+    return apiPath;
   }
   return {
     getApiPathFromParent,
