@@ -31,7 +31,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@popperjs/core", "npm:2.11.8"],\
             ["bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.3.0"],\
             ["clipboardy", "npm:3.0.0"],\
-            ["cytoscape", "npm:3.25.0"],\
+            ["cytoscape", "npm:3.30.2"],\
             ["react", "npm:18.2.0"],\
             ["react-bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.8.0"],\
             ["react-cytoscapejs", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.0.0"],\
@@ -6339,7 +6339,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@popperjs/core", "npm:2.11.8"],\
             ["bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.3.0"],\
             ["clipboardy", "npm:3.0.0"],\
-            ["cytoscape", "npm:3.25.0"],\
+            ["cytoscape", "npm:3.30.2"],\
             ["react", "npm:18.2.0"],\
             ["react-bootstrap", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.8.0"],\
             ["react-cytoscapejs", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.0.0"],\
@@ -7567,12 +7567,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["cytoscape", [\
-        ["npm:3.25.0", {\
-          "packageLocation": "./.yarn/cache/cytoscape-npm-3.25.0-73ca7c61ad-514ea396d9.zip/node_modules/cytoscape/",\
+        ["npm:3.30.2", {\
+          "packageLocation": "./.yarn/cache/cytoscape-npm-3.30.2-ffffb09f12-45ec8f256b.zip/node_modules/cytoscape/",\
           "packageDependencies": [\
-            ["cytoscape", "npm:3.25.0"],\
-            ["heap", "npm:0.2.7"],\
-            ["lodash", "npm:4.17.21"]\
+            ["cytoscape", "npm:3.30.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -9753,15 +9751,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/he-npm-1.2.0-3b73a2ff07-3d4d6babcc.zip/node_modules/he/",\
           "packageDependencies": [\
             ["he", "npm:1.2.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["heap", [\
-        ["npm:0.2.7", {\
-          "packageLocation": "./.yarn/cache/heap-npm-0.2.7-198a59506f-b0f3963a79.zip/node_modules/heap/",\
-          "packageDependencies": [\
-            ["heap", "npm:0.2.7"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -14828,7 +14817,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-cytoscapejs", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:2.0.0"],\
             ["@types/cytoscape", null],\
             ["@types/react", null],\
-            ["cytoscape", "npm:3.25.0"],\
+            ["cytoscape", "npm:3.30.2"],\
             ["prop-types", "npm:15.8.1"],\
             ["react", "npm:18.2.0"]\
           ],\
