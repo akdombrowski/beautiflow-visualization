@@ -38,7 +38,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-dom", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:18.2.0"],\
             ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:4.0.10"],\
             ["react-scripts", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.0.1"],\
-            ["sass", "npm:1.74.1"],\
+            ["sass", "npm:1.104.0"],\
             ["source-map-explorer", "npm:2.5.3"],\
             ["web-vitals", "npm:3.3.2"]\
           ],\
@@ -4015,6 +4015,140 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@parcel/watcher", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-npm-2.6.0-d7ed4997a9/node_modules/@parcel/watcher/",\
+          "packageDependencies": [\
+            ["@parcel/watcher", "npm:2.6.0"],\
+            ["@parcel/watcher-android-arm64", "npm:2.6.0"],\
+            ["@parcel/watcher-darwin-arm64", "npm:2.6.0"],\
+            ["@parcel/watcher-darwin-x64", "npm:2.6.0"],\
+            ["@parcel/watcher-freebsd-x64", "npm:2.6.0"],\
+            ["@parcel/watcher-linux-arm-glibc", "npm:2.6.0"],\
+            ["@parcel/watcher-linux-arm-musl", "npm:2.6.0"],\
+            ["@parcel/watcher-linux-arm64-glibc", "npm:2.6.0"],\
+            ["@parcel/watcher-linux-arm64-musl", "npm:2.6.0"],\
+            ["@parcel/watcher-linux-x64-glibc", "npm:2.6.0"],\
+            ["@parcel/watcher-linux-x64-musl", "npm:2.6.0"],\
+            ["@parcel/watcher-win32-arm64", "npm:2.6.0"],\
+            ["@parcel/watcher-win32-x64", "npm:2.6.0"],\
+            ["detect-libc", "npm:2.1.2"],\
+            ["is-glob", "npm:4.0.3"],\
+            ["node-addon-api", "npm:7.1.1"],\
+            ["node-gyp", "npm:9.4.0"],\
+            ["picomatch", "npm:4.0.7"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-android-arm64", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-android-arm64-npm-2.6.0-c7c9728129/node_modules/@parcel/watcher-android-arm64/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-android-arm64", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-darwin-arm64", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-darwin-arm64-npm-2.6.0-6e16c396ae/node_modules/@parcel/watcher-darwin-arm64/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-darwin-arm64", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-darwin-x64", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-darwin-x64-npm-2.6.0-136384ca5e/node_modules/@parcel/watcher-darwin-x64/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-darwin-x64", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-freebsd-x64", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-freebsd-x64-npm-2.6.0-d1c83b0c07/node_modules/@parcel/watcher-freebsd-x64/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-freebsd-x64", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-linux-arm-glibc", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-linux-arm-glibc-npm-2.6.0-016972521a/node_modules/@parcel/watcher-linux-arm-glibc/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-linux-arm-glibc", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-linux-arm-musl", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-linux-arm-musl-npm-2.6.0-04ac4c4562/node_modules/@parcel/watcher-linux-arm-musl/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-linux-arm-musl", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-linux-arm64-glibc", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-linux-arm64-glibc-npm-2.6.0-6c94a153b0/node_modules/@parcel/watcher-linux-arm64-glibc/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-linux-arm64-glibc", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-linux-arm64-musl", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-linux-arm64-musl-npm-2.6.0-b8931e8c52/node_modules/@parcel/watcher-linux-arm64-musl/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-linux-arm64-musl", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-linux-x64-glibc", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-linux-x64-glibc-npm-2.6.0-e9a3058888/node_modules/@parcel/watcher-linux-x64-glibc/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-linux-x64-glibc", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-linux-x64-musl", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-linux-x64-musl-npm-2.6.0-fc96ce1b1c/node_modules/@parcel/watcher-linux-x64-musl/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-linux-x64-musl", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-win32-arm64", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-win32-arm64-npm-2.6.0-a9b6592591/node_modules/@parcel/watcher-win32-arm64/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-win32-arm64", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@parcel/watcher-win32-x64", [\
+        ["npm:2.6.0", {\
+          "packageLocation": "./.yarn/unplugged/@parcel-watcher-win32-x64-npm-2.6.0-603748a51f/node_modules/@parcel/watcher-win32-x64/",\
+          "packageDependencies": [\
+            ["@parcel/watcher-win32-x64", "npm:2.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@pkgjs/parseargs", [\
         ["npm:0.11.0", {\
           "packageLocation": "./.yarn/cache/@pkgjs-parseargs-npm-0.11.0-cd2a3fe948-6ad6a00fc4.zip/node_modules/@pkgjs/parseargs/",\
@@ -6346,7 +6480,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-dom", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:18.2.0"],\
             ["react-error-boundary", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:4.0.10"],\
             ["react-scripts", "virtual:f07b1648c101a0421cada5316861e2a7e02806a676c7a965e963127f1fc146d22af54dbeb4d404f6d1f6045fc69c82318c44e1bb8d5f7f36b54dd4a38d74bcf7#npm:5.0.1"],\
-            ["sass", "npm:1.74.1"],\
+            ["sass", "npm:1.104.0"],\
             ["source-map-explorer", "npm:2.5.3"],\
             ["web-vitals", "npm:3.3.2"]\
           ],\
@@ -6729,6 +6863,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["is-glob", "npm:4.0.3"],\
             ["normalize-path", "npm:3.0.0"],\
             ["readdirp", "npm:3.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:5.0.0", {\
+          "packageLocation": "./.yarn/cache/chokidar-npm-5.0.0-2f70d31c86-48c0d510d8.zip/node_modules/chokidar/",\
+          "packageDependencies": [\
+            ["chokidar", "npm:5.0.0"],\
+            ["readdirp", "npm:5.1.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -7777,6 +7919,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/destroy-npm-1.2.0-6a511802e2-0acb300b74.zip/node_modules/destroy/",\
           "packageDependencies": [\
             ["destroy", "npm:1.2.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["detect-libc", [\
+        ["npm:2.1.2", {\
+          "packageLocation": "./.yarn/cache/detect-libc-npm-2.1.2-d0c382b1e2-471740d523.zip/node_modules/detect-libc/",\
+          "packageDependencies": [\
+            ["detect-libc", "npm:2.1.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -10091,10 +10242,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["immutable", [\
-        ["npm:4.3.0", {\
-          "packageLocation": "./.yarn/cache/immutable-npm-4.3.0-6120b6947c-bbd7ea99e2.zip/node_modules/immutable/",\
+        ["npm:5.1.9", {\
+          "packageLocation": "./.yarn/cache/immutable-npm-5.1.9-35365e455d-e24d57cfb1.zip/node_modules/immutable/",\
           "packageDependencies": [\
-            ["immutable", "npm:4.3.0"]\
+            ["immutable", "npm:5.1.9"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -12202,6 +12353,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["node-addon-api", [\
+        ["npm:7.1.1", {\
+          "packageLocation": "./.yarn/unplugged/node-addon-api-npm-7.1.1-bfb302df19/node_modules/node-addon-api/",\
+          "packageDependencies": [\
+            ["node-addon-api", "npm:7.1.1"],\
+            ["node-gyp", "npm:9.4.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["node-forge", [\
         ["npm:1.3.1", {\
           "packageLocation": "./.yarn/cache/node-forge-npm-1.3.1-f31fd566cc-08fb072d3d.zip/node_modules/node-forge/",\
@@ -12782,6 +12943,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/picomatch-npm-2.3.1-c782cfd986-050c865ce8.zip/node_modules/picomatch/",\
           "packageDependencies": [\
             ["picomatch", "npm:2.3.1"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:4.0.7", {\
+          "packageLocation": "./.yarn/cache/picomatch-npm-4.0.7-2906b103fe-a97edd7659.zip/node_modules/picomatch/",\
+          "packageDependencies": [\
+            ["picomatch", "npm:4.0.7"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -15138,6 +15306,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["picomatch", "npm:2.3.1"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:5.1.1", {\
+          "packageLocation": "./.yarn/cache/readdirp-npm-5.1.1-b7e741d672-0444f42c71.zip/node_modules/readdirp/",\
+          "packageDependencies": [\
+            ["readdirp", "npm:5.1.1"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["recursive-readdir", [\
@@ -15521,12 +15696,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["sass", [\
-        ["npm:1.74.1", {\
-          "packageLocation": "./.yarn/cache/sass-npm-1.74.1-8ef77a6612-3cbcd73d91.zip/node_modules/sass/",\
+        ["npm:1.104.0", {\
+          "packageLocation": "./.yarn/cache/sass-npm-1.104.0-72b5fb723b-c95bb1be78.zip/node_modules/sass/",\
           "packageDependencies": [\
-            ["sass", "npm:1.74.1"],\
-            ["chokidar", "npm:3.5.3"],\
-            ["immutable", "npm:4.3.0"],\
+            ["sass", "npm:1.104.0"],\
+            ["@parcel/watcher", "npm:2.6.0"],\
+            ["chokidar", "npm:5.0.0"],\
+            ["immutable", "npm:5.1.9"],\
             ["source-map-js", "npm:1.0.2"]\
           ],\
           "linkType": "HARD"\
