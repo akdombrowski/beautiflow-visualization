@@ -4133,11 +4133,11 @@ __metadata:
   linkType: hard
 
 "bootstrap@npm:^5.3.0":
-  version: 5.3.0
-  resolution: "bootstrap@npm:5.3.0"
+  version: 5.3.9
+  resolution: "bootstrap@npm:5.3.9"
   peerDependencies:
-    "@popperjs/core": ^2.11.7
-  checksum: 29a83cc8cac96d70051e265a5da342cc488df8fc76dff6746ef7d155698286cd5bdfa3e52c6ebf09f8e5a97f25929ee97aee36237117732e52b0d3276a72c45c
+    "@popperjs/core": ^2.11.8
+  checksum: b158efee8f1fee6f8747fc7175ecd164df24ccaf90a547fdd6b28eef9bb188e1c2f3ec2f25b7da8d438e7818e9dcbf7966d3b0df77b2807c11bc2c0954f74da7
   languageName: node
   linkType: hard
 
